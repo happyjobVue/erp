@@ -27,11 +27,12 @@ const { totalItems, itemsPerPage, maxPagesShown, onClick } = defineProps([
     list-style-type: none;
 }
 .paginate-buttons {
-    height: 40px;
-    width: 40px;
-    border-radius: 20px;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
     cursor: pointer;
     background-color: rgb(242, 242, 242);
+    align-items: center;
     border: 1px solid rgb(217, 217, 217);
     color: black;
 }

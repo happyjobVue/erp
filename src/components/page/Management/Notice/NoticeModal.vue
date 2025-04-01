@@ -2,10 +2,10 @@
     <teleport to="body">
         <div class="backdrop">
             <div class="container">
-                <label> 제목 :<input type="text" /> </label>
+                <label> 제목 :<input type="text" v-model="noticeDetail.title" /> </label>
                 <label>
                     내용 :
-                    <input type="text" />
+                    <textarea v-model="noticeDetail.content" class="textContent"></textarea>
                 </label>
                 파일 :<input type="file" style="display: none" id="fileInput" />
                 <label class="img-label" htmlFor="fileInput">
@@ -18,18 +18,108 @@
                     </div>
                 </div>
                 <div class="button-box">
-                    <button>저장</button>
-                    <button>삭제</button>
-                    <button>나가기</button>
+                    <button @click="id ? noticeUpdate() : noticeSave()">{{ id ? '수정' : '저장' }}</button>
+                    <button v-if="id" @click="noticeDelete">삭제</button>
+                    <button @click="setModalState">나가기</button>
                 </div>
             </div>
         </div>
     </teleport>
 </template>
 
-<script setup></script>
+<script setup>
+import { onMounted, onUnmounted } from 'vue';
+import { useModalStore } from '../../../../stores/modalState'
+import axios from 'axios'
+const { setModalState } = useModalStore();
+const { id } = defineProps(['id'])
+const emit = defineEmits(['modalClose', 'postSuccess'])
+const noticeDetail = ref({})
+
+const searchDetail = async () => {
+
+    try {
+        const response = await axios.post('/api/management/noticeDetailJson.do', { noticeId: id })
+        noticeDetail.value = response.data.detailValue
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+const noticeSave = async () => {
+    const param = new URLSearchParams(noticeDetail.value)
+    try {
+        const res = await axios.post('/api/management/noticeSave.do', param)
+        if (res.data.result === 'success') {
+            emit('postSuccess')
+        } else {
+            alert("저장 실패")
+        }
+    } catch (e) {
+        console.error(e);
+    }
+
+}
+
+const noticeUpdate = async () => {
+    const param = new URLSearchParams(noticeDetail.value)
+    param.append("noticeId", id)
+    try {
+        const res = await axios.post('/api/management/noticeUpdate.do', param)
+        if (res.data.result === 'success') {
+            emit('postSuccess')
+        } else {
+            alert("업데이트 실패")
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+const noticeDelete = async () => {
+    try {
+        const res = await axios.post('/api/management/noticeDeleteJson.do', { noticeId: id })
+        if (res.data.result === 'success') {
+            emit('postSuccess')
+        } else {
+            alert("삭제 실패")
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+
+onMounted(() => {
+    id && searchDetail()
+})
+
+onUnmounted(() => {
+    emit('modalClose', 0)
+})
+
+</script>
 
 <style lang="scss" scoped>
+.textContent {
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    font-size: 13px;
+    box-sizing: border-box;
+    min-height: 150px;
+    width: 100%;
+    resize: vertical;
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
+    overflow: auto;
+    border: 1px solid #ccc;
+    display: block;
+}
+
 .backdrop {
     top: 0%;
     left: 0%;
@@ -96,6 +186,7 @@ img {
     text-align: right;
     margin-top: 10px;
 }
+
 button {
     background-color: #3bb2ea;
     border: none;

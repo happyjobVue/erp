@@ -1,16 +1,40 @@
 <template>
     <div class="search-box">
         <!-- v-model을 이용하여 양방향 바인딩을 쉽게 할 수 있다. -->
-        <input />
-        <input type="date" />
-        <input type="date" />
+        <input v-model.lazy="searchTitle" />
+        <input type="date" v-model="searchStDate" />
+        <input type="date" v-model="searchEdDate" />
         <!-- v-on:click="" 또는 @click=""으로 이벤트를 설정한다. -->
-        <button>검색</button>
-        <button>신규등록</button>
+        <button @click="handleSearch">검색</button>
+        <button @click="setModalState">신규등록</button>
     </div>
 </template>
 <!-- setup을 적어야 Composition API를 사용할 수 있다.  -->
-<script setup></script>
+<script setup>
+import router from '@/router';
+import { onMounted } from 'vue';
+import { useModalStore } from '../../../../stores/modalState'
+const { setModalState } = useModalStore();
+const searchTitle = ref('');
+const searchStDate = ref('');
+const searchEdDate = ref('');
+
+const handleSearch = () => {
+    const query = []
+    !searchTitle.value || query.push(`searchTitle=${searchTitle.value}`)
+    !searchStDate.value || query.push(`searchStDate=${searchStDate.value}`)
+    !searchEdDate.value || query.push(`searchEdDate=${searchEdDate.value}`)
+    const queryString = query.length > 0 ? `?${query.join('&')}` : ''
+
+    router.push(queryString)
+}
+
+// 새로고침 시 queryParam 삭제
+onMounted(() => {
+    window.location.search && router.replace(window.location.pathname)
+})
+
+</script>
 
 <style lang="scss" scoped>
 .search-box {

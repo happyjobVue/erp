@@ -1,6 +1,8 @@
 <template>
     <div class="divNoticeList">
-        현재 페이지:  총 개수:  
+        <NoticeModal v-if="modal.modalState" :id="noticeId" @modalClose="noticeId = $event"
+            @postSuccess="onPostSuccess" />
+        현재 페이지: 총 개수: {{ noticeList?.noticeCnt }}
         <table>
             <colgroup>
                 <col width="10%" />
@@ -18,15 +20,71 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="7">일치하는 검색 결과가 없습니다</td>
-                </tr>
+                <template v-if="noticeList">
+                    <template v-if="noticeList.noticeCnt > 0">
+                        <tr v-for="notice in noticeList.noticeList" :key="notice.noticeId"
+                            @click="handlerModal(notice.noticeId)">
+                            <td>{{ notice.noticeId }}</td>
+                            <td>{{ notice.title }}</td>
+                            <td>{{ notice.createdDate.substr(0, 10) }}</td>
+                            <td>{{ notice.author }}</td>
+                        </tr>
+                    </template>
+                    <template v-else>
+                        <tr>
+                            <td colspan="7">일치하는 검색 결과가 없습니다</td>
+                        </tr>
+                    </template>
+                </template>
             </tbody>
         </table>
+        <Pagination :totalItems="noticeList?.noticeCnt" :items-per-page="5" :max-pages-shown="10" :onClick="searchList"
+            v-model="cPage" />
     </div>
 </template>
 
 <script setup>
+import axios from 'axios'
+import { watch } from 'vue'
+import { useModalStore } from '../../../../stores/modalState'
+const route = useRoute()
+const noticeList = ref()
+const modal = useModalStore()
+const noticeId = ref(0)
+const cPage = ref(1)
+
+
+const searchList = async () => {
+    const param = new URLSearchParams({
+        ...route.query,
+        pageSize: 5,
+        currentPage: cPage.value,
+    })
+
+    try {
+        const response = await axios.post('/api/management/noticeListBody.do', param)
+        noticeList.value = response.data
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+const handlerModal = (id) => {
+    noticeId.value = id
+    modal.setModalState();
+}
+
+const onPostSuccess = () => {
+    modal.setModalState()
+    searchList()
+}
+
+onMounted(() => {
+    searchList()
+})
+
+watch(() => route.query, searchList)
+
 </script>
 
 <style lang="scss" scoped>
@@ -35,13 +93,11 @@ table {
     border-collapse: collapse;
     margin: 20px 0px 0px 0px;
     font-size: 18px;
-    text-align: left;
 
     th,
     td {
         padding: 8px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
+        border: 1px solid #ddd;
         text-align: center;
     }
 

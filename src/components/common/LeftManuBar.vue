@@ -1,36 +1,20 @@
 <template>
-    <a href="">
-        <img :src="logo" alt="happyjob" />
-    </a>
+    <img :src="logo" alt="happyjob" class="home" />
     <div class="logo-box">
-        <img :src="vue_logo" alt="logoImage" />
+        <img :src="noAvatar" alt="logoImage" class="profileImage" />
         <div class="user-info">
             <div>{{ userInfo.user.loginId }}</div>
             <button @click="handlerLogout">로그아웃</button>
         </div>
     </div>
     <ul>
-        <li
-            v-for="menu in userInfo.user.usrMnuAtrt"
-            :key="menu.grp_num"
-            class="parent-menu"
-        >
+        <li v-for="menu in userInfo.user.usrMnuAtrt" :key="menu.grp_num" class="parent-menu">
             {{ menu.mnu_nm }}
-            <div
-                class="child-menu-box"
-                @click="handlerClick(menu.mnu_id, $event)"
-                :id="menu.mnu_id"
-            >
+            <div class="child-menu-box" @click="handlerClick(menu.mnu_id, $event)" :id="menu.mnu_id">
                 <template v-for="node in menu.nodeList" :key="node.mnu_id">
-                    <router-link
-                        :to="'/vue' + node.mnu_url"
-                        class="router-link"
-                    >
-                        <div
-                            class="child-menu-link"
-                            :id="node.mnu_id"
-                            @click="handlerMenuLinkClick(node.mnu_id, $event)"
-                        >
+                    <router-link :to="'/vue' + node.mnu_url" class="router-link">
+                        <div class="child-menu-link" :id="node.mnu_id"
+                            @click="handlerMenuLinkClick(node.mnu_id, $event)">
                             {{ node.mnu_nm }}
                         </div>
                     </router-link>
@@ -43,7 +27,7 @@
 <script setup>
 import { useUserInfo } from '@/stores/userInfo';
 import logo from '../../assets/logo.png';
-import vue_logo from '../../assets/vue_logo.png';
+import noAvatar from '../../assets/noAvatar.png';
 
 const userInfo = useUserInfo();
 const router = useRouter();
@@ -85,8 +69,14 @@ const handlerLogout = () => {
 </script>
 
 <style lang="scss" scoped>
-a {
+.home {
     cursor: pointer;
+}
+
+.profileImage {
+
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 button {
@@ -102,10 +92,12 @@ button {
         background-color 0.3s,
         transform 0.2s;
 }
+
 button:hover {
     background-color: #ffffff;
     transform: translateY(-2px);
 }
+
 button:active {
     background-color: ivory;
     transform: translateY(0);
@@ -118,8 +110,8 @@ button:active {
     img {
         top: 22px;
         left: 14px;
-        width: 66px;
-        height: 66px;
+        width: 70px;
+        height: 70px;
         padding: 10px;
     }
 
@@ -141,12 +133,14 @@ ul {
 .parent-menu {
     font-weight: bold;
     padding-top: 30px;
+    padding-left: 5px;
     padding-bottom: 20px;
     border-bottom: 1px solid #d6effc;
     color: #602e2e;
 
     &:hover {
         transition: 1s;
+
         .child-menu-box {
             opacity: 1;
             display: block;
@@ -163,7 +157,7 @@ ul {
             visibility 0s;
         background: #2e9acc;
         height: 0;
-        padding-left: 20px;
+        padding-left: 8px;
         padding-top: 10px;
         padding-bottom: 10px;
         margin: 0;
@@ -172,8 +166,8 @@ ul {
 
         div {
             margin: 10px 0 10px 0;
+
             &:hover {
-                text-decoration: underline;
                 color: white;
                 cursor: pointer;
             }
