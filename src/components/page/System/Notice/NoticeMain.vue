@@ -1,7 +1,11 @@
 <template>
     <div class="divNoticeList">
-        <NoticeModal v-if="modal.modalState" :id="noticeId" @modalClose="noticeId = $event"
-            @postSuccess="onPostSuccess" />
+        <NoticeModal
+            v-if="modal.modalState"
+            :id="noticeId"
+            @modalClose="noticeId = $event"
+            @postSuccess="onPostSuccess"
+        />
         <table>
             <colgroup>
                 <col width="10%" />
@@ -21,8 +25,11 @@
             <tbody>
                 <template v-if="noticeList">
                     <template v-if="noticeList.noticeCnt > 0">
-                        <tr v-for="notice in noticeList.noticeList" :key="notice.notiSeq
-                            " @click="handlerModal(notice.notiSeq)">
+                        <tr
+                            v-for="notice in noticeList.noticeList"
+                            :key="notice.notiSeq"
+                            @click="handlerModal(notice.notiSeq)"
+                        >
                             <td>{{ notice.notiSeq }}</td>
                             <td>{{ notice.notiTitle }}</td>
                             <td>{{ notice.notiDate }}</td>
@@ -37,53 +44,60 @@
                 </template>
             </tbody>
         </table>
-        <Pagination :totalItems="noticeList?.noticeCnt" :items-per-page="5" :max-pages-shown="10" :onClick="searchList"
-            v-model="cPage" />
+        <Pagination
+            :totalItems="noticeList?.noticeCnt"
+            :items-per-page="5"
+            :max-pages-shown="10"
+            :onClick="searchList"
+            v-model="cPage"
+        />
     </div>
 </template>
 
 <script setup>
-import axios from 'axios'
-import { watch } from 'vue'
-import { useModalStore } from '../../../../stores/modalState'
-const route = useRoute()
-const noticeList = ref()
-const modal = useModalStore()
-const noticeId = ref(0)
-const cPage = ref(1)
+import axios from 'axios';
+import { watch } from 'vue';
+import { useModalStore } from '../../../../stores/modalState';
+const route = useRoute();
+const noticeList = ref();
+const modal = useModalStore();
+const noticeId = ref(0);
+const cPage = ref(1);
 
 const searchList = async () => {
     const param = new URLSearchParams({
         ...route.query,
         pageSize: 5,
         currentPage: cPage.value,
-    })
+    });
 
     try {
-        const response = await axios.post('/api/system/noticeListBody.do', param)
-        console.log(response.data)
-        noticeList.value = response.data
+        const response = await axios.post(
+            '/api/system/noticeListBody.do',
+            param
+        );
+        console.log(response.data);
+        noticeList.value = response.data;
     } catch (e) {
         console.error(e);
     }
-}
+};
 
-const handlerModal = (id) => {
-    noticeId.value = id
+const handlerModal = id => {
+    noticeId.value = id;
     modal.setModalState();
-}
+};
 
 const onPostSuccess = () => {
-    modal.setModalState()
-    searchList()
-}
+    modal.setModalState();
+    searchList();
+};
 
 onMounted(() => {
-    searchList()
-})
+    searchList();
+});
 
-watch(() => route.query, searchList)
-
+watch(() => route.query, searchList);
 </script>
 
 <style lang="scss" scoped>
