@@ -7,18 +7,17 @@
                     내용 :
                     <textarea v-model="noticeDetail.content" class="textContent"></textarea>
                 </label>
-                파일 :<input type="file" style="display: none" id="fileInput" />
+                파일 :<input type="file" style="display: none" id="fileInput" @change="fileHandler" />
                 <label class="img-label" htmlFor="fileInput">
                     파일 첨부하기
                 </label>
                 <div>
-                    <div>
-                        <label>미리보기</label>
-                        <img />
+                    <div @click="downloadFileImage">
+                        <img v-if="imgUrl" :src="imgUrl" />
                     </div>
                 </div>
                 <div class="button-box">
-                    <button @click="id ? noticeUpdate() : noticeSave()">{{ id ? '수정' : '저장' }}</button>
+                    <button @click="id ? noticeFileUpdate() : noticeFileSave()">{{ id ? '수정' : '저장' }}</button>
                     <button v-if="id" @click="noticeDelete">삭제</button>
                     <button @click="setModalState">나가기</button>
                 </div>
@@ -29,20 +28,60 @@
 
 <script setup>
 import { onMounted, onUnmounted } from 'vue';
+import { useUserInfo } from '../../../../stores/userInfo';
 import { useModalStore } from '../../../../stores/modalState'
 import axios from 'axios'
+
+
 const { setModalState } = useModalStore();
 const { id } = defineProps(['id'])
 const emit = defineEmits(['modalClose', 'postSuccess'])
 const noticeDetail = ref({})
+const userInfo = useUserInfo()
+const imgUrl = ref('')
+const fileData = ref('')
 
 const searchDetail = async () => {
-
     try {
-        const response = await axios.post('/api/management/noticeDetailJson.do', { noticeId: id })
+        const response = await axios.post('/api/management/noticeFileDetailBody.do', { noticeId: id })
         noticeDetail.value = response.data.detailValue
+        if (noticeDetail.value.fileExt === 'png' || noticeDetail.value.fileExt === 'jpg' || noticeDetail.value.fileExt === "gif" || noticeDetail.value.fileExt === "jpeg") {
+            getFileImage()
+        }
+
     } catch (e) {
         console.error(e);
+    }
+}
+
+const getFileImage = async () => {
+    const param = new URLSearchParams();
+    param.append('noticeId', id)
+    try {
+        const res = await axios.post('/api/management/noticeDownload.do', param, { responseType: 'blob' })
+        const url = window.URL.createObjectURL(new Blob([res.data]))
+        imgUrl.value = url
+
+    } catch (e) {
+        console.error(e)
+    }
+}
+
+
+const downloadFileImage = async () => {
+    const param = new URLSearchParams();
+    param.append('noticeId', id)
+    try {
+        const res = await axios.post('/api/management/noticeDownload.do', param, { responseType: 'blob' })
+        const url = window.URL.createObjectURL(new Blob([res.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', noticeDetail.value.fileName)
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+    } catch (e) {
+        console.error(e)
     }
 }
 
@@ -61,6 +100,56 @@ const noticeSave = async () => {
 
 }
 
+const noticeFileSave = async () => {
+    const textData = {
+        fileContent: noticeDetail.value.content,
+        fileTitle: noticeDetail.value.title,
+        loginId: userInfo.user.loginId
+    }
+    const formData = new FormData()
+    formData.append('text', new Blob([JSON.stringify(textData)], { type: 'application/json' }))
+    if (fileData.value) {
+        formData.append('file', fileData.value)
+    }
+    try {
+        const res = await axios.post('/api/management/noticeSaveFileForm.do', formData)
+        if (res.data.result === 'success') {
+            emit('postSuccess')
+        } else {
+            alert("저장 실패")
+        }
+    } catch (e) {
+        console.error(e);
+    }
+
+}
+
+const noticeFileUpdate = async () => {
+    const textData = {
+        fileContent: noticeDetail.value.content,
+        fileTitle: noticeDetail.value.title,
+        noticeId: id
+    }
+    const formData = new FormData()
+    formData.append('text', new Blob([JSON.stringify(textData)], { type: 'application/json' }))
+    if (fileData.value) {
+        formData.append('file', fileData.value)
+    }
+    try {
+        const res = await axios.post('/api/management/noticeUpdateFileForm.do', formData)
+        if (res.data.result === 'success') {
+            emit('postSuccess')
+        } else {
+            alert("저장 실패")
+        }
+    } catch (e) {
+        console.error(e);
+    }
+
+}
+
+
+
 const noticeUpdate = async () => {
     const param = new URLSearchParams(noticeDetail.value)
     param.append("noticeId", id)
@@ -78,7 +167,7 @@ const noticeUpdate = async () => {
 
 const noticeDelete = async () => {
     try {
-        const res = await axios.post('/api/management/noticeDeleteJson.do', { noticeId: id })
+        const res = await axios.post('/api/management/noticeFileDeleteJson.do', { noticeId: id })
         if (res.data.result === 'success') {
             emit('postSuccess')
         } else {
@@ -87,6 +176,19 @@ const noticeDelete = async () => {
     } catch (e) {
         console.error(e);
     }
+}
+
+const fileHandler = (e) => {
+    const fileInfo = e.target.files
+    const fileInfoSplit = fileInfo[0].name.split('.')
+    const fileExtension = fileInfoSplit[1].toLowerCase()
+
+    if (fileExtension === 'jpg' || fileExtension === 'gif' || fileExtension === 'png' || fileExtension === 'jpeg') {
+        imgUrl.value = URL.createObjectURL(fileInfo[0])
+    }
+
+    fileData.value = fileInfo[0];
+
 }
 
 
@@ -158,8 +260,13 @@ input[type='text'] {
 }
 
 img {
-    width: 100px;
-    height: 100px;
+    margin-top: 5px;
+    border-radius: 10px;
+    width: 100%;
+    max-height: 400px;
+    /* or vh 단위 사용 */
+    height: auto;
+    object-fit: cover;
 }
 
 .img-label {

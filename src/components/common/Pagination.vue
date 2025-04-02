@@ -22,7 +22,7 @@ const { totalItems, itemsPerPage, maxPagesShown, onClick } = defineProps([
 .pagination-container {
     display: flex;
     column-gap: 10px;
-    padding-left: 35%;
+    padding-left: 40%;
     padding-top: 10px;
     list-style-type: none;
 }
@@ -33,6 +33,8 @@ const { totalItems, itemsPerPage, maxPagesShown, onClick } = defineProps([
     cursor: pointer;
     background-color: rgb(242, 242, 242);
     align-items: center;
+    text-align: center;
+    justify-content: center;
     border: 1px solid rgb(217, 217, 217);
     color: black;
 }

@@ -2,7 +2,6 @@
     <div class="divNoticeList">
         <NoticeModal v-if="modal.modalState" :id="noticeId" @modalClose="noticeId = $event"
             @postSuccess="onPostSuccess" />
-        현재 페이지: 총 개수: {{ noticeList?.noticeCnt }}
         <table>
             <colgroup>
                 <col width="10%" />
@@ -52,7 +51,6 @@ const noticeList = ref()
 const modal = useModalStore()
 const noticeId = ref(0)
 const cPage = ref(1)
-
 
 const searchList = async () => {
     const param = new URLSearchParams({
