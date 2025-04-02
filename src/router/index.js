@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from '../views/Login/Login.vue';
 import DashBoard from '../views/DashBoard/DashBoard.vue';
-import Notice from '../views/Management/Notice.vue';
+import Notice from '../views/System/Notice.vue';
 
 const routes = [
     {
@@ -15,8 +15,8 @@ const routes = [
         component: DashBoard,
         children: [
             {
-                path: 'management',
-                name: 'management',
+                path: 'system',
+                name: 'system',
                 children: [
                     {
                         path: 'notice',

@@ -21,12 +21,12 @@
             <tbody>
                 <template v-if="noticeList">
                     <template v-if="noticeList.noticeCnt > 0">
-                        <tr v-for="notice in noticeList.noticeList" :key="notice.noticeId"
-                            @click="handlerModal(notice.noticeId)">
-                            <td>{{ notice.noticeId }}</td>
-                            <td>{{ notice.title }}</td>
-                            <td>{{ notice.createdDate.substr(0, 10) }}</td>
-                            <td>{{ notice.author }}</td>
+                        <tr v-for="notice in noticeList.noticeList" :key="notice.notiSeq
+                            " @click="handlerModal(notice.notiSeq)">
+                            <td>{{ notice.notiSeq }}</td>
+                            <td>{{ notice.notiTitle }}</td>
+                            <td>{{ notice.notiDate }}</td>
+                            <td>{{ notice.loginId }}</td>
                         </tr>
                     </template>
                     <template v-else>
@@ -60,7 +60,8 @@ const searchList = async () => {
     })
 
     try {
-        const response = await axios.post('/api/management/noticeListBody.do', param)
+        const response = await axios.post('/api/system/noticeListBody.do', param)
+        console.log(response.data)
         noticeList.value = response.data
     } catch (e) {
         console.error(e);
