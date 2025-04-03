@@ -17,5 +17,7 @@ declare module 'vue' {
     Pagination: typeof import('./src/components/common/Pagination.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SalesPlanMain: typeof import('./src/components/page/Business/Plan/SalesPlanMain.vue')['default']
+    SalesPlanSearch: typeof import('./src/components/page/Business/Plan/SalesPlanSearch.vue')['default']
   }
 }
