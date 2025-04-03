@@ -61,7 +61,6 @@ const searchList = async () => {
 
     try {
         const response = await axios.post('/api/system/noticeListBody.do', param)
-        console.log(response.data)
         noticeList.value = response.data
     } catch (e) {
         console.error(e);
