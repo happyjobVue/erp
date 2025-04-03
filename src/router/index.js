@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Login from '../views/Login/Login.vue';
 import DashBoard from '../views/DashBoard/DashBoard.vue';
 import Notice from '../views/System/Notice.vue';
+import Department from '../views/System/Department.vue';
 
 const routes = [
     {
@@ -22,6 +23,11 @@ const routes = [
                         path: 'notice',
                         name: 'notice',
                         component: Notice,
+                    },
+                    {
+                        path: 'department',
+                        name: 'department',
+                        component: Department,
                     },
                 ],
             },
