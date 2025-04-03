@@ -1,45 +1,9 @@
-<script setup>
-import axios from 'axios';
-import { watch } from 'vue';
-import { useModalStore } from '../../../../stores/modalState';
-const route = useRoute();
-const accountList = ref();
-const modal = useModalStore();
-const cPage = ref(1);
-
-const searchList = async () => {
-    const param = new URLSearchParams({
-        ...route.query,
-        pageSize: 5,
-        currentPage: cPage.value,
-    });
-
-    try {
-        const response = await axios.post('/api/account/accountList.do', param);
-        accountList.value = response.data;
-    } catch (e) {
-        console.error('Axios Error:', e);
-    }
-};
-
-const onPostSuccess = () => {
-    modal.setModalState();
-    searchList();
-};
-
-onMounted(() => {
-    searchList();
-});
-
-watch(() => route.query, searchList);
-</script>
-
 <template>
     <div class="divNoticeList">
         <ManageModal
             v-if="modal.modalState"
-            :id="detailCode"
-            @modalClose="detailCode = $event"
+            :id="detail_code"
+            @modalClose="detail_code = $event"
             @postSuccess="onPostSuccess"
         />
         <table>
@@ -69,6 +33,7 @@ watch(() => route.query, searchList);
                     <tr
                         v-for="account in accountList.account"
                         :key="account.detail_code"
+                        @click="handlerModal(account.detail_code)"
                     >
                         <td>{{ account.group_code }}</td>
                         <td>{{ account.group_name }}</td>
@@ -95,6 +60,49 @@ watch(() => route.query, searchList);
         />
     </div>
 </template>
+
+<script setup>
+import axios from 'axios';
+import { watch } from 'vue';
+import { useModalStore } from '../../../../stores/modalState';
+const route = useRoute();
+const accountList = ref();
+const modal = useModalStore();
+const cPage = ref(1);
+const detail_code = ref(0);
+
+const searchList = async () => {
+    const param = new URLSearchParams({
+        ...route.query,
+        pageSize: 5,
+        currentPage: cPage.value,
+    });
+
+    try {
+        const response = await axios.post('/api/account/accountList.do', param);
+        accountList.value = response.data;
+    } catch (e) {
+        console.error('Axios Error:', e);
+    }
+};
+
+const handlerModal = id => {
+    detail_code.value = id;
+    modal.setModalState();
+};
+
+const onPostSuccess = () => {
+    modal.setModalState();
+    searchList();
+};
+
+onMounted(() => {
+    searchList();
+});
+
+watch(() => route.query, searchList);
+</script>
+
 <style lang="scss" scoped>
 table {
     width: 100%;
