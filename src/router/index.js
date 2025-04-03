@@ -4,6 +4,7 @@ import DashBoard from '../views/DashBoard/DashBoard.vue';
 import Notice from '../views/System/Notice.vue';
 import Manage from '../views/Account/Manage.vue';
 import Department from '../views/System/Department.vue';
+import ExpenseList from '../views/Account/ExpenseList.vue';
 
 const routes = [
     {
@@ -40,6 +41,11 @@ const routes = [
                         path: 'manage',
                         name: 'manage',
                         component: Manage,
+                    },
+                    {
+                        path: 'expense-list',
+                        name: 'expense-list',
+                        component: ExpenseList,
                     },
                 ],
             },
