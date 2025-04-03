@@ -1,11 +1,52 @@
+<template>
+    <div class="search-container">
+        <div class="search-box">
+            <div>
+                <label>계정대분류 : </label>
+                <select v-model="searchGroup">
+                    <option value="">전체</option>
+                    <option value="AC01">온라인매출</option>
+                    <option value="AC02">영업매출</option>
+                    <option value="AC03">온라인지출</option>
+                    <option value="AC04">영업지출</option>
+                    <option value="AC05">유동자산</option>
+                </select>
+            </div>
+            <div>
+                <label>계정세부명 : </label>
+                <input v-model.lazy="searchDetail" placeholder="검색어 입력" />
+            </div>
+            <div>
+                <label>구분 : </label>
+                <select v-model="searchCodeType">
+                    <option value="">전체</option>
+                    <option value="수입">수입</option>
+                    <option value="지출">지출</option>
+                </select>
+            </div>
+            <div>
+                <label>사용여부 : </label>
+                <select v-model="searchUseYn">
+                    <option value="">전체</option>
+                    <option value="Y">Y</option>
+                    <option value="N">N</option>
+                </select>
+            </div>
+
+            <button @click="handleSearch">검색</button>
+        </div>
+
+        <div class="register-box">
+            <button @click="setModalState">등록</button>
+        </div>
+    </div>
+</template>
+
 <script setup>
 import router from '@/router';
 import { onMounted } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 const { setModalState } = useModalStore();
-const searchTitle = ref('');
-const searchStDate = ref('');
-const searchEdDate = ref('');
 const searchGroup = ref('');
 const searchDetail = ref('');
 const searchCodeType = ref('');
@@ -13,103 +54,28 @@ const searchUseYn = ref('');
 
 const handleSearch = () => {
     const query = [];
-    !searchTitle.value || query.push(`searchTitle=${searchTitle.value}`);
-    !searchStDate.value || query.push(`searchStDate=${searchStDate.value}`);
-    !searchEdDate.value || query.push(`searchEdDate=${searchEdDate.value}`);
     !searchGroup.value || query.push(`searchGroup=${searchGroup.value}`);
     !searchDetail.value || query.push(`searchDetail=${searchDetail.value}`);
     !searchCodeType.value ||
-        query.push(`searchCodeType=${searchCodeType.value}`);
-    !searchUseYn.value || query.push(`searchUseYn=${searchUseYn.value}`);
+        query.push(`searchCode_type=${searchCodeType.value}`);
+    !searchUseYn.value || query.push(`searchUse_yn=${searchUseYn.value}`);
     const queryString = query.length > 0 ? `?${query.join('&')}` : '';
 
     router.push(queryString);
 };
-const groupOptions = [
-    { label: '전체', value: '' },
-    { label: '온라인매출', value: 'A' },
-    { label: '영업매출', value: 'B' },
-    { label: '온라인지출', value: 'B' },
-    { label: '영업지출', value: 'B' },
-    { label: '유동자산', value: 'B' },
-];
-
-const codeTypeOptions = [
-    { label: '전체', value: '' },
-    { label: '수입', value: 'type1' },
-    { label: '지출', value: 'type2' },
-];
-
-const useYnOptions = [
-    { label: '전체', value: '' },
-    { label: 'Y', value: 'Y' },
-    { label: 'N', value: 'N' },
-];
 
 onMounted(() => {
     window.location.search && router.replace(window.location.pathname);
 });
 </script>
 
-<template>
-    <div class="search-container">
-        <!-- 첫 번째 줄 -->
-        <div class="search-box">
-            <label>그룹 선택:</label>
-            <select v-model="searchGroup">
-                <option
-                    v-for="option in groupOptions"
-                    :key="option.value"
-                    :value="option.value"
-                >
-                    {{ option.label }}
-                </option>
-            </select>
-
-            <label>코드 유형:</label>
-            <select v-model="searchCodeType">
-                <option
-                    v-for="option in codeTypeOptions"
-                    :key="option.value"
-                    :value="option.value"
-                >
-                    {{ option.label }}
-                </option>
-            </select>
-
-            <label>사용 여부:</label>
-            <select v-model="searchUseYn">
-                <option
-                    v-for="option in useYnOptions"
-                    :key="option.value"
-                    :value="option.value"
-                >
-                    {{ option.label }}
-                </option>
-            </select>
-
-            <input v-model.lazy="searchTitle" placeholder="검색어 입력" />
-            <input type="date" v-model="searchStDate" />
-            <input type="date" v-model="searchEdDate" />
-            <button @click="handleSearch">검색</button>
-        </div>
-
-        <!-- 두 번째 줄 (오른쪽 끝에 등록 버튼) -->
-        <div class="register-box">
-            <button @click="setModalState">등록</button>
-        </div>
-    </div>
-</template>
-
 <style lang="scss" scoped>
-/* 검색 전체 컨테이너 */
 .search-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-/* 첫 번째 줄 검색 영역 */
 .search-box {
     display: flex;
     justify-content: flex-end;
@@ -123,7 +89,6 @@ onMounted(() => {
     margin: 10px 0;
 }
 
-/* "등록" 버튼을 우측 정렬 */
 .register-box {
     display: flex;
     justify-content: flex-end;
