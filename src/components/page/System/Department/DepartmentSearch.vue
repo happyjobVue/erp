@@ -47,6 +47,11 @@ onMounted(() => {
     float: inline-end;
 }
 
+.search-span {
+    font-size: 13px;
+    margin-right: 5px;
+}
+
 input {
     padding: 8px;
     margin-top: 5px;

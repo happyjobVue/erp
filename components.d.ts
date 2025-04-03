@@ -23,5 +23,8 @@ declare module 'vue' {
     Pagination: typeof import('./src/components/common/Pagination.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SalaryListMain: typeof import('./src/components/page/personnel/Salary-list/SalaryListMain.vue')['default']
+    SalaryListModal: typeof import('./src/components/page/personnel/Salary-list/SalaryListModal.vue')['default']
+    SalaryListSearch: typeof import('./src/components/page/personnel/Salary-list/SalaryListSearch.vue')['default']
   }
 }
