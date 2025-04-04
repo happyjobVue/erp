@@ -43,7 +43,7 @@
                         <td>{{ expense.detail_name }}</td>
                         <td>{{ expense.use_department }}</td>
                         <td>{{ expense.expense_payment }}</td>
-                        <td>{{ expense.is_approval }}</td>
+                        <td>{{ approvalMap[expense.is_approval] }}</td>
                     </tr>
                 </template>
                 <template v-else>
@@ -67,10 +67,19 @@
 import axios from 'axios';
 import { watch } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
+import { computed } from 'vue';
 const modal = useModalStore();
 const cPage = ref(1);
 const route = useRoute();
 const expenseList = ref();
+
+const approvalMap = computed(() => ({
+    W: '검토 대기',
+    F: '승인 대기',
+    S: '승인',
+    N: '반려',
+    C: '취소',
+}));
 
 const searchList = async () => {
     console.log('onMounted');

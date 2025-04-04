@@ -14,6 +14,7 @@
                     <option value="F">승인대기</option>
                     <option value="S">승인</option>
                     <option value="N">반려</option>
+                    <option value="C">취소</option>
                 </select>
             </div>
             <div>
@@ -28,13 +29,13 @@
                 <label>계정과목 : </label>
                 <select v-model="searchDetail">
                     <option value="">전체</option>
-                    <option value="AC03">사무용품비</option>
-                    <option value="AC04">광고비</option>
-                    <option value="AC04">거래 수수료</option>
-                    <option value="AC04">출장비</option>
-                    <option value="AC04">숙박비</option>
-                    <option value="AC04">인건비</option>
-                    <option value="AC04">기름비</option>
+                    <option value="AC03101">사무용품비</option>
+                    <option value="AC03102">광고비</option>
+                    <option value="AC03103">거래 수수료</option>
+                    <option value="AC04101">출장비</option>
+                    <option value="AC04102">숙박비</option>
+                    <option value="AC04104">인건비</option>
+                    <option value="AC04105">기름비</option>
                 </select>
             </div>
 
