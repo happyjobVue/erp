@@ -23,6 +23,7 @@ declare module 'vue' {
     NoticeModal: typeof import('./src/components/page/System/Notice/NoticeModal.vue')['default']
     NoticeSearch: typeof import('./src/components/page/System/Notice/NoticeSearch.vue')['default']
     Pagination: typeof import('./src/components/common/Pagination.vue')['default']
+    RetirementModal: typeof import('./src/components/page/employee/RetirementModal.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SalaryListMain: typeof import('./src/components/page/personnel/Salary-list/SalaryListMain.vue')['default']

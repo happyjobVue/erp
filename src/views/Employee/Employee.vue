@@ -11,10 +11,15 @@ const route = useRoute();
 const personnelList = ref([]);
 const cPage = ref(1);
 const isModalOpen = ref(false);
+const UserDetail = ref({});
 
 /* 현재 재직상태 변경 */
 const chEmplStatus = ref('');
 
+//modal type별 정의 
+const modalType = ref('');
+
+//1. 인사 관리 리스트 조회  
 const personnelSearchList = () => {
     console.log('쿼리 값:', route.query);
 
@@ -24,21 +29,11 @@ const personnelSearchList = () => {
         currentPage: cPage.value,
     };
 
-    axios
-        .post('/api/personnel/employeeListBody', param, {
-            headers: {
-                'Content-Type': 'application/json', // JSON 형식으로 전송
-            },
-        })
-        .then(res => {
-            personnelList.value = res.data;
-            console.log(res.data);
-        })
-        .catch(err => {
-            console.error('에러 발생:', err);
-        });
+    AxiosRequest('employeeListBody',param ,personnelList);
+
 };
 
+//2. 재직자, 퇴직자의 따른 재 검색 
 const GetEmplStatus = val => {
     chEmplStatus.value = val;
 };
@@ -60,18 +55,104 @@ const OnEmplStatus = () => {
 
 };
 
+//3. 퇴직 모달창 열기 
+const Onretire = (personnel) => {
+
+    modalType.value = 'retire'
+
+    const param = JSON.parse(JSON.stringify(personnel));
+
+/*     AxiosRequest('employeeDetailBody', param, UserDetail);
+ */
+
+    axios
+        .post(`/api/personnel/employeeDetailBody`, param, {
+            headers: {
+                'Content-Type': 'application/json', // JSON 형식으로 전송
+            },
+        })
+        .then(res => {
+            UserDetail.value = res.data;
+            console.log(UserDetail.value);
+            isModalOpen.value = true;
+        })
+        .catch(err => {
+            console.error('에러 발생:', err);
+        });
+
+}
+
+//퇴직 처리 하기 
+const handleRetireInfo = (retireData) => {
+  console.log("퇴직 정보:", retireData);
+
+  // 예: 개별로 꺼낼 수도 있음
+  const { resignationReason, resignationDate, severancePay, salary, employeeId } = retireData;
+  
+  //퇴직사유나 퇴직급여 입력 유효성 검사 
+  if(resignationReason !== '' && severancePay !== ''){
+
+    //응답형이 @RequestParam임 
+    const params = new URLSearchParams();
+
+    params.append('employeeId', employeeId);
+    params.append('emplStatus', 'F');
+    params.append('resignationReason', resignationReason );
+    params.append('resignationDate', resignationDate );
+    params.append('severancePay',severancePay  );
+    params.append('salary',salary);
+
+    axios
+        .post(`/api/personnel/emplStatusUpdate.do`, params)
+        .then(res => {
+            console.log(res.data);
+            closeModal();
+            personnelSearchList();
+        })
+        .catch(err => {
+            console.error('에러 발생:', err);
+        });
+  }else {
+    alert("퇴직사유나 퇴직급여를 입력해주세요");
+  }
+
+};
+
+
+//Axios 요청 함수 
+const AxiosRequest =  (UrlInfo, param, valueName) => {
+    axios
+        .post(`/api/personnel/${UrlInfo}`, param, {
+            headers: {
+                'Content-Type': 'application/json', // JSON 형식으로 전송
+            },
+        })
+        .then(res => {
+            valueName.value = res.data;
+            console.log(res.value);
+        })
+        .catch(err => {
+            console.error('에러 발생:', err);
+        });
+}
+
+//queryString 제거 
 const NoqueryString = () => {
     window.location.search && router.replace(window.location.pathname);
 };
 
-//모달
-const ModalOpening = (val) => {
-    isModalOpen.value = val;    
+//모달 열기 / 모달 창한개로 modalType으로 각각 불러옴 
+const ModalOpening = ({ isModalOpen : isModalOpenval, modalType : modalTypeval  }) => {
+    modalType.value = modalTypeval;
+    isModalOpen.value = isModalOpenval;   
 }
 
+
+//모달 닫기 
 const closeModal = (val) => {
   isModalOpen.value = val;
 };
+
 
 onMounted(() => {
     console.log('쿼리 값:', route.query);
@@ -83,21 +164,32 @@ watch(() => route.query, () => {
     personnelSearchList();
 });
 
+computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
+
 </script>
 
 <template>
+
+    <!-- 사원 검색 바  -->
     <EmployeeSearchBar
 
         @EmplStatus="GetEmplStatus"
         @OnEmplStatus="OnEmplStatus"
-        @ModalOpening="ModalOpening"
+        @ModalOpening="ModalOpening($event)"
     />
 
-    <EmployeeModal 
+    <!-- 공통 모달  -->
+    <div v-show="isModalOpen">
+        <EmployeeModal 
 
-        v-show="isModalOpen"
+        :modalType="modalType"
+        :UserDetail="UserDetail"
         @closeModal="closeModal"
-    />
+        @update-retire-info="handleRetireInfo"
+
+        />
+    </div> 
+
 
     <table>
         <thead>
@@ -122,12 +214,12 @@ watch(() => route.query, () => {
             <td>{{ personnel.employeeName }}</td>
             <td>{{ personnel.departmentCode }}</td>
             <td>{{ personnel.departmentDetailName }}</td>
-            <td>{{ personnel.jobGradeCode }}</td>
+            <td>{{ personnel.jobGradeDetailName }}</td>
             <td>{{ personnel.regDate }}</td>
             <td>{{ personnel.emplStatus }}</td>
             <td>{{ personnel.resignationDate }}</td>
             <td>               
-                <button>
+                <button @click="() => Onretire(personnel)" :disabled="!!personnel.resignationDate">
                     퇴직처리
                 </button>
             </td>
