@@ -13,6 +13,7 @@ declare module 'vue' {
     DepartmentSearch: typeof import('./src/components/page/System/Department/DepartmentSearch.vue')['default']
     EmployeeModal: typeof import('./src/components/page/employee/EmployeeModal.vue')['default']
     EmployeeSearchBar: typeof import('./src/components/page/employee/EmployeeSearchBar.vue')['default']
+    ExpenseListMain: typeof import('./src/components/page/Account/ExpenseList/ExpenseListMain.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     LeftManuBar: typeof import('./src/components/common/LeftManuBar.vue')['default']
     LoginMain: typeof import('./src/components/page/Login/LoginMain.vue')['default']
