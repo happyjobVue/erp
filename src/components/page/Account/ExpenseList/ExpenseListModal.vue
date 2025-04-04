@@ -128,7 +128,10 @@
                     <tr>
                         <td class="label">첨부파일</td>
                         <td colspan="3">
-                            <button @click="downloadFileImage">
+                            <button
+                                @click="downloadFileImage"
+                                class="button-box"
+                            >
                                 <img v-if="imgUrl" :src="imgUrl" />다운로드
                             </button>
                         </td>
@@ -144,6 +147,7 @@
                     </tr>
                 </table>
                 <div class="button-box">
+                    <button @click="setModalState">신청</button>
                     <button @click="setModalState">나가기</button>
                 </div>
             </div>
