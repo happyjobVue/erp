@@ -1,9 +1,9 @@
 <template>
     <div class="divNoticeList">
-        <ManageModal
+        <ExpenseListModal
             v-if="modal.modalState"
-            :id="id"
-            @modalClose="id = $event"
+            :id="expenseId"
+            @modalClose="expenseId = $event"
             @postSuccess="onPostSuccess"
         />
         <table>
@@ -43,7 +43,7 @@
                         <td>{{ expense.detail_name }}</td>
                         <td>{{ expense.use_department }}</td>
                         <td>{{ expense.expense_payment }}</td>
-                        <td>{{ expense.is_approval }}</td>
+                        <td>{{ approvalMap[expense.is_approval] }}</td>
                     </tr>
                 </template>
                 <template v-else>
@@ -71,6 +71,15 @@ const modal = useModalStore();
 const cPage = ref(1);
 const route = useRoute();
 const expenseList = ref();
+const expenseId = ref(0);
+
+const approvalMap = computed(() => ({
+    W: '검토 대기',
+    F: '승인 대기',
+    S: '승인',
+    N: '반려',
+    C: '취소',
+}));
 
 const searchList = async () => {
     console.log('onMounted');
@@ -86,6 +95,12 @@ const searchList = async () => {
     } catch (e) {
         console.error('Axios Error:', e);
     }
+};
+
+const handlerModal = id => {
+    console.log('🛠️ handlerModal called with id:', id);
+    expenseId.value = id;
+    modal.setModalState();
 };
 
 onMounted(() => {
