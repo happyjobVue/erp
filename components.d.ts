@@ -8,16 +8,25 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ContextBox: typeof import('./src/components/common/ContextBox.vue')['default']
+    DepartmentMain: typeof import('./src/components/page/System/Department/DepartmentMain.vue')['default']
+    DepartmentModal: typeof import('./src/components/page/System/Department/DepartmentModal.vue')['default']
+    DepartmentSearch: typeof import('./src/components/page/System/Department/DepartmentSearch.vue')['default']
     EmployeeModal: typeof import('./src/components/page/employee/EmployeeModal.vue')['default']
     EmployeeSearchBar: typeof import('./src/components/page/employee/EmployeeSearchBar.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     LeftManuBar: typeof import('./src/components/common/LeftManuBar.vue')['default']
     LoginMain: typeof import('./src/components/page/Login/LoginMain.vue')['default']
+    ManageMain: typeof import('./src/components/page/Account/Manage/ManageMain.vue')['default']
+    ManageModal: typeof import('./src/components/page/Account/Manage/ManageModal.vue')['default']
+    ManageSearch: typeof import('./src/components/page/Account/Manage/ManageSearch.vue')['default']
     NoticeMain: typeof import('./src/components/page/System/Notice/NoticeMain.vue')['default']
     NoticeModal: typeof import('./src/components/page/System/Notice/NoticeModal.vue')['default']
     NoticeSearch: typeof import('./src/components/page/System/Notice/NoticeSearch.vue')['default']
     Pagination: typeof import('./src/components/common/Pagination.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SalaryListMain: typeof import('./src/components/page/personnel/Salary-list/SalaryListMain.vue')['default']
+    SalaryListModal: typeof import('./src/components/page/personnel/Salary-list/SalaryListModal.vue')['default']
+    SalaryListSearch: typeof import('./src/components/page/personnel/Salary-list/SalaryListSearch.vue')['default']
   }
 }
