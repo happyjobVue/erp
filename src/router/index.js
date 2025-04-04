@@ -7,6 +7,7 @@ import Department from '../views/System/Department.vue';
 import SalaryList from '../views/Personnel/Salary-list.vue';
 import Employee from '../views/Employee/Employee.vue';
 import ExpenseList from '../views/Account/ExpenseList.vue';
+import ExpenseReviewList from '../views/Account/ExpenseReviewList.vue';
 
 const routes = [
     {
@@ -59,6 +60,11 @@ const routes = [
                         path: 'expense-list',
                         name: 'expense-list',
                         component: ExpenseList,
+                    },
+                    {
+                        path: 'expense-review',
+                        name: 'expense-review',
+                        component: ExpenseReviewList,
                     },
                 ],
             },
