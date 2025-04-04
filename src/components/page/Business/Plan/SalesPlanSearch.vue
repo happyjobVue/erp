@@ -1,72 +1,54 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
-import SalesPlanMain from './SalesPlanMain.vue';
+import {
+    fetchManufacturers,
+    fetchProductsByManufacturer,
+} from '../../../../common/selectBoxApi';
+import router from '@/router';
+import { useModalStore } from '../../../../stores/modalState';
 const manufacturers = ref(''); // 제조사 목록
 const productList = ref([]);
+const modalState = useModalStore();
 const selectedManufacturer = ref(''); // 선택된 제조사
-const selectedProduct = ref(''); // 선택된 제품
+const selectedProduct = ref(); // 선택된 제품
 const searchStDate = ref(''); // 선택된 날짜
-// 제조사 목록을 가져오는 함수
-const fetchManufacturers = async () => {
-    try {
-        const response = await axios.post(
-            '/api/business/sales-plan/getmanufacturer.do'
-        );
-        manufacturers.value = response.data.manuFacturerList;
-        console.log(manufacturers.value);
-    } catch (error) {
-        console.error('Error fetching manufacturers:', error);
-    }
-};
 
-// 제조사 선택 시 해당 제조사에 맞는 제품 목록을 가져오는 함수
-const fetchProductsByManufacturer = async () => {
+async function handleManufacturerChange() {
     if (selectedManufacturer.value) {
-        try {
-            const param = new URLSearchParams({
-                industry_code: selectedManufacturer.value,
-            });
-
-            const response = await axios.post(
-                '/api/business/sales-plan/getProductList.do',
-                param
-            );
-            productList.value = response.data.productList; // 제품 목록 설정
-            console.log(productList.value);
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        }
+        productList.value = await fetchProductsByManufacturer(
+            selectedManufacturer.value
+        );
     }
-};
+}
 
 const handlerSearch = () => {
-    // 예시로 조회 시 콘솔 로그 출력
-    console.log('조회:', {
-        selectedProduct: selectedProduct.value,
-        selectedManufacturer: selectedManufacturer.value,
-        searchStDate: searchStDate.value,
-    });
+    const query = [];
+    !selectedManufacturer.value ||
+        query.push(`industryCode=${selectedManufacturer.value}`);
+    !selectedProduct.value || query.push(`productId=${selectedProduct.value}`);
+    !searchStDate.value || query.push(`searchStDate=${searchStDate.value}`);
+    const queryString = query.length > 0 ? `?${query.join('&')}` : '';
+    console.log(queryString);
+
+    router.push(queryString);
 };
 
-// 컴포넌트가 마운트될 때 제조사 목록을 가져오기
 onMounted(() => {
-    fetchManufacturers();
+    window.location.search && router.replace(window.location.pathname);
+});
+
+// 컴포넌트가 마운트될 때 제조사 목록을 가져오기
+onMounted(async () => {
+    manufacturers.value = await fetchManufacturers();
 });
 </script>
 
 <template>
     <div class="search-box">
-        <!-- <SalesPlanMain
-            v-if="selectedProduct && selectedManufacturer"
-            :productId="selectedProduct"
-            :industryCode="selectedManufacturer"
-            :searchDate="searchStDate"
-        /> -->
         <!-- 제조사 셀렉트 박스 -->
         <select
             v-model="selectedManufacturer"
-            @change="fetchProductsByManufacturer"
+            @change="handleManufacturerChange"
         >
             <option value="" disabled>제조사</option>
             <option
@@ -92,6 +74,7 @@ onMounted(() => {
         <input type="date" v-model="searchStDate" />
     </div>
     <button @click="handlerSearch">조회</button>
+    <button @click="modalState.setModalState()">신규 등록</button>
 </template>
 
 <style lang="scss" scoped>
@@ -105,6 +88,15 @@ input {
     margin-top: 5px;
     margin-bottom: 5px;
     margin-right: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+select {
+    width: 15%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
     border-radius: 4px;
     border: 1px solid #ccc;
 }

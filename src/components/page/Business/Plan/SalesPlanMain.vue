@@ -1,26 +1,16 @@
 <script setup>
 import axios from 'axios';
+import { useRoute } from 'vue-router';
 import { useUserInfo } from '../../../../stores/userInfo';
-import { onMounted, watch, watchEffect } from 'vue';
-// props로 전달받은 데이터
-const props = defineProps({
-    productId: {
-        type: [String, Number],
-        required: true,
-    },
-    industryCode: {
-        type: String,
-        required: true,
-    },
-    searchDate: {
-        type: String,
-        required: true,
-    },
-});
+import { useModalStore } from '../../../../stores/modalState';
+import { onMounted } from 'vue';
+import SalesRegisterModal from './SalesRegisterModal.vue';
 const salesPlanListData = ref();
 const salesPlanListCnt = ref();
 const userId = useUserInfo();
+const modalState = useModalStore();
 const cPage = ref(1);
+const route = useRoute();
 const salesPlanDefaultList = () => {
     const param = {
         empId: userId.user.empId,
@@ -34,37 +24,31 @@ const salesPlanDefaultList = () => {
 };
 
 const searchList = () => {
-    const param = {
+    const param = new URLSearchParams({
+        ...route.query,
         empId: userId.user.empId,
         pageSize: 5,
         currentPage: cPage.value,
-        productId: props.productId,
-        industryCode: props.industryCode,
-        searchDate: props.searchDate,
-    };
-    axios.post('/api/business/sales-plan/getAllSalesPlan', param).then(res => {
-        salesPlanListData.value = res.data.searchPlanList;
-        salesPlanListCnt.value = res.data.salesPlanCnt;
     });
+    axios
+        .post('/api/business/sales-plan/getSearchSalesPlan', param)
+        .then(res => {
+            salesPlanListData.value = res.data.searchPlanList;
+            salesPlanListCnt.value = res.data.salesPlanCnt;
+        });
 };
 
 onMounted(() => {
     salesPlanDefaultList();
 });
 
-// productId, industryCode, searchDate가 변경될 때마다 searchList 실행
-watch(
-    [() => props.productId, () => props.industryCode, () => props.searchDate],
-    () => {
-        console.log('함수 실행 메인' + props.productId);
-        searchList(); // 값이 변경되면 다시 검색 실행
-    }
-);
+//첫번째 인자 데이터 , 두번째 인자 함수
+watch(() => route.query, searchList);
 </script>
 
 <template>
     <div class="divSalesPlanList">
-        <!-- 현재 페이지 : {{ salesPlanListCnt }} -->
+        <SalesRegisterModal v-if="modalState.modalState" />
         <table>
             <thead>
                 <th scope="col">목표날짜</th>
@@ -134,6 +118,32 @@ table {
         background-color: #d3d3d3;
         opacity: 0.9;
         cursor: pointer;
+    }
+    button {
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        border: none;
+        color: white;
+        width: 70px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        font-size: 12px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 12px;
+        box-shadow: 0 4px #999;
+        background-color: #3bb2ea;
+
+        &:hover {
+            background-color: #45a049;
+        }
+
+        &:active {
+            background-color: #3e8e41;
+            box-shadow: 0 2px #666;
+            transform: translateY(2px);
+        }
     }
 }
 </style>
