@@ -1,0 +1,263 @@
+<script setup>
+import EmployeeSearchBar from '../../components/page/employee/EmployeeSearchBar.vue';
+import axios from 'axios';
+import { onMounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import Pagination from '../../components/common/Pagination.vue';
+import router from '../../router';
+import EmployeeModal from '../../components/page/employee/EmployeeModal.vue';
+
+const route = useRoute();
+const personnelList = ref([]);
+const cPage = ref(1);
+const isModalOpen = ref(false);
+const UserDetail = ref({});
+
+/* 현재 재직상태 변경 */
+const chEmplStatus = ref('');
+
+//modal type별 정의 
+const modalType = ref('');
+
+//1. 인사 관리 리스트 조회  
+const personnelSearchList = () => {
+    console.log('쿼리 값:', route.query);
+
+    const param = {
+        ...route.query,
+        pageSize: 5,
+        currentPage: cPage.value,
+    };
+
+    AxiosRequest('employeeListBody',param ,personnelList);
+
+};
+
+//2. 재직자, 퇴직자의 따른 재 검색 
+const GetEmplStatus = val => {
+    chEmplStatus.value = val;
+};
+
+const OnEmplStatus = () => {
+    //F W 재직 상태에 따라서 값 변경
+    router.push({
+        path: route.path,
+        query: { ...route.query, emplStatus: chEmplStatus.value},
+    });
+
+    console.log(chEmplStatus.value);
+
+    //다시 재 검색
+    if(cPage.value !== 1){
+        cPage.value =1;
+    }
+    personnelSearchList()
+
+};
+
+//3. 퇴직 모달창 열기 
+const Onretire = (personnel) => {
+
+    modalType.value = 'retire'
+
+    const param = JSON.parse(JSON.stringify(personnel));
+
+/*     AxiosRequest('employeeDetailBody', param, UserDetail);
+ */
+
+    axios
+        .post(`/api/personnel/employeeDetailBody`, param, {
+            headers: {
+                'Content-Type': 'application/json', // JSON 형식으로 전송
+            },
+        })
+        .then(res => {
+            UserDetail.value = res.data;
+            console.log(UserDetail.value);
+            isModalOpen.value = true;
+        })
+        .catch(err => {
+            console.error('에러 발생:', err);
+        });
+
+}
+
+//퇴직 처리 하기 
+const handleRetireInfo = (retireData) => {
+  console.log("퇴직 정보:", retireData);
+
+  // 예: 개별로 꺼낼 수도 있음
+  const { resignationReason, resignationDate, severancePay, salary, employeeId } = retireData;
+  
+  //퇴직사유나 퇴직급여 입력 유효성 검사 
+  if(resignationReason !== '' && severancePay !== ''){
+
+    //응답형이 @RequestParam임 
+    const params = new URLSearchParams();
+
+    params.append('employeeId', employeeId);
+    params.append('emplStatus', 'F');
+    params.append('resignationReason', resignationReason );
+    params.append('resignationDate', resignationDate );
+    params.append('severancePay',severancePay  );
+    params.append('salary',salary);
+
+    axios
+        .post(`/api/personnel/emplStatusUpdate.do`, params)
+        .then(res => {
+            console.log(res.data);
+            closeModal();
+            personnelSearchList();
+        })
+        .catch(err => {
+            console.error('에러 발생:', err);
+        });
+  }else {
+    alert("퇴직사유나 퇴직급여를 입력해주세요");
+  }
+
+};
+
+
+//Axios 요청 함수 
+const AxiosRequest =  (UrlInfo, param, valueName) => {
+    axios
+        .post(`/api/personnel/${UrlInfo}`, param, {
+            headers: {
+                'Content-Type': 'application/json', // JSON 형식으로 전송
+            },
+        })
+        .then(res => {
+            valueName.value = res.data;
+            console.log(res.value);
+        })
+        .catch(err => {
+            console.error('에러 발생:', err);
+        });
+}
+
+//queryString 제거 
+const NoqueryString = () => {
+    window.location.search && router.replace(window.location.pathname);
+};
+
+//모달 열기 / 모달 창한개로 modalType으로 각각 불러옴 
+const ModalOpening = ({ isModalOpen : isModalOpenval, modalType : modalTypeval  }) => {
+    modalType.value = modalTypeval;
+    isModalOpen.value = isModalOpenval;   
+}
+
+
+//모달 닫기 
+const closeModal = (val) => {
+  isModalOpen.value = val;
+};
+
+
+onMounted(() => {
+    console.log('쿼리 값:', route.query);
+    personnelSearchList();
+    NoqueryString();
+});
+
+watch(() => route.query, () => {
+    personnelSearchList();
+});
+
+computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
+
+</script>
+
+<template>
+
+    <!-- 사원 검색 바  -->
+    <EmployeeSearchBar
+
+        @EmplStatus="GetEmplStatus"
+        @OnEmplStatus="OnEmplStatus"
+        @ModalOpening="ModalOpening($event)"
+    />
+
+    <!-- 공통 모달  -->
+    <div v-show="isModalOpen">
+        <EmployeeModal 
+
+        :modalType="modalType"
+        :UserDetail="UserDetail"
+        @closeModal="closeModal"
+        @update-retire-info="handleRetireInfo"
+
+        />
+    </div> 
+
+
+    <table>
+        <thead>
+            <td scope="col">사번</td>
+            <td scope="col">사원명</td>
+            <td scope="col">부서코드</td>
+            <td scope="col">부서명</td>
+            <td scope="col">직급</td>
+            <td scope="col">입사일자</td>
+            <td scope="col">휴직</td>
+            <td scope="col">퇴직일자</td>
+            <td scope="col">
+                퇴직처리
+            </td>
+        </thead>
+
+        <tr
+            v-for="personnel in personnelList.employeeList"
+            :key="personnel.employeeId"
+        >
+            <td>{{ personnel.number }}</td>
+            <td>{{ personnel.employeeName }}</td>
+            <td>{{ personnel.departmentCode }}</td>
+            <td>{{ personnel.departmentDetailName }}</td>
+            <td>{{ personnel.jobGradeDetailName }}</td>
+            <td>{{ personnel.regDate }}</td>
+            <td>{{ personnel.emplStatus }}</td>
+            <td>{{ personnel.resignationDate }}</td>
+            <td>               
+                <button @click="() => Onretire(personnel)" :disabled="!!personnel.resignationDate">
+                    퇴직처리
+                </button>
+            </td>
+        </tr>
+    </table>
+    <Pagination
+        :totalItems="personnelSearchList?.employeeCnt"
+        :items-per-page="5"
+        :max-pages-shown="5"
+        :onClick="personnelSearchList"
+        v-model="cPage"
+    />
+</template>
+<style>
+/* 테이블 전체 스타일 */
+table {
+    width: 1240px;
+    border-collapse: collapse;
+    margin: 0 auto;
+    margin-top: 15px;
+    border: 2px solid #ccc; /* 테두리 추가 */
+}
+
+/* 테이블 헤더 스타일 */
+th {
+    background: #e9ecef;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid #ccc;
+    padding: 12px;
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+}
+
+/* 테이블 셀 스타일 */
+td {
+    border: 2px solid #ddd;
+    padding: 12px;
+    text-align: center;
+    white-space: nowrap;
+}
+</style>
