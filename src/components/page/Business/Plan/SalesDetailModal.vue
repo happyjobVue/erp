@@ -8,7 +8,6 @@ import {
     fetchProductsByManufacturer,
 } from '../../../../common/selectBoxApi';
 import axios from 'axios';
-import router from '@/router';
 
 const { id } = defineProps(['id']);
 
@@ -45,25 +44,53 @@ const goalQuanti = ref(0); // 목표 수량
 const memo = ref('');
 
 //상세조회 데이터 
-const detailData = ref('');
+const detailData = ref({
+    manufacturer_id: 0,
+    target_date: '',
+    industry_code: '',
+    emp_name: '',
+    manufacturer_name: '',
+    product_name: '',
+    goal_quanti: 0,
+    plan_memo: '',
+    plan_num: 0,
+    product_id: 0
+});
 
+
+const emit = defineEmits(['modalClose', 'postSuccess']);
 
 onMounted(async () => {
     manufacturers.value = await fetchManufacturers();
     clients.value = await fetchClient();
 });
 
-onMounted(()=>{
-    id && planDetail();
+onMounted(() => {
+    if (id) {
+        planDetail();  // id가 있을 때만 호출
+    }
 });
+
+
+
 
 // 영업 계획 상세 조회 
 async function planDetail() {
-    
-    const response = await axios.get(`/api/business/sales-plan/detail/?planNum${id}`);
-    detailData = response.data.DetailSalesPlan;
+    const param = new URLSearchParams({ planNum: id });
+    axios.post(`/api/business/sales-plan/getDetailSalesPlan`, param)
+        .then(res => {
+            console.log(res.data.DetailSalesPlan);  // 데이터 확인
+            detailData.value = res.data.DetailSalesPlan;
+            // 디폴트 값으로 셀렉트 박스 값 설정
+            selectedManufacturer.value = res.data.DetailSalesPlan.manufacturer_id;
+            selectedProduct.value = res.data.DetailSalesPlan.product_id;
 
+        })
+        .catch(error => {
+            console.error('Request failed', error);  // 오류 확인
+        });
 }
+
 
 
 // 제조사 선택 이벤트 핸들러
@@ -86,6 +113,13 @@ function handleProductChange() {
         selectedProductName.value = selectedProduct.value.name;
     }
 }
+
+const closeModal =() =>{
+    modalState.setModalState();
+    
+}
+
+
 
 
 // 영업계획 수정 함수
@@ -117,85 +151,80 @@ const updateSalesPlan = () => {
 </script>
 
 <template>
-    <teleport to="body">
-        <div class="backdrop">
-            <div class="container">
-                <h2>영업 계획 상세</h2>
-          
-                <table>
-                    <tbody>
-                        <input type="text" hidden v-model="detailData.emp_id" />
+    <div v-if="detailData">
+        <teleport to="body">
+            <div class="backdrop">
+                <div class="container">
+                    <h2>영업 계획 상세</h2>
+                    <table>
+                        <tbody>
+                            <!-- 사원 -->
+                            <tr>
+                                <th class="table-header">사원</th>
+                                <td>
+                                    <input type="text" v-model="detailData.emp_name" readonly />
+                                </td>
+                                <th class="table-header">목표 일자</th>
+                                <td>
+                                    <input type="date" v-model="detailData.target_date" />
+                                </td>
+                            </tr>
 
-                        <tr>
-                            <th class="table-header">사원</th>
-                            <td>
-                                <input type="text" v-model="detailData.name" />
-                            </td>
-                            <th class="table-header">목표 일자</th>
-                            <td>
-                                <input type="date" v-model="detailData.target_date" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="table-header">제조사</th>
-                            <td>
-                                <select
-                                    v-model="selectedManufacturer"
-                                    @change="handleManufacturerChange"
-                                >
-                                    <option disabled value="">전체</option>
-                                    <option
-                                        v-for="manufacturer in manufacturers"
-                                        :key="manufacturer.manufacturer_id"
-                                        :value="manufacturer"
-                                    >
-                                        {{ detailData.manufaturer_name }}
-                                    </option>
-                                </select>
-                            </td>
-                            <th class="table-header">상품명</th>
-                            <td>
-                                <select v-model="selectedProduct" @change="handleProductChange">
-                                    <option value="" disabled>전체</option>
-                                    <option
-                                        v-for="product in productList"
-                                        :key="product.id"
-                                        :value="product"
-                                    >
-                                        {{ product.name }}
-                                    </option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="table-header">거래처</th>
-                            <td>
-                                <select v-model="SelectedClient" >
-                                    <option value="" disabled>전체</option>
-                                    <option v-for="client in clients" :key="client.id" :value="client.id">
-                                        {{ client.client_name }}
-                                    </option>
-                                </select>
-                            </td>
-                            <th class="table-header">목표 수량</th>
-                            <td><input type="text"  v-model="goalQuanti"/></td>
-                        </tr>
-                        <tr>
-                            <th class="table-header">메모</th>
-                            <td><input type="text" v-model="memo"/></td>
-                        </tr>
-                    </tbody>
-                </table>
-               
+                            <!-- 제조사 -->
+                            <tr>
+                                <th class="table-header">제조사</th>
+                                <td>
+                                    <select v-model="selectedManufacturer" @change="handleManufacturerChange">
+                                        <option disabled value="">전체</option>
+                                        <option v-for="manufacturer in manufacturers" :key="manufacturer.manufacturer_id" :value="manufacturer">
+                                            {{ manufacturer.manufacturer_name }}
+                                        </option>
+                                    </select>
+                                </td>
+                                <th class="table-header">상품명</th>
+                                <td>
+                                    <select v-model="selectedProduct" @change="handleProductChange">
+                                        <option value="" disabled>전체</option>
+                                        <option v-for="product in productList" :key="product.product_id" :value="product">
+                                            {{ product.product_name }}
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
 
-                <div class="button-box">
-                    <button @click="saveSalesPlan">등록</button>
-                    <button type="button" @click="clearForm">취소</button>
+                            <!-- 거래처 -->
+                            <tr>
+                                <th class="table-header">거래처</th>
+                                <td>
+                                    <select v-model="SelectedClient">
+                                        <option value="" disabled>전체</option>
+                                        <option v-for="client in clients" :key="client.client_id" :value="client.client_id">
+                                            {{ client.client_name }}
+                                        </option>
+                                    </select>
+                                </td>
+                                <th class="table-header">목표 수량</th>
+                                <td><input type="text" v-model="detailData.goal_quanti" /></td>
+                            </tr>
+
+                            <!-- 메모 -->
+                            <tr>
+                                <th class="table-header">메모</th>
+                                <td><input type="text" v-model="detailData.plan_memo" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="button-box">
+                        <button @click="saveSalesPlan">수정</button>
+                        <button type="button" @click="closeModal">취소</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </teleport>
+        </teleport>
+    </div>
 </template>
+
 
 <style lang="scss" scoped>
 .backdrop {

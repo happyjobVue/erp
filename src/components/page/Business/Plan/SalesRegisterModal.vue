@@ -9,7 +9,7 @@ import {
 } from '../../../../common/selectBoxApi';
 import axios from 'axios';
 
-const { id } = defineProps(['id']);
+
 
 // 사용자 정보 가져오기
 const userId = useUserInfo();
@@ -43,8 +43,6 @@ const goalQuanti = ref(0); // 목표 수량
 //메모 
 const memo = ref('');
 
-//상세조회 데이터 
-const detailData = ref('');
 
 
 onMounted(async () => {
@@ -52,16 +50,6 @@ onMounted(async () => {
     clients.value = await fetchClient();
 });
 
-onMounted(()=>{
-    id && planDetail();
-});
-
-// 영업 계획 상세 조회 
-async function planDetail() {
-        const response = await axios.get(`/api/business/sales-plan/detail/?planNum${id}`);
-        const data = response.data.detailPlan;
-
-}
 
 
 // 제조사 선택 이벤트 핸들러
@@ -108,6 +96,9 @@ const saveSalesPlan = () => {
 
     };
 
+    const closeModal =() =>{
+    modalState.setModalState();
+}
 
 
 </script>
@@ -186,7 +177,7 @@ const saveSalesPlan = () => {
 
                 <div class="button-box">
                     <button @click="saveSalesPlan">등록</button>
-                    <button type="button" @click="clearForm">취소</button>
+                    <button type="button" @click="closeModal">취소</button>
                 </div>
             </div>
         </div>

@@ -50,10 +50,15 @@ const onPostSuccess = () => {
 };
 
 const handlerModal = id =>{
+
     planNum.value =id; 
     modalState.setModalType('view');
     modalState.setModalState();
-}
+    console.log('모달 상태:', modalState.modalState.value);  // 상태 확인
+    console.log('모달 타입:', modalState.modalType.value);  // 타입 확인
+};
+
+
 
 //첫번째 인자 데이터 , 두번째 인자 함수
 watch(() => route.query, searchList);
