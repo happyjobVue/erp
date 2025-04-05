@@ -9,7 +9,7 @@ import {
 } from '../../../../common/selectBoxApi';
 import axios from 'axios';
 
-
+const { id } = defineProps(['id']);
 
 // 사용자 정보 가져오기
 const userId = useUserInfo();
@@ -43,11 +43,26 @@ const goalQuanti = ref(0); // 목표 수량
 //메모 
 const memo = ref('');
 
+//상세조회 데이터 
+const detailData = ref('');
+
 
 onMounted(async () => {
     manufacturers.value = await fetchManufacturers();
     clients.value = await fetchClient();
 });
+
+onMounted(()=>{
+    id && planDetail();
+});
+
+// 영업 계획 상세 조회 
+async function planDetail() {
+        const response = await axios.get(`/api/business/sales-plan/detail/?planNum${id}`);
+        const data = response.data.detailPlan;
+
+}
+
 
 // 제조사 선택 이벤트 핸들러
 // 제조사 코드와 ID를 저장 필요 -> 테이블 연결되어 있지 않아 데이터 유효성을 위한 처리 
@@ -101,7 +116,7 @@ const saveSalesPlan = () => {
     <teleport to="body">
         <div class="backdrop">
             <div class="container">
-                <h2>영업 계획</h2>
+                <h2>영업 계획 등록</h2>
           
                 <table>
                     <tbody>

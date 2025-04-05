@@ -5,10 +5,12 @@ import { useUserInfo } from '../../../../stores/userInfo';
 import { useModalStore } from '../../../../stores/modalState';
 import { onMounted } from 'vue';
 import SalesRegisterModal from './SalesRegisterModal.vue';
+import SalesDetailModal from './SalesDetailModal.vue';
 const salesPlanListData = ref();
 const salesPlanListCnt = ref();
 const userId = useUserInfo();
 const modalState = useModalStore();
+const planNum =ref(0);
 const cPage = ref(1);
 const route = useRoute();
 const salesPlanDefaultList = () => {
@@ -42,13 +44,32 @@ onMounted(() => {
     salesPlanDefaultList();
 });
 
+const onPostSuccess = () => {
+    modalState.setModalState();
+    salesPlanDefaultList();
+};
+
+const handlerModal = id =>{
+    planNum.value =id; 
+    modalState.setModalType('view');
+    modalState.setModalState();
+}
+
 //첫번째 인자 데이터 , 두번째 인자 함수
 watch(() => route.query, searchList);
 </script>
 
 <template>
     <div class="divSalesPlanList">
-        <SalesRegisterModal v-if="modalState.modalState" />
+        <SalesDetailModal 
+        v-if="modalState.modalState && modalState.modalType==='view'"
+        :id="planNum"
+        @modalClose="planNum = $event"
+        @postSuccess=" onPostSuccess"/>
+        <SalesRegisterModal 
+        v-if="modalState.modalState && modalState.modalType==='register'"
+        />
+        
         <table>
             <thead>
                 <th scope="col">목표날짜</th>
@@ -65,6 +86,7 @@ watch(() => route.query, searchList);
                         <tr
                             v-for="plan in salesPlanListData"
                             :key="plan.plan_num"
+                            @click ="handlerModal(plan.plan_num)"
                         >
                             <td>{{ plan.target_date }}</td>
                             <td>{{ plan.client_name }}</td>

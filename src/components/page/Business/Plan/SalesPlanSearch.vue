@@ -21,6 +21,12 @@ async function handleManufacturerChange() {
     }
 }
 
+// 등록 모달 열기
+const openRegisterModal = () => {
+    modalState.setModalType('register');  // 등록 모달 타입 설정
+    modalState.setModalState();  // 모달 열기
+};
+
 const handlerSearch = () => {
     const query = [];
     !selectedManufacturer.value ||
@@ -74,7 +80,7 @@ onMounted(async () => {
         <input type="date" v-model="searchStDate" />
     </div>
     <button @click="handlerSearch">조회</button>
-    <button @click="modalState.setModalState()">신규 등록</button>
+    <button @click="openRegisterModal">신규 등록</button>
 </template>
 
 <style lang="scss" scoped>
