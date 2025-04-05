@@ -5,6 +5,7 @@ import Notice from '../views/System/Notice.vue';
 import Manage from '../views/Account/Manage.vue';
 import Department from '../views/System/Department.vue';
 import SalaryList from '../views/Personnel/Salary-list.vue';
+import Daily from '../views/Sales/Daily.vue';
 import Employee from '../views/Employee/Employee.vue';
 import ExpenseList from '../views/Account/ExpenseList.vue';
 
@@ -43,6 +44,17 @@ const routes = [
                         path: 'salary-list',
                         name: 'salary-list',
                         component: SalaryList,
+                    },
+                ],
+            },
+            {
+                path: 'sales',
+                name: 'sales',
+                children: [
+                    {
+                        path: 'daily',
+                        name: 'daily',
+                        component: Daily,
                     },
                 ],
             },

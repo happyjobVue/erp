@@ -76,7 +76,6 @@ const searchList = async () => {
             '/api/system/noticeListBody.do',
             param
         );
-        console.log(response.data);
         noticeList.value = response.data;
     } catch (e) {
         console.error(e);
