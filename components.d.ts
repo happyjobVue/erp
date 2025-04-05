@@ -20,6 +20,5 @@ declare module 'vue' {
     SalesPlanMain: typeof import('./src/components/page/Business/Plan/SalesPlanMain.vue')['default']
     SalesPlanSearch: typeof import('./src/components/page/Business/Plan/SalesPlanSearch.vue')['default']
     SalesRegisterModal: typeof import('./src/components/page/Business/Plan/SalesRegisterModal.vue')['default']
-    SelectBox: typeof import('./src/components/common/SelectBox.vue')['default']
   }
 }

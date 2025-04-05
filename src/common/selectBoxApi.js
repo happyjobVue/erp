@@ -25,4 +25,15 @@ export async function fetchProductsByManufacturer(industryCode) {
         console.error('제품 목록 오류:', error);
         return [];
     }
+};
+
+//거래처 조회 api 
+export async function fetchClient(){
+    try{
+        const response = await axios.post('/api/business/searchClientList.do');
+        return response.data.clientList;
+    }catch(error){
+        console.error('거래처 목록 오류:', error);
+        return [];
+    }
 }
