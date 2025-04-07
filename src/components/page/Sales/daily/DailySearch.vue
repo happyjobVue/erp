@@ -17,7 +17,6 @@
                 <button>오늘</button>
                 <svg-icon @click="getDay(1)" class="icon" type="mdi" :path="rightPath" :size="24"></svg-icon>
             </div>
-            <!-- v-on:click="" 또는 @click=""으로 이벤트를 설정한다. -->
             <div class="search-button">
                 <button @click="handleSearch">조회</button>
             </div>
@@ -31,14 +30,11 @@ import { onMounted } from 'vue';
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiArrowLeftDropCircleOutline, mdiArrowRightDropCircleOutline } from '@mdi/js'
 import { formatDate, getToday } from '../../../../common/dateForm';
-
 const clientList = ref([])
 const searchClient = ref('')
 const searchDate = ref('');
 const leftPath = mdiArrowLeftDropCircleOutline
 const rightPath = mdiArrowRightDropCircleOutline
-
-
 const setSelectClient = async () => {
     try {
         const res = await axios.post('/api/business/clientNames')
@@ -66,11 +62,9 @@ const getDay = (day) => {
 onMounted(() => {
     setSelectClient()
     searchDate.value = getToday()
-})
-
-onMounted(() => {
     window.location.search && router.replace(window.location.pathname)
 })
+
 
 
 </script>
