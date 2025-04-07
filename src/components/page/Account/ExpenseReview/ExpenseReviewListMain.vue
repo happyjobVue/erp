@@ -1,6 +1,6 @@
 <template>
     <div class="divNoticeList">
-        <ExpenseListModal
+        <ExpenseReviewListModal
             v-if="modal.modalState"
             :id="expenseId"
             @modalClose="expenseId = $event"

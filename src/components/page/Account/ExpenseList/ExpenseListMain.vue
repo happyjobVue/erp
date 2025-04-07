@@ -83,7 +83,6 @@ const approvalMap = computed(() => ({
 }));
 
 const searchList = async () => {
-    console.log('onMounted');
     const param = new URLSearchParams({
         ...route.query,
         pageSize: 5,
@@ -99,13 +98,16 @@ const searchList = async () => {
 };
 
 const handlerModal = id => {
-    console.log('🛠️ handlerModal called with id:', id);
     expenseId.value = id;
     modal.setModalState();
 };
 
+const onPostSuccess = () => {
+    modal.setModalState();
+    searchList();
+};
+
 onMounted(() => {
-    console.log('onMounted');
     searchList();
 });
 
