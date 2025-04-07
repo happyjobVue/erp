@@ -52,7 +52,8 @@ onMounted(() => {
 
 // 모달이 성공적으로 닫힌 후 실행될 함수
 const onPostSuccess = () => {
-    modalState.setModalState(true); // 모달 열기
+    modalState.setModalState(); // 모달 열기
+    modalType.value = ''; // 모달 타입 초기화
     salesPlanDefaultList(); // 목록 새로고침
 };
 
@@ -86,10 +87,11 @@ watch(() => route.query, searchList);
         <!-- 등록 모달 -->
         <SalesRegisterModal
             v-if="modalState.modalState && modalType === 'register'"
+            @postSuccess="onPostSuccess"
         />
 
         <!-- 신규 등록 버튼 -->
-        <button @click="openRegisterModal">신규 등록</button>
+        <button @click="openRegisterModal()">신규 등록</button>
 
         <!-- 판매 계획 목록 테이블 -->
         <table>

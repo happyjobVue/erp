@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import { useUserInfo } from '../../../../stores/userInfo';
 import {
@@ -39,6 +39,8 @@ const SelectedClient = ref(''); // 거래처 객체를 직접 저장
 const goalQuanti = ref(0); // 목표 수량
 //메모
 const memo = ref('');
+
+const emit = defineEmits(['postSuccess']);
 
 onMounted(async () => {
     manufacturers.value = await fetchManufacturers();
@@ -80,18 +82,10 @@ const saveSalesPlan = () => {
         plan_memo: memo.value,
     }; // salesPlan 객체 생성
 
-    axios
-        .post('/api/business/sales-plan/insertPlan.do', salesPlan)
-        .then(res => {
-            console.log('저장로직');
-            if (res.data.result === 'sucess') {
-                alert('저장되었습니다.');
-            }
-        });
-};
-
-const closeModal = () => {
-    modalState.setModalState();
+    axios.post('/api/business/sales-plan/insertPlan.do', salesPlan).then(() => {
+        alert('저장 완료되었습니다.');
+        emit('postSuccess');
+    });
 };
 </script>
 
@@ -177,8 +171,10 @@ const closeModal = () => {
                 </table>
 
                 <div class="button-box">
-                    <button @click="saveSalesPlan">등록</button>
-                    <button type="button" @click="closeModal">취소</button>
+                    <button @click="saveSalesPlan()">등록</button>
+                    <button type="button" @click="modalState.setModalState()">
+                        취소
+                    </button>
                 </div>
             </div>
         </div>

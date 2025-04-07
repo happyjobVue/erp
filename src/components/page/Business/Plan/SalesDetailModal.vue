@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 
 import axios from 'axios';
@@ -25,16 +25,15 @@ const detailData = ref({
 
 const emit = defineEmits(['modalClose', 'postSuccess']);
 
-const closeModal = () => {
-    modalState.setModalState();
-};
-
 onMounted(() => {
     if (id) {
         planDetail(); // id가 있을 때만 호출
     }
 });
 
+onUnmounted(() => {
+    emit('modalClose', 0);
+});
 // 영업 계획 상세 조회
 async function planDetail() {
     const param = new URLSearchParams({ planNum: id });
@@ -63,7 +62,8 @@ async function updateSalesPlan() {
         );
 
         if (response.data.result === 'success') {
-            alert('저장이 완료되었습니다.');
+            alert('수정이 완료되었습니다.');
+            emit('postSuccess');
         } else {
             alert('저장이 실패되었습니다.' + response.data.message);
         }
@@ -127,7 +127,7 @@ async function updateSalesPlan() {
                                 <td>
                                     <input
                                         type="text"
-                                        :value="detailData.client_name"
+                                        v-model="detailData.client_name"
                                         readonly
                                     />
                                 </td>
@@ -154,8 +154,13 @@ async function updateSalesPlan() {
                     </table>
 
                     <div class="button-box">
-                        <button @click="updateSalesPlan">수정</button>
-                        <button type="button" @click="closeModal">취소</button>
+                        <button @click="updateSalesPlan()">수정</button>
+                        <button
+                            type="button"
+                            @click="modalState.setModalState()"
+                        >
+                            취소
+                        </button>
                     </div>
                 </div>
             </div>
