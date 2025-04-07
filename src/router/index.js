@@ -9,7 +9,7 @@ import Daily from '../views/Sales/Daily.vue';
 import Monthly from '../views/Sales/Monthly.vue';
 import Employee from '../views/Employee/Employee.vue';
 import ExpenseList from '../views/Account/ExpenseList.vue';
-import Plan from '../views/Business/Plan/Plan.vue';
+import Annual from '../views/Sales/annual.vue';
 
 const routes = [
     {
@@ -31,13 +31,53 @@ const routes = [
                         name: 'notice',
                         component: Notice,
                     },
+                    {
+                        path: 'department',
+                        name: 'department',
+                        component: Department,
+                    },
                 ],
             },
-        ],
-        children: [
             {
-                path: 'business',
-                name: 'business',
+                path: 'personnel',
+                name: 'personnel',
+                children: [
+                    {
+                        path: 'salary-list',
+                        name: 'salary-list',
+                        component: SalaryList,
+                    },
+                    {
+                        path: 'employee',
+                        name: 'employee',
+                        component: Employee,
+                    },
+                ],
+            },
+            {
+                path: 'sales',
+                name: 'sales',
+                children: [
+                    {
+                        path: 'daily',
+                        name: 'daily',
+                        component: Daily,
+                    },
+                    {
+                        path: 'monthly',
+                        name: 'monthly',
+                        component: Monthly,
+                    },
+                    {
+                        path: 'annual',
+                        name: 'annual',
+                        component: Annual,
+                    },
+                ],
+            },
+            {
+                path: 'account',
+                name: 'account',
                 children: [
                     {
                         path: 'sales-plan',

@@ -7,6 +7,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AnnualClientModal: typeof import('./src/components/page/Sales/annual/annualClientModal.vue')['default']
+    AnnualMain: typeof import('./src/components/page/Sales/annual/annualMain.vue')['default']
+    AnnualProductModal: typeof import('./src/components/page/Sales/annual/annualProductModal.vue')['default']
+    AnnualSearch: typeof import('./src/components/page/Sales/annual/annualSearch.vue')['default']
     ContextBox: typeof import('./src/components/common/ContextBox.vue')['default']
     DailyMain: typeof import('./src/components/page/Sales/daily/DailyMain.vue')['default']
     DailySearch: typeof import('./src/components/page/Sales/daily/DailySearch.vue')['default']
