@@ -9,6 +9,7 @@ import Daily from '../views/Sales/Daily.vue';
 import Monthly from '../views/Sales/Monthly.vue';
 import Employee from '../views/Employee/Employee.vue';
 import ExpenseList from '../views/Account/ExpenseList.vue';
+import Annual from '../views/Sales/annual.vue';
 
 const routes = [
     {
@@ -66,6 +67,11 @@ const routes = [
                         path: 'monthly',
                         name: 'monthly',
                         component: Monthly,
+                    },
+                    {
+                        path: 'annual',
+                        name: 'annual',
+                        component: Annual,
                     },
                 ],
             },

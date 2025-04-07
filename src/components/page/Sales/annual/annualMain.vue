@@ -1,14 +1,14 @@
 <template>
-    <div class="monthly-container">
-        <MonthlyProductModal v-if="modal.modalState && modalTag === 'product'" :searchStDate="paramStDate"
+    <div class="annual-container">
+        <AnnualProductModal v-if="modal.modalState && modalTag === 'product'" :searchStDate="paramStDate"
             :searchEdDate="paramEdDate" />
-        <MonthlyClientModal v-if="modal.modalState && modalTag === 'client'" :searchStDate="paramStDate"
+        <AnnualClientModal v-if="modal.modalState && modalTag === 'client'" :searchStDate="paramStDate"
             :searchEdDate="paramEdDate" />
-        <div class="monthly-chart">
-            <div class="monthly-graph">
+        <div class="annual-chart">
+            <div class="annual-graph">
                 <Line class="Line-chart" :data="data" :options="options" />
             </div>
-            <div class="monthly-statistics">
+            <div class="annual-statistics">
                 <table>
                     <tr>
                         <th></th>
@@ -43,7 +43,7 @@
             <button @click="handlerModal('product')">매출상위제품</button>
             <button @click="handlerModal('client')">매출상위기업</button>
         </div>
-        <div class="monthly-table">
+        <div class="annual-table">
             <table>
                 <colgroup>
                     <col width="10%">
@@ -55,7 +55,7 @@
                 </colgroup>
                 <thead>
                     <tr>
-                        <th scope="col">날짜</th>
+                        <th scope="col">년도</th>
                         <th scope="col">주문건수</th>
                         <th scope="col">매출</th>
                         <th scope="col">매출 원가</th>
@@ -64,7 +64,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item, index) in monthlyList" :key="index">
+                    <tr v-for="(item, index) in annualList" :key="index">
                         <td>{{ item.orderDate }}</td>
                         <td>{{ item.orderCount }}</td>
                         <td>{{ item.totalSupplyPrice?.toLocaleString('ko-KR') }}</td>
@@ -95,13 +95,12 @@ import {
 } from 'chart.js';
 import Swal from "sweetalert2";
 import router from '@/router';
-import { getMonth, getMonthPeriod } from '../../../../common/dateForm';
 import { useModalStore } from '../../../../stores/modalState';
 const modal = useModalStore()
 const route = useRoute()
 const maxValue = ref()
 const stepSize = ref()
-const monthlyList = ref([])
+const annualList = ref([])
 const sumAmountList = ref({})
 const modalTag = ref('')
 const upPath = mdiMenuUp
@@ -118,43 +117,43 @@ ChartJS.register(
     Legend,
 );
 
+const searchAnnual = async () => {
+    const now = new Date();
+    const now_year = now.getFullYear()
+    paramStDate.value = route.query['searchStDate'] ? route.query['searchStDate'] : now_year
+    paramEdDate.value = route.query['searchEdDate'] ? route.query['searchEdDate'] : now_year
 
-const searchMonthly = async () => {
-    paramStDate.value = route.query['searchStDate'] ? route.query['searchStDate'] : getMonth()
-    paramEdDate.value = route.query['searchEdDate'] ? route.query['searchEdDate'] : getMonth()
-
-    const monthPeriod = getMonthPeriod(paramStDate.value, paramEdDate.value)
-    if (monthPeriod < 0) {
+    if (paramEdDate.value - paramStDate.value  < 0) {
         Swal.fire({
             icon: "error",
-            title: "시작일이 끝나는 날 이후일 수 없습니다.",
+            title: "시작 년도가 끝나는 년도 이후일 수 없습니다.",
         })
 
         window.location.search && router.replace(window.location.pathname)
         return
     } 
 
-    if (monthPeriod > 5) {
+    if (paramEdDate.value - paramStDate.value > 5) {
         Swal.fire({
             icon: "error",
-            title: "6개월 이내의 데이터만 검색 가능합니다."
+            title: "6년 이내의 데이터만 검색 가능합니다."
         })
 
         window.location.search && router.replace(window.location.pathname)
         return
     } 
+
 
     const param = new URLSearchParams({
-        searchStDate: route.query['searchStDate'] ? route.query['searchStDate'] : getMonth(),
-        searchEdDate: route.query['searchEdDate'] ? route.query['searchEdDate'] : getMonth(),
+        searchStDate: route.query['searchStDate'] ? route.query['searchStDate'] : now_year,
+        searchEdDate: route.query['searchEdDate'] ? route.query['searchEdDate'] : now_year,
     })
 
-
     try {
-        const res = await axios.post('/api/sales/monthlyList.do', param)
-        const monthlyData = res.data
-        monthlyList.value = monthlyData.monthlyList
-        const total = monthlyData.monthlyList.reduce((acc, curr) => {
+        const res = await axios.post('/api/sales/annualList.do', param)
+        const annualData = res.data
+        annualList.value = annualData.annualList
+        const total = annualData.annualList.reduce((acc, curr) => {
             acc.totalSupplyPrice += curr.totalSupplyPrice
             acc.totalUnitPrice += curr.totalUnitPrice;
             acc.totalReceivableAmount += curr.totalReceivableAmount;
@@ -162,7 +161,7 @@ const searchMonthly = async () => {
             return acc;
         }, { totalSupplyPrice: 0, totalUnitPrice: 0, totalReceivableAmount: 0, totalExpenseAmount: 0 })
         sumAmountList.value = total
-        const allValues = monthlyList.value.flatMap(item => [
+        const allValues = annualList.value.flatMap(item => [
             item.totalSupplyPrice,
             item.totalExpenseAmount,
         ]);
@@ -182,19 +181,19 @@ const priceDifference = computed(() => {
 });
 
 const data = computed(() => {
-    const isSingleData = monthlyList.value.length === 1;
+    const isSingleData = annualList.value.length === 1;
 
     const labels = isSingleData
-        ? ["", monthlyList.value[0].orderDate, ""]
-        : monthlyList.value.map(item => item.orderDate);
+        ? ["", annualList.value[0].orderDate, ""]
+        : annualList.value.map(item => item.orderDate);
 
     const salesData = isSingleData
-        ? [null, monthlyList.value[0].totalSupplyPrice, null]
-        : monthlyList.value.map(item => item.totalSupplyPrice);
+        ? [null, annualList.value[0].totalSupplyPrice, null]
+        : annualList.value.map(item => item.totalSupplyPrice);
 
     const expenseData = isSingleData
-        ? [null, monthlyList.value[0].totalExpenseAmount, null]
-        : monthlyList.value.map(item => item.totalExpenseAmount);
+        ? [null, annualList.value[0].totalExpenseAmount, null]
+        : annualList.value.map(item => item.totalExpenseAmount);
 
     return {
         labels,
@@ -256,26 +255,26 @@ const handlerModal = tag => {
 };
 
 onMounted(() => {
-    searchMonthly();
+    searchAnnual();
 });
 
-watch(() => route.query, searchMonthly);
+watch(() => route.query, searchAnnual);
 
 </script>
 <style lang="scss" scoped>
-.monthly-chart {
+.annual-chart {
     display: flex;
     align-items: center;
     gap: 100px;
     /* ✅ 중간 여백 */
 }
 
-.monthly-graph,
-.monthly-statistics {
+.annual-graph,
+.annual-statistics {
     flex: 1;
 }
 
-.monthly-table {
+.annual-table {
     margin-top: 10px;
 }
 
