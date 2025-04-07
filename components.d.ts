@@ -41,5 +41,9 @@ declare module 'vue' {
     SalaryListMain: typeof import('./src/components/page/personnel/Salary-list/SalaryListMain.vue')['default']
     SalaryListModal: typeof import('./src/components/page/personnel/Salary-list/SalaryListModal.vue')['default']
     SalaryListSearch: typeof import('./src/components/page/personnel/Salary-list/SalaryListSearch.vue')['default']
+    SalesDetailModal: typeof import('./src/components/page/Business/Plan/SalesDetailModal.vue')['default']
+    SalesPlanMain: typeof import('./src/components/page/Business/Plan/SalesPlanMain.vue')['default']
+    SalesPlanSearch: typeof import('./src/components/page/Business/Plan/SalesPlanSearch.vue')['default']
+    SalesRegisterModal: typeof import('./src/components/page/Business/Plan/SalesRegisterModal.vue')['default']
   }
 }

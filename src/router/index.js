@@ -80,14 +80,9 @@ const routes = [
                 name: 'account',
                 children: [
                     {
-                        path: 'manage',
-                        name: 'manage',
-                        component: Manage,
-                    },
-                    {
-                        path: 'expense-list',
-                        name: 'expense-list',
-                        component: ExpenseList,
+                        path: 'sales-plan',
+                        name: 'sales-plan',
+                        component: Plan,
                     },
                 ],
             },
