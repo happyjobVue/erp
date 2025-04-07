@@ -18,10 +18,10 @@ const searchPlanResult = () => {
     console.log("검색로직")
     const query = [];
     !selectedManufacturer.value ||
-        query.push(`industryCode=${selectedManufacturer.value}`);
+        query.push(`manufacturerId=${selectedManufacturer.value}`);
     !selectedProduct.value || query.push(`productId=${selectedProduct.value}`);
-    !searchDate.value || query.push(`searchDate=${searchDate.value}`);
-    !SelectedClient.value || query.push(`client=${SelectedClient.value}`);
+    !searchDate.value || query.push(`targetDate=${searchDate.value}`);
+    !SelectedClient.value || query.push(`clientId=${SelectedClient.value}`);
     !empId.value || query.push(`empId=${empId.value}`);
 
     const queryString = query.length > 0 ? `?${query.join('&')}` : '';
