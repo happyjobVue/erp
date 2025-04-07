@@ -1,9 +1,100 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 const address = ref("");
 const addressCode = ref('');
 const emit = defineEmits(['closeModal']);
+const props = defineProps(['modalType','UserDetail']);
+
+//사원 등록 
+const employeeName = ref('');
+const registrationNumber = ref('');
+const sex = ref('');
+const birthday = ref('');
+const finalEducation = ref('');
+const email = ref('');
+const hp = ref(0);
+const addressDetail = ref('');
+const bank = ref('');
+const bankAccount = ref('');
+const departmentDetailName = ref('');
+const jobGradeDetailName = ref('');
+const jobRoleDetailName = ref('');
+const regDate = ref('');
+const emplStatus = ref('');
+
+
+
+
+//퇴직이유
+const resignationReason = ref('');
+//퇴직 날짜
+const resignationDate = ref('');
+//퇴직금
+const severancePay = ref(0);
+//연봉
+const salary = ref(0);
+const NowemployeeId = ref('');
+const NowregDate = new Date();
+
+//연봉 계산기 계산하기
+const Onsalary = () => {
+
+    const currentDatae = new Date();
+
+    //현재 일짜 
+    currentDatae.value = new Date().toISOString().slice(0, 10);
+
+    const anIncome = currentDatae.getFullYear() - NowregDate.getFullYear();
+
+    switch (anIncome) {
+  case 1:
+    salary.value = 30000000;
+    break;
+  case 2:
+    salary.value = 35000000;
+    break;
+  case 3:
+    salary.value = 40000000;
+    break;
+  case 4:
+    salary.value = 45000000;
+    break;
+  case 5:
+    salary.value = 50000000;
+    break;
+  default:
+    console.log("1~5년 사이가 아닙니다.");
+    break;
+
+}
+}
+
+watch(
+  () => props.UserDetail,
+  (newVal) => {
+    if (newVal && newVal.detail && newVal.detail.employeeId) {
+      NowemployeeId.value = newVal.detail.employeeId;
+      NowregDate.value = newVal.detail.regDate;
+
+    }
+  },
+  { immediate: true } // 필요에 따라 사용, 없으면 값 바뀔 때만 감지
+);
+
+const OnRetire = () => {
+
+    Onsalary();
+
+    emit('update-retire-info', {
+        resignationReason: resignationReason.value,
+        resignationDate: resignationDate.value,
+        severancePay: severancePay.value,
+        salary: salary.value,
+        employeeId: NowemployeeId.value
+    })
+
+}
 
 const openDaumPostcode = () => {
   new window.daum.Postcode({
@@ -34,276 +125,320 @@ onMounted(() => {
 
 </script>
 <template>
-  <!-- 모달 오버레이 -->
-  <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <!-- 모달 헤더 -->
-            <div class="modal-header">
+    <div v-if="modalType === 'register'">
+        <div class="modal-overlay">
+            <div class="modal-container">
+                <div class="modal-header">
                 <h2>사원 상세 정보</h2>
-                <button class="close-btn"></button>
+                <button class="modal-close" @click="closeModal">×</button>
+                </div>
+        
+                <div class="modal-body">
+                <!-- 1. 기본 정보 -->
+                <table class="row">
+                    <tbody>
+                    <tr>
+                        <td rowspan="2" colspan="2"><div id="preview"></div></td>
+                        <th>사번</th>
+                        <td colspan="3"><input type="text" class="inputTxt" id="number" placeholder="자동 입력됨" readonly /></td>
+                        <th>이름 <span class="required">*</span></th>
+                        <td colspan="3"><input type="text" class="inputTxt" id="employeeName" v-model="employeeName "/></td>
+                    </tr>
+                    <tr>
+                        <th>주민번호 <span class="required">*</span></th>
+                        <td colspan="3"><input type="text" class="inputTxt" id="registrationNumber" placeholder="숫자만 입력" @input="formatRegistrationNumber" 
+                            v-model="registrationNumber"
+                            /></td>
+                        <th>성별 <span class="required">*</span></th>
+                        <td colspan="3">
+                        <label><input type="radio" name="sex" value="남자" v-model="sex"/> 남자</label>
+                        <label><input type="radio" name="sex" value="여자" v-model="sex "/> 여자</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><input type="file" class="inputTxt" id="fileInput" /></td>
+                        <th>생년월일 <span class="required">*</span></th>
+                        <td colspan="3"><input type="date" class="inputTxt" id="birthday" v-model="birthday"/></td>
+                        <th>최종학력 <span class="required">*</span></th>
+                        <td colspan="3">
+                        <select class="inputSelect" id="finalEducation" v-model="finalEducation">
+                            <option value="">선택 필수</option>
+                            <option value="초졸">초졸</option>
+                            <option value="중졸">중졸</option>
+                            <option value="고졸">고졸</option>
+                            <option value="대졸">대졸</option>
+                            <option value="석사">석사</option>
+                            <option value="박사">박사</option>
+                        </select>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+        
+                <!-- 2. 연락처 및 계좌 -->
+                <table class="row">
+                    <tbody>
+                    <tr>
+                        <th>이메일 <span class="required">*</span></th>
+                        <td colspan="3"><input type="email" class="inputTxt" id="email" v-model="email" /></td>
+                        <th>연락처 <span class="required">*</span></th>
+                        <td colspan="3"><input type="text" class="inputTxt" id="hp" placeholder="숫자만 입력" @input="formatPhoneNumber" v-model="hp" /></td>
+                    </tr>
+                    <tr>
+                        <th>우편번호 <span class="required">*</span></th>
+                        <td colspan="2"><input type="text" class="inputTxt" id="zipCode" v-model="addressCode" /></td>
+                        <td><button @click="openDaumPostcode" class="btnType blue" style="width:130px;height:28px;">우편번호 찾기</button></td>
+                        <th rowspan="2">은행계좌 <span class="required">*</span></th>
+                        <td colspan="3">
+                        <select class="inputSelect" id="bank" v-model="bank">
+                            <option value="">선택 필수</option>
+                            <option value="기업">기업</option>
+                            <option value="하나">하나</option>
+                            <option value="농협">농협</option>
+                            <option value="우리">우리</option>
+                            <option value="신한">신한</option>
+                            <option value="카카오뱅크">카카오뱅크</option>
+                            <option value="국민">국민</option>
+                            <option value="수협">수협</option>
+                            <option value="케이뱅크">케이뱅크</option>
+                            <option value="산업">산업</option>
+                        </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th rowspan="2">주소 <span class="required">*</span></th>
+                        <td colspan="3"><input type="text" class="inputTxt" id="address" placeholder="주소" v-model="address" /></td>
+                        <td colspan="3"><input type="text" class="inputTxt" id="bankAccount" placeholder="계좌번호" v-model="bankAccount"/></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6"><input type="text" class="inputTxt" id="addressDetail" placeholder="상세주소" v-model="addressDetail" /></td>
+                    </tr>
+                    </tbody>
+                </table>
+        
+                <!-- 3. 부서 및 직무 -->
+                <table class="row">
+                    <tbody>
+                    <tr>
+                        <th>부서 <span class="required">*</span></th>
+                        <td colspan="3">
+                        <select class="inputSelect" id="departmentGroup" v-model="departmentDetailName ">
+                            <option value="">전체</option>
+                            <!-- v-for 로 대체 -->
+                        </select>
+                        </td>
+                        <th>부서코드</th>
+                        <td colspan="3"><input type="text" class="inputTxt" id="departmentCode" placeholder="자동 입력됨" readonly /></td>
+                        <th>직무</th>
+                        <td colspan="3">
+                        <select class="inputSelect" id="jobRoleGroup" v-model="jobGradeDetailName ">
+                            <option value="">-</option>
+                        </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>직급 <span class="required">*</span></th>
+                        <td colspan="3">
+                        <select class="inputSelect" id="jobGradeGroup" v-model="jobRoleDetailName">
+                            <option value="">전체</option>
+                            <!-- v-for 로 대체 -->
+                        </select>
+                        </td>
+                        <th>직급코드</th>
+                        <td colspan="3"><input type="text" class="inputTxt" id="jobGradeCode" placeholder="자동 입력됨" readonly /></td>
+                        <th>재직구분 <span class="required">*</span></th>
+                        <td colspan="3">
+                        <label><input type="radio" name="emplStatus" value="W" v-model="emplStatus"/> 재직</label>
+                        <label><input type="radio" name="emplStatus" value="F" v-model="emplStatus"/> 퇴직</label>
+                        <label><input type="radio" name="emplStatus" value="O" v-model="emplStatus"/> 휴직</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>입사일 <span class="required">*</span></th>
+                        <td colspan="3"><input type="date" class="inputTxt" id="regDate" v-model="regDate"/></td>
+                        <th>퇴직일</th>
+                        <td colspan="3"><input type="date" class="inputTxt" id="resignationDate" readonly /></td>
+                        <th>근무연차</th>
+                        <td colspan="3"><input type="text" class="inputTxt" id="workingYear" placeholder="자동 입력됨" readonly /></td>
+                    </tr>
+                    <tr>
+                        <th>연봉</th>
+                        <td colspan="3">
+                        <input type="text" class="inputTxt" id="salary" @input="formatSalary" placeholder="자동 입력됨" />
+                        </td>
+                        <th>퇴직금</th>
+                        <td colspan="3"><input type="text" class="inputTxt" id="detailSeverancePay" placeholder="퇴직시 자동 입력됨" readonly /></td>
+                        <th>비고</th>
+                        <td colspan="3"><input type="text" class="inputTxt" id="empMemo" /></td>
+                    </tr>
+                    </tbody>
+                </table>
+                
+                <!-- 버튼 영역 -->
+                <div class="btn_areaC mt30">
+                    <button class="btnType blue" @click="saveEmployee" v-if="modalType === 'register'" >등록</button>
+                    <button class="btnType blue" @click="updateEmployee" v-else >수정</button>
+                    <button class="btnType gray" @click="closeModal">취소</button>
+                </div>
+                </div>
             </div>
-
-            <!-- 모달 본문 -->
-            <div class="modal-body">
-                <!-- 프로필 이미지 -->
-                 <div class="DetailImg">
-                    <div class="profile" >
-                        <img src="" alt="프로필">
-                        <input type="file">
-                    </div>
-
-                    <div>
-                        
-                    </div class="totalDetail">
-                    <!-- 상세정보  -->
-                    <div class="Detailinfo">
-                        <div>
-                            <label>사번</label>
-                            <input type="text">
-                        </div>
-                        <div>
-                            <label>이름</label>
-                            <input type="text">
-                        </div>
-                        <!-- 주민번호 / 성별 -->
-                        <div>
-                            <label>주민번호</label>
-                            <input type="text">
-                        </div>
-                    </div>
-                    <div class="SubDetailinfo">
-                        <div class="checkSex" style="display: flex; align-items: center; margin-top: 8px;">
-                            <label>성별</label>
-                            <div style="display: flex; margin-left: 20px;">
-                                <label style="width: 80px;">남자</label>
-                                <input type="checkbox" style="margin-left: -10px;" />
-                            </div>
-                            <div style="display: flex;">
-                                <label style="width: 80px; ">여자</label>
-                                <input type="checkbox" style="margin-left: -10px;" />
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 10px;">
-                            <label>생년월일</label>
-                            <input type="date" />
-                        </div>
-
-                        <div>
-                            <label>최종학력</label>
-                            <select>
-                                <option>대졸</option>
-                                <option>고졸</option>
-                            </select>
-                        </div>
-                    </div>
-                 </div>
             </div>
-            <div>
-                                <!-- 이메일 / 연락처 -->
-                <div>
-                    <label>이메일</label>
-                    <input type="email">
-                </div>
-
-                <div>
-                    <label>우편번호</label>
-                    <input type="text" v-model="addressCode" />
-                    <input type="text" v-model="address" />
-                    <button @click="openDaumPostcode">주소 찾기</button>
-                </div>
-                <div>
-                    <label>상세 주소</label>
-                    <input type="text">
-                </div>
-
-                <div>
-                    <label>연락처</label>
-                    <input type="text">
-                </div>
-
-                <div>
-                    <label>은행계좌</label>
-                    <select name="" id="">
-                        <option value="">신한</option>
-                        <option value="">국민</option>
-                        <option value="">기업</option>
-                    </select>
-                    <input type="text">
-                </div>
+    </div>
 
 
+    <div v-if="modalType === 'retire'">
+        <div class="modal-overlay">
+            <div class="modal-container" style="width: 600px;">
+            <dl>
+                <dt style="display: flex; justify-content: space-between;">
+                <strong style="margin-left: 10px;">퇴직처리</strong>
+                
+                <button class="closePop" @click="closeModal">
+                    <span class="hidden">x</span>
+                </button>
+                </dt>
+                <dd class="content" style="margin: 0; padding: 0;">
+                <table class="row">
+                    <tbody>
+                    <tr>
+                        <th scope="row">사번</th>
+                        <td colspan="3">
+                        <input type="text" class="inputTxt p100" readonly :value="UserDetail?.detail?.number || ''"/>
+                        </td>
+                        <th scope="row">이름</th>
+                        <td colspan="3">
+                        <input type="text" class="inputTxt p100" readonly :value="UserDetail?.detail?.employeeName || ''"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">입사일</th>
+                        <td colspan="3">
+                        <input type="date" class="inputTxt p100" readonly :value="UserDetail?.detail?.regDate || ''" />
+                        </td>
+                        <th scope="row">퇴직일<span class="font_red">*</span></th>
+                        <td colspan="3">
+                        <input type="date" class="inputTxt p100" v-model="resignationDate"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">퇴직사유<span class="font_red">*</span></th>
+                        <td colspan="7">
+                        <input type="text" class="inputTxt p100" v-model="resignationReason" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">퇴직금<span class="font_red">*</span></th>
+                        <td colspan="7">
+                        <input type="text" class="inputTxt p100" placeholder="숫자만 입력" v-model="severancePay "/>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
 
-                <!-- 부서 / 직급 -->
-                <div>
-                    <label>부서</label>
-                    <select>
-                        <option>부서1</option>
-                        <option>부서2</option>
-                    </select>
+                <div class="btn_areaC mt30">
+                    <button class="btnType blue" @click="OnRetire">
+                    <span>퇴직</span>
+                    </button>
                 </div>
-                <div>
-                    <label>직급</label>
-                    <select>
-                        <option>직급1</option>
-                        <option>직급2</option>
-                    </select>
-                </div>
+                </dd>
+            </dl>
 
-                <!-- 입사일 / 연봉 -->
-                <div>
-                    <label>입사일</label>
-                    <input type="date">
-                </div>
-                <div>
-                    <label>연봉</label>
-                    <input type="text">
-                </div>
-            </div>
-
-            <!-- 모달 하단 버튼 -->
-            <div class="modal-footer">
-                <button class="btn btn-update">등록</button>
-                <button class="btn btn-cancel" @click="closeModal">취소</button>
             </div>
         </div>
     </div>
-</template>
-<style>
-/* 모달 배경 (반투명 검정) */
+
+  </template>
+
+
+<style scoped>
+
+/* 등록창 css */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(5px);
-    display: flex; /* 중앙 정렬을 위한 flex */
-    justify-content: center; /* 가로 중앙 정렬 */
-    align-items: center; /* 세로 중앙 정렬 */
-    z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* 모달 박스 */
-.modal {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 700px;
-    width: 90%;
-    height: 550px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    position: relative;
+.modal-container {
+  background: #fff;
+  width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  padding: 20px;
 }
 
-/* 모달 헤더 */
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.modal-header h2 {
-    font-size: 18px;
-    margin: 0;
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
 }
 
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
+.required {
+  color: red;
 }
 
-/* 입력 폼 */
-.modal-body {
-    display: grid;
-    width: 1500px;
-    height: 200px;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 10px;
+.inputTxt, .inputSelect {
+  width: 100%;
+  padding: 5px;
+  box-sizing: border-box;
 }
 
-.modal-body label {
-    font-weight: bold;
-    display: block;
+.row {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
 }
 
-.modal-body input,
-.modal-body select {
-    width: 100%;
-    padding: 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+.row th, .row td {
+  border: 1px solid #ccc;
+  padding: 5px;
 }
 
-.DetailImg {
-    display: flex;
+.btn_areaC {
+  text-align: center;
+  margin-top: 30px;
 }
 
-/* 프로필 이미지 */
-.profile {
-    display: flex;
-    flex-direction: column;
-    align-items: left;
-    gap: 10px;
-    grid-column: span 2;
-
+.btnType {
+  display: inline-block;
+  padding: 5px 15px;
+  margin: 0 5px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
 }
 
-.profile input {
-    width: 170px;
+.btnType.blue {
+  background-color: #007bff;
+  color: white;
 }
 
-.profile img {
-    width: 180px;
-    height: 100px;
-    border: 1px solid #ddd;
+.btnType.gray {
+  background-color: #6c757d;
+  color: white;
 }
 
-/* 버튼 스타일 */
-.modal-footer {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 15px;
+.closePop {
+  border: none !important; 
+  background-color: white !important;  /* 배경색 흰색 */
+  color: black !important;          /* 글자색은 필요에 따라 설정 (흰 배경엔 검정 추천) */
+  cursor: pointer !important;       /* 마우스 오버 시 포인터로 */
 }
-
-.modal-footer button {
-    width: 100px;
-}
-
-.btn {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.btn-update {
-    background: #007bff;
-    color: white;
-}
-
-.btn-cancel {
-    background: #6c757d;
-    color: white;
-}
-
-/* 모달 활성화 */
-.modal-overlay.active {
-    display: flex;
-}
-
-.Detailinfo {
-    width: 150px;
-    margin-right: 50px;
-    margin-left: 50px;
-}
-
 </style>

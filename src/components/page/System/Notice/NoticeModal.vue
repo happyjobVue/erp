@@ -31,8 +31,6 @@ import { onMounted, onUnmounted } from 'vue';
 import { useUserInfo } from '../../../../stores/userInfo';
 import { useModalStore } from '../../../../stores/modalState'
 import axios from 'axios'
-
-
 const { setModalState } = useModalStore();
 const { id } = defineProps(['id'])
 const emit = defineEmits(['modalClose', 'postSuccess'])

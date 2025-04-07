@@ -5,8 +5,12 @@ import Notice from '../views/System/Notice.vue';
 import Manage from '../views/Account/Manage.vue';
 import Department from '../views/System/Department.vue';
 import SalaryList from '../views/Personnel/Salary-list.vue';
+import Daily from '../views/Sales/Daily.vue';
+import Monthly from '../views/Sales/Monthly.vue';
 import Employee from '../views/Employee/Employee.vue';
 import ExpenseList from '../views/Account/ExpenseList.vue';
+import Annual from '../views/Sales/annual.vue';
+import Plan from '../views/Business/Plan/Plan.vue';
 import ExpenseReviewList from '../views/Account/ExpenseReviewList.vue';
 
 const routes = [
@@ -45,12 +49,48 @@ const routes = [
                         name: 'salary-list',
                         component: SalaryList,
                     },
+                    {
+                        path: 'employee',
+                        name: 'employee',
+                        component: Employee,
+                    },
+                ],
+            },
+            {
+                path: 'sales',
+                name: 'sales',
+                children: [
+                    {
+                        path: 'daily',
+                        name: 'daily',
+                        component: Daily,
+                    },
+                    {
+                        path: 'monthly',
+                        name: 'monthly',
+                        component: Monthly,
+                    },
+                    {
+                        path: 'annual',
+                        name: 'annual',
+                        component: Annual,
+                    },
                 ],
             },
             {
                 path: 'account',
                 name: 'account',
                 children: [
+                    {
+                        path: 'sales-plan',
+                        name: 'sales-plan',
+                        component: Plan,
+                    },
+                    {
+                        path: 'expense-review',
+                        name: 'expense-review',
+                        component: ExpenseReviewList,
+                    },
                     {
                         path: 'manage',
                         name: 'manage',
@@ -65,6 +105,17 @@ const routes = [
                         path: 'expense-review',
                         name: 'expense-review',
                         component: ExpenseReviewList,
+                    },
+                ],
+            },
+            {
+                path: 'business',
+                name: 'business',
+                children: [
+                    {
+                        path: 'sales-plan',
+                        name: 'sales-plan',
+                        component: Plan,
                     },
                 ],
             },

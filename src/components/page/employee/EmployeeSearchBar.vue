@@ -10,7 +10,7 @@ const jobGrade = ref('');
 const emplStatus = ref('');
 const searchId = ref();
 
-const emit = defineEmits(['emplStatusW','emplStatusF','ModalOpenStatus']);
+const emit = defineEmits(['emplStatusW','emplStatusF','ModalOpening']);
 
 const personnelDptOptions = ref([
     { value: '회계부', label: '회계부'},
@@ -22,10 +22,10 @@ const personnelDptOptions = ref([
 ]);
 
 const personnelJbOptions = ref([
-    { value: 'JGA', label: 'JGA'},
-    { value: 'JGS', label: 'JGS'},
-    { value: 'JGM', label: 'JGM'},
-    { value: 'JGG', label: 'JGG'},
+    { value: '사원', label: '사원'},
+    { value: '대리', label: '대리'},
+    { value: '과장', label: '과장'},
+    { value: '부장', label: '부장'},
 ]);
 
 const SetEmplStatus = (val) => {
@@ -63,10 +63,14 @@ const handlerSearch = () => {
 //modal 코드
 
 const isModalOpen = ref(false);
+const ResimodalType = ref('register');
 
 const openModal = () => {
   isModalOpen.value = true;
-  emit('ModalOpening', isModalOpen.value);
+  emit('ModalOpening', {
+    isModalOpen : isModalOpen.value,
+    modalType: ResimodalType.value
+  });
 };
 
 const closeModal = () => {

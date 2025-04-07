@@ -1,5 +1,5 @@
 <template>
-    <SalaryListModal v-if="modal.modalState"/>
+    <SalaryListModal v-if="modal.modalState" />
     <div class="salary-container">
         <div class="employ-box">
             <div class="employ-item">
@@ -15,7 +15,7 @@
                 <input class="employ-input" v-model="employeeInfo.workingYear" type="text">
             </div>
         </div>
-        <div class="salary-box" v-if="route.query.searchPaymentMonth">
+        <div class="salary-box" v-if="route.query.searchPaymentMonth && employeeInfo.salary">
             <div class="left-salary">
                 <table>
                     <tr>
@@ -86,11 +86,10 @@ const searchSalary = async () => {
     const param = new URLSearchParams({
         ...route.query,
     })
-
+    
     try {
         const res = await axios.post('/api/personnel/salaryListDetail.do', param)
         employeeInfo.value = res.data.salaryListDetail
-
     } catch (e) {
         console.error(e)
     }
@@ -107,7 +106,6 @@ watch(() => route.query, searchSalary)
 <style lang="scss" scoped>
 .salary-container {
     border: 1px solid #ddd;
-
 }
 
 .employ-box {

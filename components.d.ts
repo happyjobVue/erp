@@ -7,7 +7,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AnnualClientModal: typeof import('./src/components/page/Sales/annual/annualClientModal.vue')['default']
+    AnnualMain: typeof import('./src/components/page/Sales/annual/annualMain.vue')['default']
+    AnnualProductModal: typeof import('./src/components/page/Sales/annual/annualProductModal.vue')['default']
+    AnnualSearch: typeof import('./src/components/page/Sales/annual/annualSearch.vue')['default']
     ContextBox: typeof import('./src/components/common/ContextBox.vue')['default']
+    DailyMain: typeof import('./src/components/page/Sales/daily/DailyMain.vue')['default']
+    DailySearch: typeof import('./src/components/page/Sales/daily/DailySearch.vue')['default']
     DepartmentMain: typeof import('./src/components/page/System/Department/DepartmentMain.vue')['default']
     DepartmentModal: typeof import('./src/components/page/System/Department/DepartmentModal.vue')['default']
     DepartmentSearch: typeof import('./src/components/page/System/Department/DepartmentSearch.vue')['default']
@@ -25,6 +31,10 @@ declare module 'vue' {
     ManageMain: typeof import('./src/components/page/Account/Manage/ManageMain.vue')['default']
     ManageModal: typeof import('./src/components/page/Account/Manage/ManageModal.vue')['default']
     ManageSearch: typeof import('./src/components/page/Account/Manage/ManageSearch.vue')['default']
+    MonthlyClientModal: typeof import('./src/components/page/Sales/Monthly/MonthlyClientModal.vue')['default']
+    MonthlyMain: typeof import('./src/components/page/Sales/Monthly/MonthlyMain.vue')['default']
+    MonthlyProductModal: typeof import('./src/components/page/Sales/Monthly/MonthlyProductModal.vue')['default']
+    MonthlySearch: typeof import('./src/components/page/Sales/Monthly/MonthlySearch.vue')['default']
     NoticeMain: typeof import('./src/components/page/System/Notice/NoticeMain.vue')['default']
     NoticeModal: typeof import('./src/components/page/System/Notice/NoticeModal.vue')['default']
     NoticeSearch: typeof import('./src/components/page/System/Notice/NoticeSearch.vue')['default']
@@ -34,5 +44,9 @@ declare module 'vue' {
     SalaryListMain: typeof import('./src/components/page/personnel/Salary-list/SalaryListMain.vue')['default']
     SalaryListModal: typeof import('./src/components/page/personnel/Salary-list/SalaryListModal.vue')['default']
     SalaryListSearch: typeof import('./src/components/page/personnel/Salary-list/SalaryListSearch.vue')['default']
+    SalesDetailModal: typeof import('./src/components/page/Business/Plan/SalesDetailModal.vue')['default']
+    SalesPlanMain: typeof import('./src/components/page/Business/Plan/SalesPlanMain.vue')['default']
+    SalesPlanSearch: typeof import('./src/components/page/Business/Plan/SalesPlanSearch.vue')['default']
+    SalesRegisterModal: typeof import('./src/components/page/Business/Plan/SalesRegisterModal.vue')['default']
   }
 }
