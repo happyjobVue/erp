@@ -5,10 +5,8 @@ import {
     fetchProductsByManufacturer,
 } from '../../../../common/selectBoxApi';
 import router from '@/router';
-import { useModalStore } from '../../../../stores/modalState';
 const manufacturers = ref(''); // 제조사 목록
 const productList = ref([]);
-const modalState = useModalStore();
 const selectedManufacturer = ref(''); // 선택된 제조사
 const selectedProduct = ref(); // 선택된 제품
 const searchStDate = ref(''); // 선택된 날짜
@@ -20,12 +18,6 @@ async function handleManufacturerChange() {
         );
     }
 }
-
-// 등록 모달 열기
-const openRegisterModal = () => {
-    modalState.setModalType('register');  // 등록 모달 타입 설정
-    modalState.setModalState();  // 모달 열기
-};
 
 const handlerSearch = () => {
     const query = [];
@@ -78,9 +70,8 @@ onMounted(async () => {
             </option>
         </select>
         <input type="date" v-model="searchStDate" />
+        <button @click="handlerSearch">조회</button>
     </div>
-    <button @click="handlerSearch">조회</button>
-    <button @click="openRegisterModal">신규 등록</button>
 </template>
 
 <style lang="scss" scoped>

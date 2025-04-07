@@ -9,24 +9,21 @@ import {
 } from '../../../../common/selectBoxApi';
 import axios from 'axios';
 
-
-
 // 사용자 정보 가져오기
 const userId = useUserInfo();
 // modal
 const modalState = useModalStore();
 // 제조사 목록
 const manufacturers = ref('');
-// 선택한 제조사
-const selectedManufacturer = ref('');
-// 선택한 상품
-const selectedProduct = ref();
 // 상품 목록
 const productList = ref([]);
 // 거래처 목록
 const clients = ref('');
 
-
+// 선택한 제조사
+const selectedManufacturer = ref('');
+// 선택한 상품
+const selectedProduct = ref();
 // 선택한 제조사 id 와 제조사 코드 - (manufacturer_id, industry_code)
 const selectedManufactureId = ref('');
 const selectedIndutryCode = ref('');
@@ -40,20 +37,16 @@ const targetDate = ref(''); // 선택된 날짜
 const SelectedClient = ref(''); // 거래처 객체를 직접 저장
 //목표
 const goalQuanti = ref(0); // 목표 수량
-//메모 
+//메모
 const memo = ref('');
-
-
 
 onMounted(async () => {
     manufacturers.value = await fetchManufacturers();
     clients.value = await fetchClient();
 });
 
-
-
 // 제조사 선택 이벤트 핸들러
-// 제조사 코드와 ID를 저장 필요 -> 테이블 연결되어 있지 않아 데이터 유효성을 위한 처리 
+// 제조사 코드와 ID를 저장 필요 -> 테이블 연결되어 있지 않아 데이터 유효성을 위한 처리
 async function handleManufacturerChange() {
     selectedManufactureId.value = selectedManufacturer.value.manufacturer_id;
     selectedIndutryCode.value = selectedManufacturer.value.industryCode;
@@ -76,31 +69,30 @@ function handleProductChange() {
 const saveSalesPlan = () => {
     const salesPlan = {
         emp_id: userId.user.empId,
-        client_id:SelectedClient.value,
-        manufacturer_id:selectedManufactureId.value,
-        industry_code:selectedIndutryCode.value,
-        target_date:targetDate.value,
-        goal_quanti:goalQuanti.value,
-        perform_qut:0,
-        detail_code:selectedProductCode.value,
-        product_name:selectedProductName.value,
-        plan_memo:memo.value
+        client_id: SelectedClient.value,
+        manufacturer_id: selectedManufactureId.value,
+        industry_code: selectedIndutryCode.value,
+        target_date: targetDate.value,
+        goal_quanti: goalQuanti.value,
+        perform_qut: 0,
+        detail_code: selectedProductCode.value,
+        product_name: selectedProductName.value,
+        plan_memo: memo.value,
     }; // salesPlan 객체 생성
 
-        axios.post('/api/business/sales-plan/insertPlan.do',salesPlan).then(res=>{
-           console.log("저장로직");
-            if(res.data.result ==='sucess'){
-                alert("저장되었습니다.");
+    axios
+        .post('/api/business/sales-plan/insertPlan.do', salesPlan)
+        .then(res => {
+            console.log('저장로직');
+            if (res.data.result === 'sucess') {
+                alert('저장되었습니다.');
             }
-        })
+        });
+};
 
-    };
-
-    const closeModal =() =>{
+const closeModal = () => {
     modalState.setModalState();
-}
-
-
+};
 </script>
 
 <template>
@@ -108,7 +100,7 @@ const saveSalesPlan = () => {
         <div class="backdrop">
             <div class="container">
                 <h2>영업 계획 등록</h2>
-          
+
                 <table>
                     <tbody>
                         <input type="text" hidden v-model="userId.user.empId" />
@@ -116,7 +108,10 @@ const saveSalesPlan = () => {
                         <tr>
                             <th class="table-header">사원</th>
                             <td>
-                                <input type="text" v-model="userId.user.userNm" />
+                                <input
+                                    type="text"
+                                    v-model="userId.user.userNm"
+                                />
                             </td>
                             <th class="table-header">목표 일자</th>
                             <td>
@@ -142,7 +137,10 @@ const saveSalesPlan = () => {
                             </td>
                             <th class="table-header">상품명</th>
                             <td>
-                                <select v-model="selectedProduct" @change="handleProductChange">
+                                <select
+                                    v-model="selectedProduct"
+                                    @change="handleProductChange"
+                                >
                                     <option value="" disabled>전체</option>
                                     <option
                                         v-for="product in productList"
@@ -157,23 +155,26 @@ const saveSalesPlan = () => {
                         <tr>
                             <th class="table-header">거래처</th>
                             <td>
-                                <select v-model="SelectedClient" >
+                                <select v-model="SelectedClient">
                                     <option value="" disabled>전체</option>
-                                    <option v-for="client in clients" :key="client.id" :value="client.id">
+                                    <option
+                                        v-for="client in clients"
+                                        :key="client.id"
+                                        :value="client.id"
+                                    >
                                         {{ client.client_name }}
                                     </option>
                                 </select>
                             </td>
                             <th class="table-header">목표 수량</th>
-                            <td><input type="text"  v-model="goalQuanti"/></td>
+                            <td><input type="text" v-model="goalQuanti" /></td>
                         </tr>
                         <tr>
                             <th class="table-header">메모</th>
-                            <td><input type="text" v-model="memo"/></td>
+                            <td><input type="text" v-model="memo" /></td>
                         </tr>
                     </tbody>
                 </table>
-               
 
                 <div class="button-box">
                     <button @click="saveSalesPlan">등록</button>

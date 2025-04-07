@@ -3,16 +3,20 @@ import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { useUserInfo } from '../../../../stores/userInfo';
 import { useModalStore } from '../../../../stores/modalState';
-import { onMounted } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import SalesRegisterModal from './SalesRegisterModal.vue';
 import SalesDetailModal from './SalesDetailModal.vue';
+
 const salesPlanListData = ref();
 const salesPlanListCnt = ref();
 const userId = useUserInfo();
 const modalState = useModalStore();
-const planNum =ref(0);
+const planNum = ref(0);
 const cPage = ref(1);
 const route = useRoute();
+const modalType = ref('');
+
+// 판매 계획 목록을 불러오는 함수
 const salesPlanDefaultList = () => {
     const param = {
         empId: userId.user.empId,
@@ -25,6 +29,7 @@ const salesPlanDefaultList = () => {
     });
 };
 
+// 검색된 판매 계획 목록을 불러오는 함수
 const searchList = () => {
     const param = new URLSearchParams({
         ...route.query,
@@ -40,50 +45,64 @@ const searchList = () => {
         });
 };
 
+// 페이지 로드 시 기본 판매 계획 목록 불러오기
 onMounted(() => {
     salesPlanDefaultList();
 });
 
+// 모달이 성공적으로 닫힌 후 실행될 함수
 const onPostSuccess = () => {
-    modalState.setModalState();
-    salesPlanDefaultList();
+    modalState.setModalState(true); // 모달 열기
+    salesPlanDefaultList(); // 목록 새로고침
 };
 
-const handlerModal = id =>{
-
-    planNum.value =id; 
-    modalState.setModalType('view');
-    modalState.setModalState();
-    console.log('모달 상태:', modalState.modalState.value);  // 상태 확인
-    console.log('모달 타입:', modalState.modalType.value);  // 타입 확인
+// 모달을 여는 함수 (보기 모달)
+const handlerModal = id => {
+    planNum.value = id;
+    modalType.value = 'view'; // 'view' 모달 열기
+    modalState.setModalState(true); // 모달 열기
 };
 
+// 등록 모달 열기
+const openRegisterModal = () => {
+    modalType.value = 'register'; // 'register' 모달 열기
+    modalState.setModalState(true); // 모달 열기
+};
 
-
-//첫번째 인자 데이터 , 두번째 인자 함수
+// watch로 라우트 쿼리 변경을 감지하여 목록을 갱신
 watch(() => route.query, searchList);
 </script>
 
 <template>
     <div class="divSalesPlanList">
-        <SalesDetailModal 
-        v-if="modalState.modalState && modalState.modalType==='view'"
-        :id="planNum"
-        @modalClose="planNum = $event"
-        @postSuccess=" onPostSuccess"/>
-        <SalesRegisterModal 
-        v-if="modalState.modalState && modalState.modalType==='register'"
+        <!-- 상세보기 모달 -->
+        <SalesDetailModal
+            v-if="modalState.modalState && modalType === 'view'"
+            :id="planNum"
+            @modalClose="planNum = $event"
+            @postSuccess="onPostSuccess"
         />
-        
+
+        <!-- 등록 모달 -->
+        <SalesRegisterModal
+            v-if="modalState.modalState && modalType === 'register'"
+        />
+
+        <!-- 신규 등록 버튼 -->
+        <button @click="openRegisterModal">신규 등록</button>
+
+        <!-- 판매 계획 목록 테이블 -->
         <table>
             <thead>
-                <th scope="col">목표날짜</th>
-                <th scope="col">거래처 이름</th>
-                <th scope="col">제조업체</th>
-                <th scope="col">제품코드</th>
-                <th scope="col">제품명</th>
-                <th scope="col">목표수량</th>
-                <th scope="col">비고란</th>
+                <tr>
+                    <th scope="col">목표날짜</th>
+                    <th scope="col">거래처 이름</th>
+                    <th scope="col">제조업체</th>
+                    <th scope="col">제품코드</th>
+                    <th scope="col">제품명</th>
+                    <th scope="col">목표수량</th>
+                    <th scope="col">비고란</th>
+                </tr>
             </thead>
             <tbody>
                 <template v-if="salesPlanListData">
@@ -91,7 +110,7 @@ watch(() => route.query, searchList);
                         <tr
                             v-for="plan in salesPlanListData"
                             :key="plan.plan_num"
-                            @click ="handlerModal(plan.plan_num)"
+                            @click="handlerModal(plan.plan_num)"
                         >
                             <td>{{ plan.target_date }}</td>
                             <td>{{ plan.client_name }}</td>
@@ -102,14 +121,16 @@ watch(() => route.query, searchList);
                             <td>{{ plan.plan_memo }}</td>
                         </tr>
                     </template>
-                </template>
-                <template>
-                    <tr>
-                        <td colspan="7">일치하는 검색 결과가 없습니다</td>
-                    </tr>
+                    <template v-else>
+                        <tr>
+                            <td colspan="7">일치하는 검색 결과가 없습니다</td>
+                        </tr>
+                    </template>
                 </template>
             </tbody>
         </table>
+
+        <!-- 페이징 -->
         <Pagination
             :totalItems="salesPlanListCnt"
             :items-per-page="5"
@@ -119,7 +140,9 @@ watch(() => route.query, searchList);
         />
     </div>
 </template>
+
 <style lang="scss" scoped>
+/* 테이블 스타일 */
 table {
     width: 100%;
     border-collapse: collapse;
