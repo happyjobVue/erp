@@ -22,3 +22,15 @@ export const getMonth = () => {
     const transformMonth = formatMonth(today);
     return transformMonth;
 };
+
+export const getMonthPeriod = (stDate, edDate) => {
+    const stArr = stDate.split("-");
+    const edArr = edDate.split("-");
+    
+    const startYear = stArr[0];
+    const startMonth = stArr[1];
+    const endYear = edArr[0];
+    const endMonth = edArr[1];
+    
+    return (endYear - startYear) * 12 + (endMonth - startMonth);
+}
