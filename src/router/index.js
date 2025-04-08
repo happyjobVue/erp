@@ -12,6 +12,9 @@ import ExpenseList from '../views/Account/ExpenseList.vue';
 import Annual from '../views/Sales/annual.vue';
 import Plan from '../views/Business/Plan/Plan.vue';
 import ExpenseReviewList from '../views/Account/ExpenseReviewList.vue';
+import PlanResult from '../views/Business/PlanResult/PlanResult.vue';
+import Estimate from '../views/Business/Estimate/Estimate.vue';
+import Code from '../views/System/Code.vue';
 
 const routes = [
     {
@@ -37,6 +40,11 @@ const routes = [
                         path: 'department',
                         name: 'department',
                         component: Department,
+                    },
+                    {
+                        path: 'code',
+                        name: 'code',
+                        component: Code,
                     },
                 ],
             },
@@ -116,6 +124,16 @@ const routes = [
                         path: 'sales-plan',
                         name: 'sales-plan',
                         component: Plan,
+                    },
+                    {
+                        path: 'sales-list',
+                        name: 'sales-list',
+                        component: PlanResult,
+                    },
+                    {
+                        path: 'estimate-list',
+                        name: 'estimate-list',
+                        component: Estimate,
                     },
                 ],
             },

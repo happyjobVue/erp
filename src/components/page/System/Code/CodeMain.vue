@@ -1,39 +1,30 @@
 <template>
     <div class="divNoticeList">
-        <NoticeModal
+        <CodeModal
             v-if="modal.modalState"
-            :id="noticeId"
-            @modalClose="noticeId = $event"
+            :id="groupCode"
+            @modalClose="groupCode = $event"
             @postSuccess="onPostSuccess"
         />
         <table>
-            <colgroup>
-                <col width="10%" />
-                <col width="50%" />
-                <col width="30%" />
-                <col width="10%" />
-            </colgroup>
-
             <thead>
                 <tr>
-                    <th scope="col">번호</th>
-                    <th scope="col">제목</th>
-                    <th scope="col">작성일</th>
-                    <th scope="col">작성자</th>
+                    <th scope="col">공통코드</th>
+                    <th scope="col">공통코드명</th>
+                    <th scope="col">비고</th>
                 </tr>
             </thead>
             <tbody>
-                <template v-if="noticeList">
-                    <template v-if="noticeList.noticeCnt > 0">
+                <template v-if="groupCodeList">
+                    <template v-if="groupCodeList.groupCnt > 0">
                         <tr
-                            v-for="notice in noticeList.noticeList"
-                            :key="notice.notiSeq"
-                            @click="handlerModal(notice.notiSeq)"
+                            v-for="groupCode in groupCodeList.groupList"
+                            :key="groupCode.groupCode"
+                            @click="handlerModal(groupCode.groupCode)"
                         >
-                            <td>{{ notice.notiSeq }}</td>
-                            <td>{{ notice.notiTitle }}</td>
-                            <td>{{ notice.notiDate }}</td>
-                            <td>{{ notice.loginId }}</td>
+                            <td>{{ groupCode.groupCode }}</td>
+                            <td>{{ groupCode.groupName }}</td>
+                            <td>{{ groupCode.note }}</td>
                         </tr>
                     </template>
                     <template v-else>
@@ -45,7 +36,7 @@
             </tbody>
         </table>
         <Pagination
-            :totalItems="noticeList?.noticeCnt"
+            :totalItems="groupCodeList?.groupCnt"
             :items-per-page="5"
             :max-pages-shown="10"
             :onClick="searchList"
@@ -59,12 +50,13 @@ import axios from 'axios';
 import { watch } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 const route = useRoute();
-const noticeList = ref();
 const modal = useModalStore();
-const noticeId = ref(0);
+const groupCodeList = ref();
+const groupCode = ref(0);
 const cPage = ref(1);
 
 const searchList = async () => {
+    console.log('route.query:', route.query);
     const param = new URLSearchParams({
         ...route.query,
         pageSize: 5,
@@ -73,18 +65,17 @@ const searchList = async () => {
 
     try {
         const response = await axios.post(
-            '/api/system/noticeListBody.do',
+            '/api/system/groupCodeListBody.do',
             param
         );
-        console.log('noticeList 응답:', response.data);
-        noticeList.value = response.data;
+        groupCodeList.value = response.data;
     } catch (e) {
         console.error(e);
     }
 };
 
 const handlerModal = id => {
-    noticeId.value = id;
+    groupCode.value = id;
     modal.setModalState();
 };
 
@@ -98,6 +89,7 @@ onMounted(() => {
 });
 
 watch(() => route.query, searchList);
+watch(cPage, searchList);
 </script>
 
 <style lang="scss" scoped>
