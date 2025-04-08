@@ -1,21 +1,22 @@
 <script setup>
 import router from '@/router';
 import { onMounted, ref } from 'vue';
-import { fetchProductsByManufacturer,fetchManufacturers, fetchClient } from '../../../../common/selectBoxApi';
+import {
+    fetchProductsByManufacturer,
+    fetchManufacturers,
+    fetchClient,
+} from '../../../../common/selectBoxApi';
 
-
-const searchDate =ref(''); //검색 날짜 
-const SelectedClient=ref(''); //선택된 고객
+const searchDate = ref(''); //검색 날짜
+const SelectedClient = ref(''); //선택된 고객
 const selectedManufacturer = ref(''); // 선택된 제조사
 const manufacturer = ref(''); //제조사 목록
-const productList =ref([]); //제품 목록 
+const productList = ref([]); //제품 목록
 const selectedProduct = ref(''); // 선택된 제품
 const clients = ref(''); // 고객 목록
-const empId = ref(''); // 사원번호 
-
+const empId = ref(''); // 사원번호
 
 const searchPlanResult = () => {
-    console.log("검색로직")
     const query = [];
     !selectedManufacturer.value ||
         query.push(`manufacturerId=${selectedManufacturer.value}`);
@@ -34,7 +35,6 @@ onMounted(() => {
     window.location.search && router.replace(window.location.pathname);
 });
 
-
 // 컴포넌트가 마운트될 때 제조사 목록을 가져오기
 onMounted(async () => {
     manufacturer.value = await fetchManufacturers();
@@ -50,62 +50,57 @@ async function handleManufacturerChange() {
         );
     }
 }
-
-
-
-
-
 </script>
 <template>
-<!-- 사번,조회날짜,제품이름,제조사,거래처처 -->
-  <div>
-    <div class="search-box">
-        <label for="">사번: </label>
-        <input type="text" v-model="empId">
-        <label for="">제조사:</label>
-        <select
-            v-model="selectedManufacturer"
-            @change="handleManufacturerChange"
-        >
-            <option value="" disabled>제조사</option>
-            <option
-                v-for="manufacturer in manufacturer"
-                :key="manufacturer.manufacturer_id"
-                :value="manufacturer.industryCode"
+    <!-- 사번,조회날짜,제품이름,제조사,거래처처 -->
+    <div>
+        <div class="search-box">
+            <label for="">사번: </label>
+            <input type="text" v-model="empId" />
+            <label for="">제조사:</label>
+            <select
+                v-model="selectedManufacturer"
+                @change="handleManufacturerChange"
             >
-                {{ manufacturer.industryName }}
-            </option>
-        </select>
-        <label for ="">제품 이름</label>
-        <!-- 제품 목록 -->
-        <select v-model="selectedProduct">
-            <option value="" disabled>제품</option>
-            <option
-                v-for="product in productList"
-                :key="product.id"
-                :value="product.id"
-            >
-                {{ product.name }}
-            </option>
-        </select>
-        <label for ="">거래처 </label>
-        <select v-model="SelectedClient">
-                                    <option value="" disabled>전체</option>
-                                    <option
-                                        v-for="client in clients"
-                                        :key="client.id"
-                                        :value="client.id"
-                                    >
-                                        {{ client.client_name }}
-                                    </option>
-                                </select>
-                                <label for ="">날짜 </label>
-        <input type="date" v-model="searchDate">
-        <div class="button-box"><button @click="searchPlanResult">조회</button></div>
-
+                <option value="" disabled>제조사</option>
+                <option
+                    v-for="manufacturer in manufacturer"
+                    :key="manufacturer.manufacturer_id"
+                    :value="manufacturer.industryCode"
+                >
+                    {{ manufacturer.industryName }}
+                </option>
+            </select>
+            <label for="">제품 이름</label>
+            <!-- 제품 목록 -->
+            <select v-model="selectedProduct">
+                <option value="" disabled>제품</option>
+                <option
+                    v-for="product in productList"
+                    :key="product.id"
+                    :value="product.id"
+                >
+                    {{ product.name }}
+                </option>
+            </select>
+            <label for="">거래처 </label>
+            <select v-model="SelectedClient">
+                <option value="" disabled>전체</option>
+                <option
+                    v-for="client in clients"
+                    :key="client.id"
+                    :value="client.id"
+                >
+                    {{ client.client_name }}
+                </option>
+            </select>
+            <label for="">날짜 </label>
+            <input type="date" v-model="searchDate" />
+            <div class="button-box">
+                <button @click="searchPlanResult">조회</button>
+            </div>
         </div>
-
-  </div>
+    </div>
 </template>
 <style lang="scss" scoped>
 .search-box {
