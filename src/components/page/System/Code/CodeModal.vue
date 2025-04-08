@@ -3,34 +3,34 @@
         <div class="backdrop">
             <div class="container">
                 <label>
-                    제목 :<input type="text" v-model="noticeDetail.notiTitle" />
+                    공통코드 :<input
+                        type="text"
+                        v-model="groupDetail.groupCode"
+                    />
                 </label>
                 <label>
-                    내용 :
-                    <textarea
-                        v-model="noticeDetail.notiContent"
-                        class="textContent"
-                    ></textarea>
+                    공통코드명 :<input
+                        type="text"
+                        v-model="groupDetail.groupName"
+                    />
                 </label>
-                파일 :<input
-                    type="file"
-                    style="display: none"
-                    id="fileInput"
-                    @change="fileHandler"
-                />
-                <label class="img-label" htmlFor="fileInput">
-                    파일 첨부하기
+                <label>
+                    사용여부 :
+                    <select v-model="groupDetail.useYn">
+                        <option value="Y">사용</option>
+                        <option value="N">미사용</option>
+                    </select>
                 </label>
-                <div>
-                    <div @click="downloadFileImage">
-                        <img v-if="imgUrl" :src="imgUrl" />
-                    </div>
-                </div>
+                <label>
+                    비고 :<input type="text" v-model="groupDetail.note" />
+                </label>
                 <div class="button-box">
-                    <button @click="id ? noticeFileUpdate() : noticeFileSave()">
+                    <button
+                        @click="id ? groupDetailUpdate() : groupDetailSave()"
+                    >
                         {{ id ? '수정' : '저장' }}
                     </button>
-                    <button v-if="id" @click="noticeDelete">삭제</button>
+                    <button v-if="id" @click="groupDetailDelete">삭제</button>
                     <button @click="setModalState">나가기</button>
                 </div>
             </div>
@@ -40,149 +40,74 @@
 
 <script setup>
 import { onMounted, onUnmounted } from 'vue';
-import { useUserInfo } from '../../../../stores/userInfo';
 import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
 const { setModalState } = useModalStore();
 const { id } = defineProps(['id']);
 const emit = defineEmits(['modalClose', 'postSuccess']);
-const noticeDetail = ref({});
-const userInfo = useUserInfo();
-const imgUrl = ref('');
-const fileData = ref('');
+const groupDetail = ref({
+    groupCode: '',
+    groupName: '',
+    note: '',
+    useYn: 'Y',
+});
 
 const searchDetail = async () => {
     try {
-        const response = await axios.post(
-            '/api/system/noticeFileDetailBody.do',
-            { noticeSeq: id }
-        );
-        noticeDetail.value = response.data.detail;
-        if (
-            noticeDetail.value.fileExt === 'png' ||
-            noticeDetail.value.fileExt === 'jpg' ||
-            noticeDetail.value.fileExt === 'gif' ||
-            noticeDetail.value.fileExt === 'jpeg'
-        ) {
-            getFileImage();
-        }
-    } catch (e) {
-        console.error(e);
-    }
-};
-
-const getFileImage = async () => {
-    const param = new URLSearchParams();
-    param.append('noticeSeq', id);
-    try {
-        const res = await axios.post('/api/system/noticeDownload.do', param, {
-            responseType: 'blob',
+        const response = await axios.post('/api/system/groupDetailBody.do', {
+            groupCode: id,
         });
-        const url = window.URL.createObjectURL(new Blob([res.data]));
-        imgUrl.value = url;
+        const detail = response.data.detail;
+        detail.oldGroupCode = detail.groupCode;
+        groupDetail.value = response.data.detail;
     } catch (e) {
         console.error(e);
     }
 };
 
-const downloadFileImage = async () => {
-    const param = new URLSearchParams();
-    param.append('noticeSeq', id);
-    try {
-        const res = await axios.post(
-            '/api/management/noticeDownload.do',
-            param,
-            { responseType: 'blob' }
-        );
-        const url = window.URL.createObjectURL(new Blob([res.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', noticeDetail.value.fileName);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-    } catch (e) {
-        console.error(e);
+const groupDetailSave = async () => {
+    if (
+        !groupDetail.value.groupCode ||
+        groupDetail.value.groupCode.trim() === ''
+    ) {
+        alert('공통코드를 입력해주세요.');
+        return;
     }
-};
+    if (
+        !groupDetail.value.groupName ||
+        groupDetail.value.groupName.trim() === ''
+    ) {
+        alert('공통코드명을 입력해주세요.');
+        return;
+    }
 
-const noticeSave = async () => {
-    const param = new URLSearchParams(noticeDetail.value);
+    const param = new FormData();
+    param.append('groupCode', groupDetail.value.groupCode);
+    param.append('groupName', groupDetail.value.groupName);
+    param.append('groupNote', groupDetail.value.note);
+    param.append('use_yn', groupDetail.value.use_yn);
     try {
-        const res = await axios.post('/api/management/noticeSave.do', param);
+        const res = await axios.post('/api/system/groupSave.do', param);
+        console.log(res);
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
-            alert('저장 실패');
+            alert(res.data.message);
         }
     } catch (e) {
         console.error(e);
     }
 };
 
-const noticeFileSave = async () => {
-    const textData = {
-        fileContent: noticeDetail.value.notiContent,
-        fileTitle: noticeDetail.value.notiTitle,
-        loginId: userInfo.user.loginId,
-    };
-    const formData = new FormData();
-    formData.append(
-        'text',
-        new Blob([JSON.stringify(textData)], { type: 'application/json' })
-    );
-    if (fileData.value) {
-        formData.append('file', fileData.value);
-    }
+const groupDetailUpdate = async () => {
+    const param = new FormData();
+    param.append('oldGroupCode', groupDetail.value.oldGroupCode);
+    param.append('newGroupCode', groupDetail.value.groupCode);
+    param.append('groupName', groupDetail.value.groupName);
+    param.append('groupNote', groupDetail.value.note);
+    param.append('groupUseYn', groupDetail.value.useYn);
     try {
-        const res = await axios.post(
-            '/api/system/noticeSaveFileForm.do',
-            formData
-        );
-        if (res.data.result === 'success') {
-            emit('postSuccess');
-        } else {
-            alert('저장 실패');
-        }
-    } catch (e) {
-        console.error(e);
-    }
-};
-
-const noticeFileUpdate = async () => {
-    const textData = {
-        fileContent: noticeDetail.value.notiContent,
-        fileTitle: noticeDetail.value.notiTitle,
-        noticeSeq: id,
-    };
-    const formData = new FormData();
-    formData.append(
-        'text',
-        new Blob([JSON.stringify(textData)], { type: 'application/json' })
-    );
-    if (fileData.value) {
-        formData.append('file', fileData.value);
-    }
-    try {
-        const res = await axios.post(
-            '/api/system/noticeUpdateFileForm.do',
-            formData
-        );
-        if (res.data.result === 'success') {
-            emit('postSuccess');
-        } else {
-            alert('저장 실패');
-        }
-    } catch (e) {
-        console.error(e);
-    }
-};
-
-const noticeUpdate = async () => {
-    const param = new URLSearchParams(noticeDetail.value);
-    param.append('noticeId', id);
-    try {
-        const res = await axios.post('/api/management/noticeUpdate.do', param);
+        const res = await axios.post('/api/system/groupUpdate.do', param);
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
@@ -193,11 +118,12 @@ const noticeUpdate = async () => {
     }
 };
 
-const noticeDelete = async () => {
+const groupDetailDelete = async () => {
     try {
-        const res = await axios.post('/api/management/noticeDeleteBody.do', {
-            noticeSeq: id,
+        const res = await axios.post('/api/system/detailDelete.do', {
+            groupCode: id,
         });
+
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
@@ -206,23 +132,6 @@ const noticeDelete = async () => {
     } catch (e) {
         console.error(e);
     }
-};
-
-const fileHandler = e => {
-    const fileInfo = e.target.files;
-    const fileInfoSplit = fileInfo[0].name.split('.');
-    const fileExtension = fileInfoSplit[1].toLowerCase();
-
-    if (
-        fileExtension === 'jpg' ||
-        fileExtension === 'gif' ||
-        fileExtension === 'png' ||
-        fileExtension === 'jpeg'
-    ) {
-        imgUrl.value = URL.createObjectURL(fileInfo[0]);
-    }
-
-    fileData.value = fileInfo[0];
 };
 
 onMounted(() => {
@@ -274,6 +183,7 @@ label {
     flex-direction: column;
 }
 
+select,
 input[type='text'] {
     padding: 8px;
     margin-top: 5px;
@@ -322,16 +232,20 @@ img {
 }
 
 .button-box {
+    display: flex;
+    justify-content: space-between;
     text-align: right;
     margin-top: 10px;
 }
 
 button {
+    flex: 1;
+    margin: 0 5px;
     background-color: #3bb2ea;
     border: none;
     color: white;
     padding: 10px 22px;
-    text-align: right;
+    text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;

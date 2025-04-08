@@ -15,16 +15,16 @@
                 </tr>
             </thead>
             <tbody>
-                <template v-if="groupList">
-                    <template v-if="groupList.groupCnt > 0">
+                <template v-if="groupCodeList">
+                    <template v-if="groupCodeList.groupCnt > 0">
                         <tr
-                            v-for="groupCodeList in groupList.groupList"
-                            :key="groupCodeList.groupCode"
+                            v-for="groupCode in groupCodeList.groupList"
+                            :key="groupCode.groupCode"
                             @click="handlerModal(groupCode.groupCode)"
                         >
-                            <td>{{ groupCodeList.groupCode }}</td>
-                            <td>{{ groupCodeList.groupName }}</td>
-                            <td>{{ groupCodeList.note }}</td>
+                            <td>{{ groupCode.groupCode }}</td>
+                            <td>{{ groupCode.groupName }}</td>
+                            <td>{{ groupCode.note }}</td>
                         </tr>
                     </template>
                     <template v-else>
@@ -36,7 +36,7 @@
             </tbody>
         </table>
         <Pagination
-            :totalItems="groupList?.groupCnt"
+            :totalItems="groupCodeList?.groupCnt"
             :items-per-page="5"
             :max-pages-shown="10"
             :onClick="searchList"
@@ -51,11 +51,12 @@ import { watch } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 const route = useRoute();
 const modal = useModalStore();
-const groupList = ref();
+const groupCodeList = ref();
 const groupCode = ref(0);
 const cPage = ref(1);
 
 const searchList = async () => {
+    console.log('route.query:', route.query);
     const param = new URLSearchParams({
         ...route.query,
         pageSize: 5,
@@ -64,10 +65,10 @@ const searchList = async () => {
 
     try {
         const response = await axios.post(
-            '/api/system/commonCodeListBody.do',
+            '/api/system/groupCodeListBody.do',
             param
         );
-        groupList.value = response.data;
+        groupCodeList.value = response.data;
     } catch (e) {
         console.error(e);
     }
@@ -88,6 +89,7 @@ onMounted(() => {
 });
 
 watch(() => route.query, searchList);
+watch(cPage, searchList);
 </script>
 
 <style lang="scss" scoped>

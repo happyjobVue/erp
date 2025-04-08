@@ -12,6 +12,18 @@
         />
         <button @click="handleSearch">검색</button>
         <button @click="setModalState">등록</button>
+        <label class="toggle-switch">
+            <input
+                type="checkbox"
+                v-model="showInactive"
+                true-value="true"
+                false-value=""
+            />
+            <span class="slider"></span>
+            <span class="status-text">
+                {{ showInactive === 'true' ? '미사용 코드' : '사용 코드' }}
+            </span>
+        </label>
     </div>
 </template>
 
@@ -22,6 +34,7 @@ import { useModalStore } from '../../../../stores/modalState';
 const { setModalState } = useModalStore();
 const searchGroupName = ref('');
 const searchGroupNote = ref('');
+const showInactive = ref(false);
 
 const handleSearch = () => {
     const query = [];
@@ -29,6 +42,8 @@ const handleSearch = () => {
         query.push(`searchGroupName=${searchGroupName.value}`);
     !searchGroupNote.value ||
         query.push(`searchGroupNote=${searchGroupNote.value}`);
+    showInactive.value && query.push('showInactive=true');
+
     const queryString = query.length > 0 ? `?${query.join('&')}` : '';
 
     router.push(queryString);
@@ -37,9 +52,61 @@ const handleSearch = () => {
 onMounted(() => {
     window.location.search && router.replace(window.location.pathname);
 });
+watch(showInactive, () => {
+    handleSearch();
+});
 </script>
 
 <style lang="scss" scoped>
+.toggle-switch {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    margin-left: 10px;
+
+    input {
+        display: none;
+    }
+
+    .slider {
+        position: relative;
+        width: 40px;
+        height: 20px;
+        background-color: #ccc;
+        border-radius: 34px;
+        transition: 0.4s;
+        margin-right: 8px;
+    }
+
+    .slider::before {
+        content: '';
+        position: absolute;
+        height: 16px;
+        width: 16px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        border-radius: 50%;
+        transition: 0.4s;
+    }
+
+    input:checked + .slider {
+        background-color: #3bb2ea;
+    }
+
+    input:checked + .slider::before {
+        transform: translateX(20px);
+    }
+
+    .status-text {
+        font-size: 14px;
+        width: 80px; /* 고정 너비 */
+        text-align: center;
+        display: inline-block;
+    }
+}
+
 .search-box {
     margin-bottom: 10px;
     display: block;
