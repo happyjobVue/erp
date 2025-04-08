@@ -10,6 +10,7 @@ import Monthly from '../views/Sales/Monthly.vue';
 import Employee from '../views/Employee/Employee.vue';
 import ExpenseList from '../views/Account/ExpenseList.vue';
 import Annual from '../views/Sales/annual.vue';
+import ReceivablesList from '../views/Sales/ReceivablesList.vue';
 import Plan from '../views/Business/Plan/Plan.vue';
 import ExpenseReviewList from '../views/Account/ExpenseReviewList.vue';
 import PlanResult from '../views/Business/PlanResult/PlanResult.vue';
@@ -82,6 +83,11 @@ const routes = [
                         path: 'annual',
                         name: 'annual',
                         component: Annual,
+                    },
+                    {
+                        path: 'receivables-list',
+                        name: 'receivables-list',
+                        component: ReceivablesList,
                     },
                 ],
             },
