@@ -1,27 +1,19 @@
 <template>
     <div class="divNoticeList">
-        <ExpenseListModal
+        <ExpenseReviewListModal
             v-if="modal.modalState"
             :id="expenseId"
             @modalClose="expenseId = $event"
             @postSuccess="onPostSuccess"
         />
         <table>
-            <colgroup>
-                <col width="10%" />
-                <col width="15%" />
-                <col width="10%" />
-                <col width="15%" />
-                <col width="10%" />
-                <col width="30%" />
-                <col width="10%" />
-            </colgroup>
-
             <thead>
                 <tr>
                     <th scope="col">결의번호</th>
                     <th scope="col">신청일자</th>
                     <th scope="col">사용일자</th>
+                    <th scope="col">사번</th>
+                    <th scope="col">사원명</th>
                     <th scope="col">계정대분류명</th>
                     <th scope="col">계정과목</th>
                     <th scope="col">사용부서</th>
@@ -39,6 +31,8 @@
                         <td>{{ expense.id }}</td>
                         <td>{{ expense.req_date }}</td>
                         <td>{{ expense.use_date }}</td>
+                        <td>{{ expense.emp_no }}</td>
+                        <td>{{ expense.name }}</td>
                         <td>{{ expense.group_name }}</td>
                         <td>{{ expense.detail_name }}</td>
                         <td>{{ expense.use_department }}</td>
@@ -83,6 +77,7 @@ const approvalMap = computed(() => ({
 }));
 
 const searchList = async () => {
+    console.log('onMounted');
     const param = new URLSearchParams({
         ...route.query,
         pageSize: 5,
@@ -98,16 +93,13 @@ const searchList = async () => {
 };
 
 const handlerModal = id => {
+    console.log('🛠️ handlerModal called with id:', id);
     expenseId.value = id;
     modal.setModalState();
 };
 
-const onPostSuccess = () => {
-    modal.setModalState();
-    searchList();
-};
-
 onMounted(() => {
+    console.log('onMounted');
     searchList();
 });
 
