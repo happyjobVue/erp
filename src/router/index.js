@@ -10,6 +10,7 @@ import Monthly from '../views/Sales/Monthly.vue';
 import Employee from '../views/Employee/Employee.vue';
 import ExpenseList from '../views/Account/ExpenseList.vue';
 import Annual from '../views/Sales/annual.vue';
+import ReceivablesList from '../views/Sales/ReceivablesList.vue';
 
 const routes = [
     {
@@ -72,6 +73,11 @@ const routes = [
                         path: 'annual',
                         name: 'annual',
                         component: Annual,
+                    },
+                    {
+                        path: 'receivables-list',
+                        name: 'receivables-list',
+                        component: ReceivablesList,
                     },
                 ],
             },

@@ -22,7 +22,7 @@ const { totalItems, itemsPerPage, maxPagesShown, onClick } = defineProps([
 .pagination-container {
     display: flex;
     column-gap: 10px;
-    padding-left: 40%;
+    padding-left: 44%;
     padding-top: 10px;
     list-style-type: none;
 }
