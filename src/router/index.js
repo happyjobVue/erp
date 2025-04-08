@@ -13,6 +13,7 @@ import Annual from '../views/Sales/annual.vue';
 import Plan from '../views/Business/Plan/Plan.vue';
 import ExpenseReviewList from '../views/Account/ExpenseReviewList.vue';
 import PlanResult from '../views/Business/PlanResult/PlanResult.vue';
+import Estimate from '../views/Business/Estimate/Estimate.vue';
 
 const routes = [
     {
@@ -122,6 +123,11 @@ const routes = [
                         path: 'sales-list',
                         name: 'sales-list',
                         component: PlanResult,
+                    },
+                    {
+                        path: 'estimate-list',
+                        name: 'estimate-list',
+                        component: Estimate,
                     },
                 ],
             },
