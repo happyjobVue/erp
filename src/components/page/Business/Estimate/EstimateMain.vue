@@ -39,14 +39,13 @@ const onPostSuccess = () => {
 
 //등록 모달 열기
 const registerEstiModal = () => {
-    console.log('등록 모달 로직');
+    console.log('등록');
     modalType.value = 'register';
     modalState.setModalState(true);
 };
 
 //상세 보기 모달
 const detailEst = (clientId, id) => {
-    console.log('상세 모달 로직');
     modalType.value = 'view';
     modalState.setModalState(true);
 

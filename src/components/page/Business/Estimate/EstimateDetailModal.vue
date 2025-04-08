@@ -145,9 +145,9 @@ onUnmounted(() => {
                             >
                                 <td>{{ detail.productName }}</td>
                                 <td>{{ detail.quantity }}</td>
-                                <td>{{ detail.supplyPrice }}</td>
+                                <td>{{ detail.unitPrice }}</td>
                                 <td>{{ estimate.totalTax }}</td>
-                                <td>{{ estimate.totalSupplyPrice }}</td>
+                                <td>{{ detail.supplyPrice }}</td>
                             </tr>
                         </tbody>
                     </table>
