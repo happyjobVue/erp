@@ -146,7 +146,7 @@ watch(() => route.query, searchList);
 <style lang="scss" scoped>
 table {
     width: 100%;
-    border-collapse: collapse;
+
     margin: 20px 0px 0px 0px;
     font-size: 18px;
     text-align: left;
