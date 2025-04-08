@@ -11,7 +11,6 @@ declare module 'vue' {
     AnnualMain: typeof import('./src/components/page/Sales/annual/annualMain.vue')['default']
     AnnualProductModal: typeof import('./src/components/page/Sales/annual/annualProductModal.vue')['default']
     AnnualSearch: typeof import('./src/components/page/Sales/annual/annualSearch.vue')['default']
-    CodeeMain: typeof import('./src/components/page/System/Code/CodeeMain.vue')['default']
     CodeMain: typeof import('./src/components/page/System/Code/CodeMain.vue')['default']
     CodeModal: typeof import('./src/components/page/System/Code/CodeModal.vue')['default']
     CodeSearch: typeof import('./src/components/page/System/Code/CodeSearch.vue')['default']
