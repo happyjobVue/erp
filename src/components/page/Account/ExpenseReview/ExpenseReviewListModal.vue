@@ -112,7 +112,10 @@
                     <tr>
                         <td class="label">승인여부</td>
                         <td>
-                            <div class="radio-group">
+                            <div
+                                v-if="expenseDetail.is_approval === 'W'"
+                                class="radio-group"
+                            >
                                 <label style="margin-right: 10px">
                                     <input
                                         type="radio"
@@ -130,7 +133,11 @@
                                     반려
                                 </label>
                             </div>
+                            <div v-else>
+                                {{ approvalMap[expenseDetail.is_approval] }}
+                            </div>
                         </td>
+
                         <td class="label">승인일자</td>
                         <td>
                             <input
