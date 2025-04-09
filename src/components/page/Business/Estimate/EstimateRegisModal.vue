@@ -12,8 +12,6 @@ const clients = ref(''); // 고객 목록
 const manufacturers = ref(''); //제조사 목록
 const productList = ref([]); //제품 목록
 const selectedClient = ref('');
-const estimateDate = ref('');
-const selectedSalesArea = ref('');
 const selectedManufacturer = ref(''); // 선택된 제조사
 const selectedProduct = ref(''); // 선택된 제품
 const quantity = ref(''); // 수량 저장
@@ -24,6 +22,8 @@ const supplyPrice = ref(0); // 총 금액
 const estimateDeliveryDate = ref('');
 const estimateSalesArea = ref('');
 const estimateList = ref([]);
+
+const emit = defineEmits(['modalClose', 'postSuccess']);
 
 // 추가 버튼 클릭 시
 const addEstimateItem = () => {
@@ -48,9 +48,6 @@ const addEstimateItem = () => {
         (supplyPrice.value = '');
 };
 
-// 데이터 넘기는 예
-// {"clientId":"0","estimateDeliveryDate":"2025-04-10","estimateSalesArea":"SCM","estimateList":[{"manufacturerId":0,"majorCategoryId":"MF001","subCategoryId":"MF00102","productId":1,"unitPrice":"80000","quantity":"10","supplyPrice":"800000"},{"manufacturerId":0,"majorCategoryId":"MF001","subCategoryId":"MF00102","productId":1,"unitPrice":"80000","quantity":"10","supplyPrice":"800000"}]}
-
 const saveEstimate = async () => {
     const param = {
         clientId: selectedClient.value,
@@ -60,11 +57,20 @@ const saveEstimate = async () => {
     };
 
     try {
-        const response = await axios.post('/api/business/saveEstimate', param);
-        console.log(response.data); // 서버 응답 확인
+        const response = await axios
+            .post('/api/business/saveEstimate', param)
+            .then(() => {
+                alert('저장 완료되었습니다.');
+                emit('postSuccess');
+                closeModal();
+            });
     } catch (error) {
         console.error('저장 실패:', error);
     }
+};
+
+const closeModal = () => {
+    modalState.setModalState();
 };
 
 onMounted(async () => {
@@ -200,9 +206,7 @@ const calculateSupplyPrice = () => {
                 <div class="button-box">
                     <button @click="saveEstimate()">등록</button>
                     <button>전체 삭제</button>
-                    <button type="button" @click="modalState.setModalState()">
-                        취소
-                    </button>
+                    <button type="button" @click="closeModal()">취소</button>
                 </div>
             </div>
         </div>

@@ -1,6 +1,7 @@
 <script setup>
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { onMounted, ref, watch } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import EstimateDetailModal from './EstimateDetailModal.vue';
 import EstimateRegisModal from './EstimateRegisModal.vue';
@@ -12,6 +13,7 @@ const modalType = ref('');
 const modalState = useModalStore();
 const selectedEstimateId = ref(null);
 const selectedClientId = ref(null);
+const route = useRoute();
 onMounted(() => {
     getAllEstimate();
 });
@@ -29,6 +31,24 @@ const getAllEstimate = () => {
             estimateCnt.value = res.data.estimateCnt;
         });
 };
+
+// 검색된 견적서 목록 불러오는 함수
+const searchEstimateList = () => {
+    console.log('검색 로직 ');
+    const param = {
+        ...route.query,
+        currentPage: cPage.value,
+        pageSize: 5,
+    };
+    axios
+        .post('/api/business/estimate-list/estimateListBody.do', param)
+        .then(res => {
+            estimateList.value = res.data.estimateList;
+            estimateCnt.value = res.data.estimateCnt;
+        });
+};
+
+watch(() => route.query, searchEstimateList);
 
 // 모달이 성공적으로 닫힌 후 실행될 함수
 const onPostSuccess = () => {
@@ -74,6 +94,7 @@ const onModalClose = () => {
         <EstimateRegisModal
             v-if="modalState.modalState && modalType === 'register'"
             @postSucess="onPostSuccess"
+            @modalClose="onModalClose"
         />
         <!-- 신규 등록 버튼 -->
         <button @click="registerEstiModal()">거래처 등록</button>
