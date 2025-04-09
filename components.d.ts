@@ -22,6 +22,7 @@ declare module 'vue' {
     DepartmentSearch: typeof import('./src/components/page/System/Department/DepartmentSearch.vue')['default']
     EmployeeModal: typeof import('./src/components/page/employee/EmployeeModal.vue')['default']
     EmployeeSearchBar: typeof import('./src/components/page/employee/EmployeeSearchBar.vue')['default']
+    ExpenseApproval: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApproval.vue')['default']
     ExpenseApprovalMain: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApprovalMain.vue')['default']
     ExpenseApprovalModal: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApprovalModal.vue')['default']
     ExpenseApprovalSearch: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApprovalSearch.vue')['default']

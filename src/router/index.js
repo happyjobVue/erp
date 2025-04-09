@@ -17,6 +17,7 @@ import PlanResult from '../views/Business/PlanResult/PlanResult.vue';
 import Estimate from '../views/Business/Estimate/Estimate.vue';
 import Code from '../views/System/Code.vue';
 import ExpenseReviewListPrint from '../components/page/Account/ExpenseReview/ExpenseReviewListPrint.vue';
+import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
 
 const routes = [
     {
@@ -125,6 +126,11 @@ const routes = [
                         path: 'expense-review',
                         name: 'expense-review',
                         component: ExpenseReviewList,
+                    },
+                    {
+                        path: 'expense-approval',
+                        name: 'expense-approval',
+                        component: ExpenseApproval,
                     },
                 ],
             },
