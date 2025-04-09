@@ -116,10 +116,10 @@
                                 <label style="margin-right: 10px">
                                     <input
                                         type="radio"
-                                        value="F"
+                                        value="S"
                                         v-model="expenseDetail.is_approval"
                                     />
-                                    승인대기
+                                    승인
                                 </label>
                                 <label>
                                     <input
@@ -134,6 +134,7 @@
                                 {{ approvalMap[expenseDetail.is_approval] }}
                             </div>
                         </td>
+
                         <td class="label">승인일자</td>
                         <td>
                             <input
@@ -178,10 +179,10 @@
                         v-if="showSubmitButton"
                         @click="expenseReviewUpdate()"
                     >
-                        검토완료
+                        승인완료
                     </button>
                     <button
-                        v-if="expenseDetail.is_approval === 'S'"
+                        v-if="originalApproval !== 'F'"
                         @click="goToPrintPage"
                     >
                         지출결의서 출력
@@ -203,6 +204,7 @@ const expenseDetail = ref({});
 const clientList = ref([]);
 const expenseDetailName = ref([]);
 const { id } = defineProps(['id']);
+const originalApproval = ref('');
 const showRadio = ref(false);
 const showSubmitButton = ref(false);
 
@@ -222,6 +224,7 @@ const searchDetail = async () => {
         expenseDetail.value = response.data.expenseDetail;
         clientList.value = response.data.clientList;
         expenseDetailName.value = response.data.expenseDetailName;
+        originalApproval.value = response.data.expenseDetail.is_approval;
     } catch (e) {
         console.error(e);
     }
@@ -250,7 +253,7 @@ const downloadFileImage = async () => {
 };
 
 const expenseReviewUpdate = async () => {
-    if (!['F', 'N'].includes(expenseDetail.value.is_approval)) {
+    if (!['S'].includes(expenseDetail.value.is_approval)) {
         alert('승인여부를 선택해주세요. (승인대기 또는 반려)');
         return;
     }
@@ -267,7 +270,10 @@ const expenseReviewUpdate = async () => {
     param.append('exp_id', expenseDetail.value.id);
 
     try {
-        const res = await axios.post('/api/account/expenseUpdate.do', param);
+        const res = await axios.post(
+            '/api/account/expenseLastUpdate.do',
+            param
+        );
         console.log('서버 응답:', res.data);
         if (res.data.result === 'success') {
             emit('postSuccess');
@@ -293,14 +299,13 @@ const goToPrintPage = () => {
 onMounted(() => {
     if (id) {
         searchDetail().then(() => {
-            if (expenseDetail.value.is_approval === 'W') {
+            if (expenseDetail.value.is_approval === 'F') {
                 showRadio.value = true;
                 showSubmitButton.value = true;
             }
         });
     }
 });
-
 onUnmounted(() => {
     emit('modalClose', 0);
 });
