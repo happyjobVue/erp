@@ -1,5 +1,5 @@
 <template>
-    <div class="divNoticeList">
+    <div class="divExpenseList">
         <ExpenseListModal
             v-if="modal.modalState"
             :id="expenseId"

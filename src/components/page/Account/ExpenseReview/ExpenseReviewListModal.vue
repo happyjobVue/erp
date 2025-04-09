@@ -112,9 +112,24 @@
                     <tr>
                         <td class="label">승인여부</td>
                         <td>
-                            <span>{{
-                                approvalMap[expenseDetail.is_approval]
-                            }}</span>
+                            <div class="radio-group">
+                                <label style="margin-right: 10px">
+                                    <input
+                                        type="radio"
+                                        value="F"
+                                        v-model="expenseDetail.is_approval"
+                                    />
+                                    승인대기
+                                </label>
+                                <label>
+                                    <input
+                                        type="radio"
+                                        value="N"
+                                        v-model="expenseDetail.is_approval"
+                                    />
+                                    반려
+                                </label>
+                            </div>
                         </td>
                         <td class="label">승인일자</td>
                         <td>
@@ -127,13 +142,22 @@
                     </tr>
                     <tr>
                         <td class="label">첨부파일</td>
-                        <td colspan="3">
-                            <button
-                                @click="downloadFileImage"
-                                class="button-box"
-                            >
-                                <img v-if="imgUrl" :src="imgUrl" />다운로드
-                            </button>
+
+                        <button @click="downloadFileImage" class="button-box">
+                            <img v-if="imgUrl" :src="imgUrl" />다운로드
+                        </button>
+
+                        <td class="label">대변계정과목</td>
+                        <td>
+                            <select v-model="expenseDetail.crebit_code">
+                                <option
+                                    v-for="item in expenseDetailName"
+                                    :key="item.detail_code"
+                                    :value="item.detail_code"
+                                >
+                                    {{ item.detail_name }}
+                                </option>
+                            </select>
                         </td>
                     </tr>
                     <tr>
@@ -147,7 +171,18 @@
                     </tr>
                 </table>
                 <div class="button-box">
-                    <button @click="setModalState">신청</button>
+                    <button
+                        v-if="expenseDetail.is_approval === 'W'"
+                        @click="expenseReviewUpdate()"
+                    >
+                        검토완료
+                    </button>
+                    <button
+                        v-if="expenseDetail.is_approval === 'S'"
+                        @click="goToPrintPage"
+                    >
+                        지출결의서 출력
+                    </button>
                     <button @click="setModalState">나가기</button>
                 </div>
             </div>
@@ -159,12 +194,13 @@
 import { ref, onMounted } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
-
+const emit = defineEmits(['modalClose', 'postSuccess']);
 const { setModalState } = useModalStore();
 const expenseDetail = ref({});
 const clientList = ref([]);
 const expenseDetailName = ref([]);
 const { id } = defineProps(['id']);
+const router = useRouter();
 
 const approvalMap = computed(() => ({
     W: '검토 대기',
@@ -209,8 +245,52 @@ const downloadFileImage = async () => {
     }
 };
 
+const expenseReviewUpdate = async () => {
+    if (!['F', 'N'].includes(expenseDetail.value.is_approval)) {
+        alert('승인여부를 선택해주세요. (승인대기 또는 반려)');
+        return;
+    }
+    if (
+        !expenseDetail.value.crebit_code ||
+        expenseDetail.value.crebit_code.trim() === ''
+    ) {
+        alert('대변과목을 입력해주세요.');
+        return;
+    }
+    const param = new URLSearchParams();
+    param.append('checkApproval', expenseDetail.value.is_approval);
+    param.append('detail_code', expenseDetail.value.crebit_code);
+    param.append('exp_id', expenseDetail.value.id);
+
+    try {
+        const res = await axios.post('/api/account/expenseUpdate.do', param);
+        console.log('서버 응답:', res.data);
+        if (res.data.result === 'success') {
+            emit('postSuccess');
+        } else {
+            alert('저장 실패');
+        }
+    } catch (e) {
+        console.error('저장 중 오류:', e);
+        alert('저장 중 오류가 발생했습니다.');
+    }
+};
+
+const goToPrintPage = () => {
+    const id = expenseDetail.value.id;
+    localStorage.setItem(
+        'printExpenseData',
+        JSON.stringify(expenseDetail.value)
+    );
+    const url = `/expense-review/print/${id}`;
+    window.open(url, '_blank');
+};
+
 onMounted(() => {
     if (id) searchDetail();
+});
+onUnmounted(() => {
+    emit('modalClose', 0);
 });
 </script>
 
@@ -241,13 +321,24 @@ onMounted(() => {
     border: 1px solid #ccc;
     padding: 10px;
 }
+.radio-group {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.radio-group input[type='radio'] {
+    display: inline-block;
+    margin-right: 5px;
+}
+
 .label {
     background: #f0f0f0;
     font-weight: bold;
     text-align: left;
     width: 150px;
 }
-input,
+input:not([type='radio']),
 select,
 span,
 textarea {
@@ -262,6 +353,7 @@ textarea {
     border-radius: 4px;
     border: 1px solid #ccc;
 }
+
 textarea {
     min-height: 80px;
     resize: vertical;

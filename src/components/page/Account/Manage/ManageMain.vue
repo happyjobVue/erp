@@ -1,5 +1,5 @@
 <template>
-    <div class="divNoticeList">
+    <div class="divManage">
         <ManageModal
             v-if="modal.modalState"
             :id="detail_code"
