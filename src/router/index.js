@@ -15,12 +15,18 @@ import ExpenseReviewList from '../views/Account/ExpenseReviewList.vue';
 import PlanResult from '../views/Business/PlanResult/PlanResult.vue';
 import Estimate from '../views/Business/Estimate/Estimate.vue';
 import Code from '../views/System/Code.vue';
+import ExpenseReviewListPrint from '../components/page/Account/ExpenseReview/ExpenseReviewListPrint.vue';
 
 const routes = [
     {
         path: '/',
         name: 'login',
         component: Login,
+    },
+    {
+        path: '/expense-review/print/:id',
+        name: 'expense-review-print',
+        component: ExpenseReviewListPrint,
     },
     {
         path: '/vue',

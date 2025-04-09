@@ -1,5 +1,5 @@
 <template>
-    <div class="divNoticeList">
+    <div class="divCode">
         <CodeModal
             v-if="modal.modalState"
             :id="groupCode"
