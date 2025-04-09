@@ -18,6 +18,7 @@ import Estimate from '../views/Business/Estimate/Estimate.vue';
 import Code from '../views/System/Code.vue';
 import ExpenseReviewListPrint from '../components/page/Account/ExpenseReview/ExpenseReviewListPrint.vue';
 import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
+import Order from '../views/Business/Order/Order.vue';
 
 const routes = [
     {
@@ -152,6 +153,11 @@ const routes = [
                         path: 'estimate-list',
                         name: 'estimate-list',
                         component: Estimate,
+                    },
+                    {
+                        path: 'order-information-list',
+                        name: 'order-information-list',
+                        component: Order,
                     },
                 ],
             },
