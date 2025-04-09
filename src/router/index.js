@@ -10,16 +10,25 @@ import Monthly from '../views/Sales/Monthly.vue';
 import Employee from '../views/Employee/Employee.vue';
 import ExpenseList from '../views/Account/ExpenseList.vue';
 import Annual from '../views/Sales/annual.vue';
+import ReceivablesList from '../views/Sales/ReceivablesList.vue';
 import Plan from '../views/Business/Plan/Plan.vue';
 import ExpenseReviewList from '../views/Account/ExpenseReviewList.vue';
 import PlanResult from '../views/Business/PlanResult/PlanResult.vue';
 import Estimate from '../views/Business/Estimate/Estimate.vue';
+import Code from '../views/System/Code.vue';
+import ExpenseReviewListPrint from '../components/page/Account/ExpenseReview/ExpenseReviewListPrint.vue';
+import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
 
 const routes = [
     {
         path: '/',
         name: 'login',
         component: Login,
+    },
+    {
+        path: '/expense-review/print/:id',
+        name: 'expense-review-print',
+        component: ExpenseReviewListPrint,
     },
     {
         path: '/vue',
@@ -39,6 +48,11 @@ const routes = [
                         path: 'department',
                         name: 'department',
                         component: Department,
+                    },
+                    {
+                        path: 'code',
+                        name: 'code',
+                        component: Code,
                     },
                 ],
             },
@@ -77,6 +91,11 @@ const routes = [
                         name: 'annual',
                         component: Annual,
                     },
+                    {
+                        path: 'receivables-list',
+                        name: 'receivables-list',
+                        component: ReceivablesList,
+                    },
                 ],
             },
             {
@@ -107,6 +126,11 @@ const routes = [
                         path: 'expense-review',
                         name: 'expense-review',
                         component: ExpenseReviewList,
+                    },
+                    {
+                        path: 'expense-approval',
+                        name: 'expense-approval',
+                        component: ExpenseApproval,
                     },
                 ],
             },

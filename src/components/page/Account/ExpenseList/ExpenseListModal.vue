@@ -167,7 +167,12 @@
                     <button v-if="!isReadOnly" @click="expenseListSave()">
                         신청
                     </button>
-                    <button v-if="id" @click="expenseListDelete">삭제</button>
+                    <button
+                        v-if="id && expenseDetail.is_approval === 'W'"
+                        @click="expenseListDelete"
+                    >
+                        삭제
+                    </button>
                     <button @click="setModalState">나가기</button>
                 </div>
             </div>

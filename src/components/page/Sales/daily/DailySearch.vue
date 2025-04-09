@@ -14,7 +14,7 @@
                 <span class="search-span">기간</span>
                 <input type="date" v-model="searchDate" />
                 <svg-icon @click="getDay(-1)" class="icon" type="mdi" :path="leftPath" :size="24"></svg-icon>
-                <button>오늘</button>
+                <button @click="moveToday">오늘</button>
                 <svg-icon @click="getDay(1)" class="icon" type="mdi" :path="rightPath" :size="24"></svg-icon>
             </div>
             <div class="search-button">
@@ -57,6 +57,10 @@ const getDay = (day) => {
     baseDate.setDate(baseDate.getDate() + day);
     const transformDate = formatDate(baseDate)
     searchDate.value = transformDate
+}
+
+const moveToday = () => {
+    searchDate.value = getToday()
 }
 
 onMounted(() => {

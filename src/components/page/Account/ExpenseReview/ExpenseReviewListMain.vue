@@ -1,5 +1,5 @@
 <template>
-    <div class="divNoticeList">
+    <div class="divExpenseReviewList">
         <ExpenseReviewListModal
             v-if="modal.modalState"
             :id="expenseId"
@@ -93,9 +93,13 @@ const searchList = async () => {
 };
 
 const handlerModal = id => {
-    console.log('🛠️ handlerModal called with id:', id);
     expenseId.value = id;
     modal.setModalState();
+};
+
+const onPostSuccess = () => {
+    modal.setModalState();
+    searchList();
 };
 
 onMounted(() => {
