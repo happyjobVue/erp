@@ -8,6 +8,7 @@ import SalaryList from '../views/Personnel/Salary-list.vue';
 import Daily from '../views/Sales/Daily.vue';
 import Employee from '../views/Employee/Employee.vue';
 import ExpenseList from '../views/Account/ExpenseList.vue';
+import Promotion from '../views/promotion/promotion.vue';
 
 const routes = [
     {
@@ -82,6 +83,11 @@ const routes = [
                         path: 'employee',
                         name: 'employee',
                         component: Employee,
+                    },
+                    {
+                        path: 'promotion',
+                        name: 'promotion',
+                        component: Promotion,
                     },
                 ],
             },

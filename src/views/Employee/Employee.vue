@@ -11,13 +11,18 @@ const route = useRoute();
 const personnelList = ref([]);
 const cPage = ref(1);
 const isModalOpen = ref(false);
+//퇴직에 사용될 것 
 const UserDetail = ref({});
+//유저 상세보기
+const employeeDetail = ref({});
 
 /* 현재 재직상태 변경 */
 const chEmplStatus = ref('');
 
 //modal type별 정의 
 const modalType = ref('');
+
+const imgUrl = ref('');
 
 //1. 인사 관리 리스트 조회  
 const personnelSearchList = () => {
@@ -31,6 +36,57 @@ const personnelSearchList = () => {
 
     AxiosRequest('employeeListBody',param ,personnelList);
 
+};
+
+//개인 조회 
+const checkPerson = (personnel) => {
+    modalType.value = 'update'
+    
+    const param = {
+        employeeId: personnel.employeeId,
+        jobGradeCode: personnel.jobGradeCode,
+    }
+
+    getFileImage(personnel.employeeId);
+
+
+
+    axios
+        .post(`/api/personnel/employeeDetailBody`, param, {
+            headers: {
+                'Content-Type': 'application/json', // JSON 형식으로 전송
+            },
+        })
+        .then(res => {
+            employeeDetail.value = res.data.detail;
+            console.log(employeeDetail.value);
+            if (
+                employeeDetail.value.profileFileExt === 'jpg' ||
+                employeeDetail.value.profileFileExt === 'gif' ||
+                employeeDetail.value.profileFileExt === 'png'
+            ) {
+            }
+
+            isModalOpen.value = true;
+        })
+        .catch(err => {
+            console.error('에러 발생:', err);
+        });
+
+}
+
+const getFileImage = (val) => {
+    const param = new URLSearchParams();
+    param.append('employeeId', val);
+    axios
+        .post('/api/personnel/employeeDownload.do', param, {
+            responseType: 'blob',
+        })
+        .then(res => {
+            const contentType = res.headers['content-type']; // image/jpeg 등
+            const blob = new Blob([res.data], { type: contentType });
+            imgUrl.value = URL.createObjectURL(blob); // 이미지 URL 생성
+        });
 };
 
 //2. 재직자, 퇴직자의 따른 재 검색 
@@ -143,14 +199,18 @@ const NoqueryString = () => {
 
 //모달 열기 / 모달 창한개로 modalType으로 각각 불러옴 
 const ModalOpening = ({ isModalOpen : isModalOpenval, modalType : modalTypeval  }) => {
+  
     modalType.value = modalTypeval;
-    isModalOpen.value = isModalOpenval;   
+    isModalOpen.value = isModalOpenval; 
+    
+
 }
 
 
 //모달 닫기 
 const closeModal = (val) => {
   isModalOpen.value = val;
+  personnelSearchList();
 };
 
 
@@ -184,6 +244,9 @@ computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
 
         :modalType="modalType"
         :UserDetail="UserDetail"
+        :employeeDetail="employeeDetail"
+        :imgUrl="imgUrl"
+
         @closeModal="closeModal"
         @update-retire-info="handleRetireInfo"
 
@@ -209,6 +272,7 @@ computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
         <tr
             v-for="personnel in personnelList.employeeList"
             :key="personnel.employeeId"
+            @click="() => checkPerson(personnel)"
         >
             <td>{{ personnel.number }}</td>
             <td>{{ personnel.employeeName }}</td>
@@ -219,7 +283,7 @@ computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
             <td>{{ personnel.emplStatus }}</td>
             <td>{{ personnel.resignationDate }}</td>
             <td>               
-                <button @click="() => Onretire(personnel)" :disabled="!!personnel.resignationDate">
+                <button @click.stop="() => Onretire(personnel)" :disabled="!!personnel.resignationDate">
                     퇴직처리
                 </button>
             </td>
