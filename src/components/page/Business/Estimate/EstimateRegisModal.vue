@@ -1,58 +1,66 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import {
     fetchClient,
     fetchManufacturers,
     fetchProductsByManufacturer,
 } from '../../../../common/selectBoxApi';
-
+import { useModalStore } from '../../../../stores/modalState';
+import axios from 'axios';
+const modalState = useModalStore();
 const clients = ref(''); // 고객 목록
-const manufacturer = ref(''); //제조사 목록
+const manufacturers = ref(''); //제조사 목록
 const productList = ref([]); //제품 목록
 const selectedClient = ref('');
 const estimateDate = ref('');
 const selectedSalesArea = ref('');
 const selectedManufacturer = ref(''); // 선택된 제조사
 const selectedProduct = ref(''); // 선택된 제품
-const qunti = ref(''); // 수량 저장
+const quantity = ref(''); // 수량 저장
+const supplyPrice = ref(0); // 총 금액
 
-const clientId = ref('2'); // 예시로 설정된 clientId
-const estimateDeliveryDate = ref('2025-04-10');
-const estimateSalesArea = ref('영업');
+// 견적서 저장시 일정하게 넘겨져야하는 데이터
 
-// const estimateList = ref([
-//     {
-//         manufacturerId: 0,
-//         majorCategoryId: "MF001",
-//         subCategoryId: "MF00103",
-//         productId: 2,
-//         unitPrice: "5000",
-//         quantity: "10",
-//         supplyPrice: "50000"
-//     },
-//     {
-//         manufacturerId: 1,
-//         majorCategoryId: "MF002",
-//         subCategoryId: "MF00203",
-//         productId: 7,
-//         unitPrice: "1000",
-//         quantity: "10",
-//         supplyPrice: "100"
-//     }
-// ]);
+const estimateDeliveryDate = ref('');
+const estimateSalesArea = ref('');
+const estimateList = ref([]);
 
+// 추가 버튼 클릭 시
+const addEstimateItem = () => {
+    console.log('추가 버튼 클릭 후 ');
+    // 새로운 항목을 estimateList 배열에 추가
+    estimateList.value.push({
+        manufacturerId: selectedManufacturer.value.manufacturerId,
+        majorCategoryId: selectedProduct.value.industry_code,
+        subCategoryId: selectedProduct.value.product_code,
+        productId: selectedProduct.value.id,
+        unitPrice: selectedProduct.value.unit_price,
+        quantity: quantity.value,
+        supplyPrice: supplyPrice.value, // 공급가액 포함
+        // 데이터 출력을 위한 것
+        productName: selectedProduct.value.name,
+        industryName: selectedManufacturer.value.industryName,
+    });
+
+    (selectedManufacturer.value = ''),
+        (selectedProduct.value = ''),
+        (quantity.value = ''),
+        (supplyPrice.value = '');
+};
+
+// 데이터 넘기는 예
 // {"clientId":"0","estimateDeliveryDate":"2025-04-10","estimateSalesArea":"SCM","estimateList":[{"manufacturerId":0,"majorCategoryId":"MF001","subCategoryId":"MF00102","productId":1,"unitPrice":"80000","quantity":"10","supplyPrice":"800000"},{"manufacturerId":0,"majorCategoryId":"MF001","subCategoryId":"MF00102","productId":1,"unitPrice":"80000","quantity":"10","supplyPrice":"800000"}]}
 
 const saveEstimate = async () => {
     const param = {
-        clientId: clientId.value,
+        clientId: selectedClient.value,
         estimateDeliveryDate: estimateDeliveryDate.value,
         estimateSalesArea: estimateSalesArea.value,
         estimateList: estimateList.value,
     };
 
     try {
-        const response = await axios.post('/api/business/estimate-save', param);
+        const response = await axios.post('/api/business/saveEstimate', param);
         console.log(response.data); // 서버 응답 확인
     } catch (error) {
         console.error('저장 실패:', error);
@@ -60,7 +68,7 @@ const saveEstimate = async () => {
 };
 
 onMounted(async () => {
-    manufacturer.value = await fetchManufacturers();
+    manufacturers.value = await fetchManufacturers();
     clients.value = await fetchClient();
 });
 
@@ -69,10 +77,14 @@ onMounted(async () => {
 async function handleManufacturerChange() {
     if (selectedManufacturer.value) {
         productList.value = await fetchProductsByManufacturer(
-            selectedManufacturer.value
+            selectedManufacturer.value.industryCode
         );
     }
 }
+//  총액 = 제품 단가 * 수량
+const calculateSupplyPrice = () => {
+    supplyPrice.value = quantity.value * selectedProduct.value.unit_price;
+};
 </script>
 
 <template>
@@ -93,37 +105,14 @@ async function handleManufacturerChange() {
                         </option>
                     </select>
                     <label for="">납기일 </label>
-                    <input type="date" v-model="estimateDate" />
+                    <input type="date" v-model="estimateDeliveryDate" />
                     <label for="">영역구분 </label>
-                    <select v-model="selectedSalesArea">
+                    <select v-model="estimateSalesArea">
                         <option value="" disabled>전체</option>
                         <option value="SCM">SCM</option>
                         <option value="영업">영업</option>
                     </select>
                 </div>
-                <table>
-                    <tbody>
-                        <input type="text" hidden />
-
-                        <tr>
-                            <th class="table-header">제조업체</th>
-                            <th class="table-header">제품명</th>
-                            <th class="table-header">제품단가</th>
-                            <th class="table-header">수량</th>
-                            <th class="table-header">공급가액</th>
-                            <th class="table-header">삭제</th>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-
                 <table>
                     <tr>
                         <th>제조업체</th>
@@ -134,9 +123,9 @@ async function handleManufacturerChange() {
                             >
                                 <option value="" disabled>제조사</option>
                                 <option
-                                    v-for="manufacturer in manufacturer"
+                                    v-for="manufacturer in manufacturers"
                                     :key="manufacturer.manufacturer_id"
-                                    :value="manufacturer.industryCode"
+                                    :value="manufacturer"
                                 >
                                     {{ manufacturer.industryName }}
                                 </option>
@@ -165,23 +154,51 @@ async function handleManufacturerChange() {
                     </tr>
                     <tr>
                         <th>수량</th>
-                        <td><input type="text" v-model="qunti" /></td>
-                        <th>총액</th>
                         <td>
                             <input
                                 type="text"
-                                :value="qunti * selectedProduct.unit_price"
-                                disabled
+                                v-model="quantity"
+                                @input="calculateSupplyPrice"
                             />
+                        </td>
+                        <th>총액</th>
+                        <td>
+                            <input type="text" v-model="supplyPrice" disabled />
                         </td>
                         <th></th>
                         <td></td>
                     </tr>
                 </table>
-                <button>추가</button>
+                <button @click="addEstimateItem">추가</button>
+                <table>
+                    <tbody>
+                        <input type="text" hidden />
+
+                        <tr>
+                            <th class="table-header">제조업체</th>
+                            <th class="table-header">제품명</th>
+                            <th class="table-header">제품단가</th>
+                            <th class="table-header">수량</th>
+                            <th class="table-header">공급가액</th>
+                            <th class="table-header">삭제</th>
+                        </tr>
+                        <tr v-for="(item, index) in estimateList" :key="index">
+                            <td>{{ item.industryName }}</td>
+                            <td>{{ item.productName }}</td>
+                            <td>{{ item.unitPrice }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.supplyPrice }}</td>
+                            <td>
+                                <button @click="estimateList.splice(index, 1)">
+                                    삭제
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
                 <div class="button-box">
-                    <button>등록</button>
+                    <button @click="saveEstimate()">등록</button>
                     <button>전체 삭제</button>
                     <button type="button" @click="modalState.setModalState()">
                         취소
