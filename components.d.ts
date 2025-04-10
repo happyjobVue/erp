@@ -11,7 +11,6 @@ declare module 'vue' {
     AnnualMain: typeof import('./src/components/page/Sales/annual/annualMain.vue')['default']
     AnnualProductModal: typeof import('./src/components/page/Sales/annual/annualProductModal.vue')['default']
     AnnualSearch: typeof import('./src/components/page/Sales/annual/annualSearch.vue')['default']
-    Attendance: typeof import('./src/components/page/personnel/Attendance/Attendance.vue')['default']
     AttendanceModal: typeof import('./src/components/page/personnel/Attendance/AttendanceModal.vue')['default']
     AttendanceRequestModal: typeof import('./src/components/page/personnel/Attendance/AttendanceRequestModal.vue')['default']
     CodeMain: typeof import('./src/components/page/System/Code/CodeMain.vue')['default']
@@ -29,10 +28,6 @@ declare module 'vue' {
     EstimateMain: typeof import('./src/components/page/Business/Estimate/EstimateMain.vue')['default']
     EstimateRegisModal: typeof import('./src/components/page/Business/Estimate/EstimateRegisModal.vue')['default']
     EstimateSearch: typeof import('./src/components/page/Business/Estimate/EstimateSearch.vue')['default']
-<<<<<<< HEAD
-=======
-    ExpenseApproval: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApproval.vue')['default']
->>>>>>> c44724dca5389998c0815fc01955b0d08c931521
     ExpenseApprovalMain: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApprovalMain.vue')['default']
     ExpenseApprovalModal: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApprovalModal.vue')['default']
     ExpenseApprovalSearch: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApprovalSearch.vue')['default']
