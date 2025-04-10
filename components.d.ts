@@ -20,12 +20,8 @@ declare module 'vue' {
     DepartmentMain: typeof import('./src/components/page/System/Department/DepartmentMain.vue')['default']
     DepartmentModal: typeof import('./src/components/page/System/Department/DepartmentModal.vue')['default']
     DepartmentSearch: typeof import('./src/components/page/System/Department/DepartmentSearch.vue')['default']
-<<<<<<< HEAD
     EmployeeModal: typeof import('./src/components/page/personnel/employee/EmployeeModal.vue')['default']
     EmployeeSearchBar: typeof import('./src/components/page/personnel/employee/EmployeeSearchBar.vue')['default']
-=======
-    EmployeeModal: typeof import('./src/components/page/employee/EmployeeModal.vue')['default']
-    EmployeeSearchBar: typeof import('./src/components/page/employee/EmployeeSearchBar.vue')['default']
     EstimateDetailModal: typeof import('./src/components/page/Business/Estimate/EstimateDetailModal.vue')['default']
     EstimateMain: typeof import('./src/components/page/Business/Estimate/EstimateMain.vue')['default']
     EstimateRegisModal: typeof import('./src/components/page/Business/Estimate/EstimateRegisModal.vue')['default']
@@ -34,11 +30,6 @@ declare module 'vue' {
     ExpenseApprovalMain: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApprovalMain.vue')['default']
     ExpenseApprovalModal: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApprovalModal.vue')['default']
     ExpenseApprovalSearch: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApprovalSearch.vue')['default']
-    EstimateDetailModal: typeof import('./src/components/page/Business/Estimate/EstimateDetailModal.vue')['default']
-    EstimateMain: typeof import('./src/components/page/Business/Estimate/EstimateMain.vue')['default']
-    EstimateRegisModal: typeof import('./src/components/page/Business/Estimate/EstimateRegisModal.vue')['default']
-    EstimateSearch: typeof import('./src/components/page/Business/Estimate/EstimateSearch.vue')['default']
->>>>>>> edaa0420edc8497e245dc9daeb6f456b1bf01491
     ExpenseListMain: typeof import('./src/components/page/Account/ExpenseList/ExpenseListMain.vue')['default']
     ExpenseListModal: typeof import('./src/components/page/Account/ExpenseList/ExpenseListModal.vue')['default']
     ExpenseListSearch: typeof import('./src/components/page/Account/ExpenseList/ExpenseListSearch.vue')['default']

@@ -21,6 +21,7 @@ import ExpenseReviewListPrint from '../components/page/Account/ExpenseReview/Exp
 import SalaryManage from '../views/Personnel/Salary/Salary-manage.vue';
 import Attendance from '../views/Personnel/Attendance/Attendance.vue';
 import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
+import Order from '../views/Business/Order/Order.vue';
 
 const routes = [
     {
@@ -174,7 +175,7 @@ const routes = [
                     {
                         path: 'order-information-list',
                         name: 'order-information-list',
-                        component: Orde,
+                        component: Order,
                     },
                 ],
             },
