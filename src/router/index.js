@@ -19,15 +19,10 @@ import Estimate from '../views/Business/Estimate/Estimate.vue';
 import Code from '../views/System/Code.vue';
 import ExpenseReviewListPrint from '../components/page/Account/ExpenseReview/ExpenseReviewListPrint.vue';
 import SalaryManage from '../views/Personnel/Salary/Salary-manage.vue';
-<<<<<<< HEAD
 import AttendanceList from '../views/Personnel/Attendance/Attendance-list.vue';
 import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
 import AttendanceRequest from '../views/Personnel/Attendance/Attendance-request.vue';
-=======
-import Attendance from '../views/Personnel/Attendance/Attendance.vue';
-import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
 import Order from '../views/Business/Order/Order.vue';
->>>>>>> c44724dca5389998c0815fc01955b0d08c931521
 
 const routes = [
     {
