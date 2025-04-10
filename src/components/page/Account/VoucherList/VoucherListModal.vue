@@ -4,7 +4,7 @@
             <div class="modal-container">
                 <table class="modal-table">
                     <tr>
-                        <td class="label">결의번호</td>
+                        <td class="label">전표번호</td>
                         <td>
                             <input
                                 type="text"
@@ -12,7 +12,23 @@
                                 readonly
                             />
                         </td>
-                        <td class="label">신청일자</td>
+                        <td class="label">구분</td>
+                        <td>
+                            <input
+                                type="date"
+                                v-model="expenseDetail.req_date"
+                                readonly
+                            />
+                        </td>
+                        <td class="label">담당자</td>
+                        <td>
+                            <input
+                                type="date"
+                                v-model="expenseDetail.req_date"
+                                readonly
+                            />
+                        </td>
+                        <td class="label">일자</td>
                         <td>
                             <input
                                 type="date"
@@ -22,15 +38,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">사번</td>
-                        <td>
-                            <input
-                                type="text"
-                                v-model="expenseDetail.emp_no"
-                                readonly
-                            />
-                        </td>
-                        <td class="label">사용일자</td>
+                        <td class="label">거래처</td>
                         <td>
                             <input
                                 type="date"
@@ -38,9 +46,15 @@
                                 readonly
                             />
                         </td>
-                    </tr>
-                    <tr>
-                        <td class="label">사원명</td>
+                        <td class="label">주문번호</td>
+                        <td>
+                            <input
+                                type="text"
+                                v-model="expenseDetail.emp_no"
+                                readonly
+                            />
+                        </td>
+                        <td class="label">지출번호</td>
                         <td>
                             <input
                                 type="text"
@@ -48,129 +62,28 @@
                                 readonly
                             />
                         </td>
-                        <td class="label">사용부서</td>
-                        <td>
-                            <input
-                                type="text"
-                                v-model="expenseDetail.use_department"
-                                readonly
-                            />
-                        </td>
                     </tr>
-                    <tr>
-                        <td class="label">계정대분류명</td>
-                        <td>
-                            <input
-                                type="text"
-                                v-model="expenseDetail.group_name"
-                                readonly
-                            />
-                        </td>
-                        <td class="label">거래처명</td>
-                        <td>
-                            <input
-                                type="text"
-                                v-model="expenseDetail.client_name"
-                                readonly
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label">차변계정과목</td>
-                        <td>
-                            <input
-                                type="text"
-                                v-model="expenseDetail.detail_name"
-                                readonly
-                            />
-                        </td>
-                        <td class="label">대변계정과목</td>
-                        <td>
-                            <template v-if="!showRadio">
-                                <input
-                                    type="text"
-                                    v-model="expenseDetail.credit_name"
-                                    readonly
-                                />
-                            </template>
-                            <template v-else>
-                                <select v-model="expenseDetail.crebit_code">
-                                    <option value="">선택</option>
-                                    <option
-                                        v-for="item in expenseDetailName"
-                                        :key="item.detail_code"
-                                        :value="item.detail_code"
-                                    >
-                                        {{ item.detail_name }}
-                                    </option>
-                                </select>
-                            </template>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label">승인여부</td>
-                        <td>
-                            <div v-if="showRadio" class="radio-group">
-                                <label style="margin-right: 10px">
-                                    <input
-                                        type="radio"
-                                        value="F"
-                                        v-model="expenseDetail.is_approval"
-                                    />
-                                    승인대기
-                                </label>
-                                <label>
-                                    <input
-                                        type="radio"
-                                        value="N"
-                                        v-model="expenseDetail.is_approval"
-                                    />
-                                    반려
-                                </label>
-                            </div>
-                            <div v-else>
-                                <input
-                                    type="text"
-                                    :value="
-                                        approvalMap[expenseDetail.is_approval]
-                                    "
-                                    readonly
-                                />
-                            </div>
-                        </td>
-                        <td class="label">승인일자</td>
-                        <td>
-                            <input
-                                type="date"
-                                v-model="expenseDetail.approval_date"
-                                readonly
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label">첨부파일</td>
-
-                        <button @click="downloadFileImage" class="button-box">
-                            다운로드
-                        </button>
-                        <td class="label">결의금액</td>
-                        <td>
-                            <input
-                                type="text"
-                                v-model="expenseDetail.expense_payment"
-                                readonly
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label">비고</td>
-                        <td colspan="3">
-                            <textarea
-                                v-model="expenseDetail.memo"
-                                readonly
-                            ></textarea>
-                        </td>
-                    </tr>
+                </table>
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>계정과목</th>
+                            <th>차변</th>
+                            <th>대변</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, index) in detailList" :key="index">
+                            <td>{{ item.date }}</td>
+                            <td>{{ item.description }}</td>
+                            <td>{{ numberWithCommas(item.amount) }}</td>
+                        </tr>
+                        <!-- <tr class="total-row">
+                            <td colspan="2">합계</td>
+                            <td>{{ numberWithCommas(totalAmount) }}</td>
+                            <td></td>
+                        </tr> -->
+                    </tbody>
                 </table>
                 <div class="button-box">
                     <button
@@ -204,7 +117,6 @@ const expenseDetailName = ref([]);
 const { id } = defineProps(['id']);
 const showRadio = ref(false);
 const showSubmitButton = ref(false);
-const isEditMode = computed(() => !!id);
 
 const approvalMap = computed(() => ({
     W: '검토 대기',
@@ -264,9 +176,7 @@ const expenseReviewUpdate = async () => {
     const param = new URLSearchParams();
     param.append('checkApproval', expenseDetail.value.is_approval);
     param.append('detail_code', expenseDetail.value.crebit_code);
-    param.append('detail_name', expenseDetail.value.detail_name);
     param.append('exp_id', expenseDetail.value.id);
-    param.append('credit_name', expenseDetail.value.credit_name);
 
     try {
         const res = await axios.post('/api/account/expenseUpdate.do', param);
@@ -306,18 +216,6 @@ onMounted(() => {
 onUnmounted(() => {
     emit('modalClose', 0);
 });
-
-watch(
-    () => expenseDetail.value.crebit_code,
-    newCode => {
-        const selected = expenseDetailName.value.find(
-            item => item.detail_code === newCode
-        );
-        if (selected) {
-            expenseDetail.value.credit_name = selected.detail_name;
-        }
-    }
-);
 </script>
 
 <style scoped>

@@ -9,7 +9,7 @@
             <div>
                 <label>승인여부 : </label>
                 <select v-model="searchApproval">
-                    <option value="">전체</option>
+                    <option value="">선택</option>
                     <option value="W">검토대기</option>
                     <option value="F">승인대기</option>
                     <option value="S">승인</option>
@@ -20,7 +20,7 @@
             <div>
                 <label>계정대분류 : </label>
                 <select v-model="searchGroup">
-                    <option value="">전체</option>
+                    <option value="">선택</option>
                     <option value="AC03">온라인지출</option>
                     <option value="AC04">영업지출</option>
                 </select>
@@ -28,14 +28,14 @@
             <div>
                 <label>계정과목 : </label>
                 <select v-model="searchDetail">
-                    <option value="">전체</option>
-                    <option value="AC03101">사무용품비</option>
-                    <option value="AC03102">광고비</option>
-                    <option value="AC03103">거래 수수료</option>
-                    <option value="AC04101">출장비</option>
-                    <option value="AC04102">숙박비</option>
-                    <option value="AC04104">인건비</option>
-                    <option value="AC04105">기름비</option>
+                    <option value="">선택</option>
+                    <option
+                        v-for="item in expenseDetailName"
+                        :key="item.detail_code"
+                        :value="item.detail_code"
+                    >
+                        {{ item.detail_name }}
+                    </option>
                 </select>
             </div>
 
@@ -45,15 +45,27 @@
 </template>
 
 <script setup>
+import axios from 'axios';
 import router from '@/router';
-import { onMounted } from 'vue';
-import { useModalStore } from '../../../../stores/modalState';
-const { setModalState } = useModalStore();
+import { ref, onMounted } from 'vue';
 const searchGroup = ref('');
 const searchDetail = ref('');
 const searchStDate = ref('');
 const searchEdDate = ref('');
 const searchApproval = ref('');
+const expenseDetailName = ref([]);
+
+const fetchLoginInfo = async () => {
+    try {
+        const res = await axios.post(
+            '/api/account/expenseLoginInfoBody.do',
+            {}
+        );
+        expenseDetailName.value = res.data.expenseDetailName;
+    } catch (e) {
+        console.error('사용자 정보 불러오기 실패:', e);
+    }
+};
 
 const handleSearch = () => {
     const query = [];
@@ -69,6 +81,7 @@ const handleSearch = () => {
 };
 
 onMounted(() => {
+    fetchLoginInfo();
     window.location.search && router.replace(window.location.pathname);
 });
 </script>
@@ -86,7 +99,6 @@ onMounted(() => {
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
-    background-color: #e0e0e0;
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 12px 15px;

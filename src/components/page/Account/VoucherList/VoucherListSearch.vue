@@ -2,37 +2,51 @@
     <div class="search-container">
         <div class="search-box">
             <div>
-                <label>신청일자 : </label>
+                <label>일자 : </label>
                 <input type="date" v-model="searchStDate" />
                 <input type="date" v-model="searchEdDate" />
             </div>
             <div>
-                <label>승인여부 : </label>
-                <select v-model="searchApproval">
-                    <option value="">선택</option>
-                    <option value="W">검토대기</option>
-                    <option value="F">승인대기</option>
-                    <option value="S">승인</option>
-                    <option value="N">반려</option>
-                    <option value="C">취소</option>
+                <label>구분 : </label>
+                <select v-model="searchType">
+                    <option value="sales">매출</option>
+                    <option value="expense">비용</option>
                 </select>
             </div>
             <div>
-                <label>계정대분류 : </label>
-                <select v-model="searchGroup">
+                <label>거래처명 : </label>
+                <select v-model="searchClientName">
                     <option value="">선택</option>
-                    <option value="AC03">온라인지출</option>
-                    <option value="AC04">영업지출</option>
+                    <option
+                        v-for="client in clientList"
+                        :key="client.client_name"
+                        :value="client.client_name"
+                    >
+                        {{ client.clientName }}
+                    </option>
                 </select>
             </div>
             <div>
-                <label>계정과목 : </label>
-                <select v-model="searchDetail">
+                <label>차변계정과목 : </label>
+                <select v-model="searchDebitName">
                     <option value="">선택</option>
                     <option
                         v-for="item in expenseDetailName"
-                        :key="item.detail_code"
-                        :value="item.detail_code"
+                        :key="item.debit_name"
+                        :value="item.debit_name"
+                    >
+                        {{ item.detail_name }}
+                    </option>
+                </select>
+            </div>
+            <div>
+                <label>대변계정과목 : </label>
+                <select v-model="searchCrebitName">
+                    <option value="">선택</option>
+                    <option
+                        v-for="item in expenseDetailName"
+                        :key="item.crebit_name"
+                        :value="item.crebit_name"
                     >
                         {{ item.detail_name }}
                     </option>
@@ -41,10 +55,6 @@
 
             <button @click="handleSearch">검색</button>
         </div>
-
-        <div class="register-box">
-            <button @click="setModalState">등록</button>
-        </div>
     </div>
 </template>
 
@@ -52,14 +62,14 @@
 import axios from 'axios';
 import router from '@/router';
 import { ref, onMounted } from 'vue';
-import { useModalStore } from '../../../../stores/modalState';
-const { setModalState } = useModalStore();
-const searchGroup = ref('');
-const searchDetail = ref('');
 const searchStDate = ref('');
 const searchEdDate = ref('');
-const searchApproval = ref('');
+const searchType = ref('expense');
+const searchClientName = ref('');
+const searchDebitName = ref('');
+const searchCrebitName = ref('');
 const expenseDetailName = ref([]);
+const clientList = ref([]);
 
 const fetchLoginInfo = async () => {
     try {
@@ -68,6 +78,7 @@ const fetchLoginInfo = async () => {
             {}
         );
         expenseDetailName.value = res.data.expenseDetailName;
+        clientList.value = res.data.clientList;
     } catch (e) {
         console.error('사용자 정보 불러오기 실패:', e);
     }
@@ -75,12 +86,15 @@ const fetchLoginInfo = async () => {
 
 const handleSearch = () => {
     const query = [];
-    !searchGroup.value || query.push(`searchGroup=${searchGroup.value}`);
-    !searchDetail.value || query.push(`searchDetail=${searchDetail.value}`);
-    !searchApproval.value ||
-        query.push(`searchApproval=${searchApproval.value}`);
     !searchStDate.value || query.push(`searchStDate=${searchStDate.value}`);
     !searchEdDate.value || query.push(`searchEdDate=${searchEdDate.value}`);
+    !searchType.value || query.push(`searchType=${searchType.value}`);
+    !searchClientName.value ||
+        query.push(`searchClientName=${searchClientName.value}`);
+    !searchDebitName.value ||
+        query.push(`searchDebitName=${searchDebitName.value}`);
+    !searchCrebitName.value ||
+        query.push(`searchCrebitName=${searchCrebitName.value}`);
     const queryString = query.length > 0 ? `?${query.join('&')}` : '';
 
     router.push(queryString);

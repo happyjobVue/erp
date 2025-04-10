@@ -7,26 +7,16 @@
             @postSuccess="onPostSuccess"
         />
         <table>
-            <colgroup>
-                <col width="10%" />
-                <col width="15%" />
-                <col width="10%" />
-                <col width="15%" />
-                <col width="10%" />
-                <col width="30%" />
-                <col width="10%" />
-            </colgroup>
-
             <thead>
                 <tr>
-                    <th scope="col">결의번호</th>
-                    <th scope="col">신청일자</th>
-                    <th scope="col">사용일자</th>
-                    <th scope="col">계정대분류명</th>
-                    <th scope="col">계정과목</th>
-                    <th scope="col">사용부서</th>
-                    <th scope="col">결의금액</th>
-                    <th scope="col">승인여부</th>
+                    <th>결의번호</th>
+                    <th>신청일자</th>
+                    <th>사용일자</th>
+                    <th>계정대분류명</th>
+                    <th>계정과목</th>
+                    <th>사용부서</th>
+                    <th>결의금액</th>
+                    <th>승인여부</th>
                 </tr>
             </thead>
             <tbody>
@@ -91,6 +81,7 @@ const searchList = async () => {
 
     try {
         const response = await axios.post('/api/account/expenseList.do', param);
+        console.log(response.data);
         expenseList.value = response.data;
     } catch (e) {
         console.error('Axios Error:', e);
@@ -123,14 +114,14 @@ table {
 
     th,
     td {
-        padding: 8px;
         border: 1px solid #ddd;
+        padding: 10px;
         text-align: center;
     }
 
     th {
-        background-color: #2676bf;
-        color: #ddd;
+        background: #f4f4f4;
+        font-weight: bold;
     }
 
     /* 테이블 올렸을 때 */
