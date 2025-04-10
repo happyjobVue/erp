@@ -29,6 +29,10 @@ declare module 'vue' {
     EstimateMain: typeof import('./src/components/page/Business/Estimate/EstimateMain.vue')['default']
     EstimateRegisModal: typeof import('./src/components/page/Business/Estimate/EstimateRegisModal.vue')['default']
     EstimateSearch: typeof import('./src/components/page/Business/Estimate/EstimateSearch.vue')['default']
+<<<<<<< HEAD
+=======
+    ExpenseApproval: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApproval.vue')['default']
+>>>>>>> c44724dca5389998c0815fc01955b0d08c931521
     ExpenseApprovalMain: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApprovalMain.vue')['default']
     ExpenseApprovalModal: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApprovalModal.vue')['default']
     ExpenseApprovalSearch: typeof import('./src/components/page/Account/ExpenseApproval/ExpenseApprovalSearch.vue')['default']
@@ -52,6 +56,10 @@ declare module 'vue' {
     NoticeMain: typeof import('./src/components/page/System/Notice/NoticeMain.vue')['default']
     NoticeModal: typeof import('./src/components/page/System/Notice/NoticeModal.vue')['default']
     NoticeSearch: typeof import('./src/components/page/System/Notice/NoticeSearch.vue')['default']
+    OrderDetailModal: typeof import('./src/components/page/Business/Order/OrderDetailModal.vue')['default']
+    OrderMain: typeof import('./src/components/page/Business/Order/OrderMain.vue')['default']
+    OrderRegisterModal: typeof import('./src/components/page/Business/Order/OrderRegisterModal.vue')['default']
+    OrderSearch: typeof import('./src/components/page/Business/Order/OrderSearch.vue')['default']
     Pagination: typeof import('./src/components/common/Pagination.vue')['default']
     PromotionSearchBar: typeof import('./src/components/page/personnel/Promotion/PromotionSearchBar.vue')['default']
     ReceivablesMain: typeof import('./src/components/page/Sales/ReceivablesList/ReceivablesMain.vue')['default']
