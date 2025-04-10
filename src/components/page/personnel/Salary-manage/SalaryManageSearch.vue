@@ -134,3 +134,151 @@ const jobGradeGroupList = [
       </div>
       </div>
 </template>
+
+<style scoped>
+.promotion-container {
+  padding: 20px;
+  font-family: 'Pretendard', sans-serif;
+  color: #333;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  margin-bottom: 15px;
+  font-family: 'Pretendard', sans-serif;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  color: #1f2d3d;
+}
+
+.breadcrumb .icon-home::before {
+  content: '🏠';
+  margin-right: 5px;
+}
+
+.breadcrumb .divider {
+  margin: 0 5px;
+  color: #888;
+}
+
+.breadcrumb .section,
+.breadcrumb .current {
+  color: #333;
+  font-weight: 500;
+}
+
+.refresh-btn {
+  border: 1px solid #ddd;
+  background: #fff;
+  padding: 5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.refresh-btn:hover {
+  background: #f5f5f5;
+}
+
+.refresh-btn .icon-refresh::before {
+  content: '🔄';
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.date-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-filter input[type="month"],
+.date-filter button {
+  height: 28px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.date-filter button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  cursor: pointer;
+}
+
+.search-box {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  background-color: #fafafa;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.filters label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* 범용 스타일을 filters 내부로 한정 */
+.filters input,
+.filters select {
+  height: 28px;
+  padding: 2px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.filters button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.promotion-table {
+  margin: 0 auto;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.promotion-table thead {
+  background-color: #f0f0f0;
+}
+
+.promotion-table th,
+.promotion-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.promotion-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+</style>
+

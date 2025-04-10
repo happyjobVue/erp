@@ -18,12 +18,10 @@ import PlanResult from '../views/Business/PlanResult/PlanResult.vue';
 import Estimate from '../views/Business/Estimate/Estimate.vue';
 import Code from '../views/System/Code.vue';
 import ExpenseReviewListPrint from '../components/page/Account/ExpenseReview/ExpenseReviewListPrint.vue';
-<<<<<<< HEAD
 import SalaryManage from '../views/Personnel/Salary/Salary-manage.vue';
-import Attendance from '../views/Personnel/Attendance/Attendance.vue';
-=======
+import AttendanceList from '../views/Personnel/Attendance/Attendance-list.vue';
 import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
->>>>>>> edaa0420edc8497e245dc9daeb6f456b1bf01491
+import AttendanceRequest from '../views/Personnel/Attendance/Attendance-request.vue';
 
 const routes = [
     {
@@ -89,7 +87,12 @@ const routes = [
                     {
                         path: 'attendance-list',
                         name: 'attendance-list',
-                        component: Attendance,
+                        component: AttendanceList,
+                    },
+                    {
+                        path: 'attendance-request',
+                        name: 'attendance-request',
+                        component: AttendanceRequest,
                     },
                 ],
             },

@@ -294,7 +294,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
       </div>
   </template>
     
-  <style>
+<style scoped>
   .promotion-container {
     padding: 20px;
     font-family: 'Pretendard', sans-serif;
@@ -421,5 +421,5 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
   .promotion-table tbody tr:hover {
     background-color: #f9f9f9;
   }
-  </style>
+</style>
   

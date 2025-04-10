@@ -324,4 +324,9 @@ td {
     text-align: center;
     white-space: nowrap;
 }
+
+table tr:hover {
+  background-color: #f0f8ff; /* 연한 파란 배경 */
+  cursor: pointer; /* 마우스 커서 바꾸기 */
+    }  
 </style>
