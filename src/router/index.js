@@ -18,13 +18,9 @@ import PlanResult from '../views/Business/PlanResult/PlanResult.vue';
 import Estimate from '../views/Business/Estimate/Estimate.vue';
 import Code from '../views/System/Code.vue';
 import ExpenseReviewListPrint from '../components/page/Account/ExpenseReview/ExpenseReviewListPrint.vue';
-<<<<<<< HEAD
 import SalaryManage from '../views/Personnel/Salary/Salary-manage.vue';
 import Attendance from '../views/Personnel/Attendance/Attendance.vue';
-=======
 import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
->>>>>>> edaa0420edc8497e245dc9daeb6f456b1bf01491
-import Order from '../views/Business/Order/Order.vue';
 
 const routes = [
     {
@@ -178,18 +174,7 @@ const routes = [
                     {
                         path: 'order-information-list',
                         name: 'order-information-list',
-                        component: Order,
-                    },
-                ],
-            },
-            {
-                path: 'personnel',
-                name: 'personnel',
-                children: [
-                    {
-                        path: 'employee',
-                        name: 'employee',
-                        component: Employee,
+                        component: Orde,
                     },
                 ],
             },
