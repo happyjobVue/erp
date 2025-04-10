@@ -166,6 +166,7 @@ import { useModalStore } from '../../../../stores/modalState';
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiClose } from '@mdi/js'
 import axios from 'axios';
+import Swal from "sweetalert2";
 const { setModalState } = useModalStore()
 const { id } = defineProps(['id'])
 const emit = defineEmits(['postSuccess'])
@@ -196,9 +197,6 @@ const searchDetail = async () => {
             detail.value.receivableStatus = '수금 완료'
         }
 
-        if (detail.value.managerName === "") {
-            detail.value.managerName = '자동 처리';
-        }
 
     } catch (e) {
         console.error(e);
@@ -212,7 +210,31 @@ const formatCurrency = (value) => {
 
 const insertDeposit = async () => {
     const unpaidAmount = detail.value.totalReceivableAmount
-    console.log(unpaidAmount)
+    if (!inputDepositAmount.value) {
+        Swal.fire({
+            icon: "error",
+            title: "입금할 금액을 입력해 주세요.",
+        })
+        return
+    }
+
+    if (inputDepositAmount.value <= 0 ) {
+        Swal.fire({
+            icon: "error",
+            title: "금액을 정확히 입력해 주세요.",
+        })
+        return
+    }
+
+    if (unpaidAmount - inputDepositAmount.value < 0 ) {
+        Swal.fire({
+            icon: "error",
+            title: "입금할 금액이 미납액보다 클 수 없습니다.",
+        })
+        return
+    }
+
+
     const param = new URLSearchParams({
         orderId: detail.value.orderId,
         clientId: detail.value.clientId,

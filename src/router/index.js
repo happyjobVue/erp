@@ -18,8 +18,12 @@ import PlanResult from '../views/Business/PlanResult/PlanResult.vue';
 import Estimate from '../views/Business/Estimate/Estimate.vue';
 import Code from '../views/System/Code.vue';
 import ExpenseReviewListPrint from '../components/page/Account/ExpenseReview/ExpenseReviewListPrint.vue';
+<<<<<<< HEAD
 import SalaryManage from '../views/Personnel/Salary/Salary-manage.vue';
 import Attendance from '../views/Personnel/Attendance/Attendance.vue';
+=======
+import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
+>>>>>>> edaa0420edc8497e245dc9daeb6f456b1bf01491
 
 const routes = [
     {
@@ -143,6 +147,11 @@ const routes = [
                         path: 'expense-review',
                         name: 'expense-review',
                         component: ExpenseReviewList,
+                    },
+                    {
+                        path: 'expense-approval',
+                        name: 'expense-approval',
+                        component: ExpenseApproval,
                     },
                 ],
             },

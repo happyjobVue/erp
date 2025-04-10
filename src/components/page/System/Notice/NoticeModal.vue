@@ -70,7 +70,7 @@ const downloadFileImage = async () => {
     const param = new URLSearchParams();
     param.append('noticeSeq', id)
     try {
-        const res = await axios.post('/api/management/noticeDownload.do', param, { responseType: 'blob' })
+        const res = await axios.post('/api/system/noticeDownload.do', param, { responseType: 'blob' })
         const url = window.URL.createObjectURL(new Blob([res.data]))
         const link = document.createElement('a')
         link.href = url
@@ -86,7 +86,7 @@ const downloadFileImage = async () => {
 const noticeSave = async () => {
     const param = new URLSearchParams(noticeDetail.value)
     try {
-        const res = await axios.post('/api/management/noticeSave.do', param)
+        const res = await axios.post('/api/system/noticeSave.do', param)
         if (res.data.result === 'success') {
             emit('postSuccess')
         } else {
@@ -165,7 +165,7 @@ const noticeUpdate = async () => {
 
 const noticeDelete = async () => {
     try {
-        const res = await axios.post('/api/management/noticeDeleteBody.do', { noticeSeq: id })
+        const res = await axios.post('/api/system/noticeDeleteBody.do', { noticeSeq: id })
         if (res.data.result === 'success') {
             emit('postSuccess')
         } else {

@@ -42,7 +42,7 @@
                                 </td>
                                 <td td> {{ item.receivableStatus === 'Y' ? '수금완료' : '미수금' }}
                                 </td>
-                                <td td> {{ item.managerName ? managerName : '자동 처리' }}</td>
+                                <td td> {{ item.managerName }}</td>
                             </tr>
                         </template>
                     </template>

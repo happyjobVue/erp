@@ -25,14 +25,27 @@ export async function fetchProductsByManufacturer(industryCode) {
         console.error('제품 목록 오류:', error);
         return [];
     }
-};
+}
 
-//거래처 조회 api 
-export async function fetchClient(){
-    try{
+//거래처 조회 api
+export async function fetchClient() {
+    try {
         const response = await axios.post('/api/business/searchClientList.do');
         return response.data.clientList;
-    }catch(error){
+    } catch (error) {
+        console.error('거래처 목록 오류:', error);
+        return [];
+    }
+}
+
+//제품 전체 조회 api
+export async function productListAll() {
+    try {
+        const response = await axios.post(
+            '/api/business/estimate-list/productNamesBody.do'
+        );
+        return response.data.productNameList;
+    } catch (error) {
         console.error('거래처 목록 오류:', error);
         return [];
     }
