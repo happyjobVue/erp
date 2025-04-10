@@ -1,11 +1,11 @@
 <script setup>
-import EmployeeSearchBar from '../../components/page/employee/EmployeeSearchBar.vue';
+import EmployeeSearchBar from '../../../components/page/personnel/employee/EmployeeSearchBar.vue';
 import axios from 'axios';
 import { onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import Pagination from '../../components/common/Pagination.vue';
-import router from '../../router';
-import EmployeeModal from '../../components/page/employee/EmployeeModal.vue';
+import Pagination from '../../../components/common/Pagination.vue';
+import EmployeeModal from '../../../components/page/personnel/employee/EmployeeModal.vue';
+import router from '../../../router';
 
 const route = useRoute();
 const personnelList = ref([]);

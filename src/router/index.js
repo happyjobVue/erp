@@ -4,17 +4,33 @@ import DashBoard from '../views/DashBoard/DashBoard.vue';
 import Notice from '../views/System/Notice.vue';
 import Manage from '../views/Account/Manage.vue';
 import Department from '../views/System/Department.vue';
-import SalaryList from '../views/Personnel/Salary-list.vue';
+import SalaryList from '../views/Personnel/Salary/Salary-list.vue';
 import Daily from '../views/Sales/Daily.vue';
-import Employee from '../views/Employee/Employee.vue';
+import Monthly from '../views/Sales/Monthly.vue';
+import Employee from '../views/Personnel/Employee/Employee.vue';
 import ExpenseList from '../views/Account/ExpenseList.vue';
-import Promotion from '../views/promotion/promotion.vue';
+import Promotion from '../views/Personnel/Promotion/Promotion.vue';
+import Annual from '../views/Sales/annual.vue';
+import ReceivablesList from '../views/Sales/ReceivablesList.vue';
+import Plan from '../views/Business/Plan/Plan.vue';
+import ExpenseReviewList from '../views/Account/ExpenseReviewList.vue';
+import PlanResult from '../views/Business/PlanResult/PlanResult.vue';
+import Estimate from '../views/Business/Estimate/Estimate.vue';
+import Code from '../views/System/Code.vue';
+import ExpenseReviewListPrint from '../components/page/Account/ExpenseReview/ExpenseReviewListPrint.vue';
+import SalaryManage from '../views/Personnel/Salary/Salary-manage.vue';
+import Attendance from '../views/Personnel/Attendance/Attendance.vue';
 
 const routes = [
     {
         path: '/',
         name: 'login',
         component: Login,
+    },
+    {
+        path: '/expense-review/print/:id',
+        name: 'expense-review-print',
+        component: ExpenseReviewListPrint,
     },
     {
         path: '/vue',
@@ -35,6 +51,11 @@ const routes = [
                         name: 'department',
                         component: Department,
                     },
+                    {
+                        path: 'code',
+                        name: 'code',
+                        component: Code,
+                    },
                 ],
             },
             {
@@ -45,6 +66,26 @@ const routes = [
                         path: 'salary-list',
                         name: 'salary-list',
                         component: SalaryList,
+                    },
+                    {
+                        path: 'salary-manage',
+                        name: 'salary-manage',
+                        component: SalaryManage,
+                    },
+                    {
+                        path: 'employee',
+                        name: 'employee',
+                        component: Employee,
+                    },
+                    {
+                        path: 'promotion',
+                        name: 'promotion',
+                        component: Promotion,
+                    },
+                    {
+                        path: 'attendance-list',
+                        name: 'attendance-list',
+                        component: Attendance,
                     },
                 ],
             },
@@ -57,12 +98,37 @@ const routes = [
                         name: 'daily',
                         component: Daily,
                     },
+                    {
+                        path: 'monthly',
+                        name: 'monthly',
+                        component: Monthly,
+                    },
+                    {
+                        path: 'annual',
+                        name: 'annual',
+                        component: Annual,
+                    },
+                    {
+                        path: 'receivables-list',
+                        name: 'receivables-list',
+                        component: ReceivablesList,
+                    },
                 ],
             },
             {
                 path: 'account',
                 name: 'account',
                 children: [
+                    {
+                        path: 'sales-plan',
+                        name: 'sales-plan',
+                        component: Plan,
+                    },
+                    {
+                        path: 'expense-review',
+                        name: 'expense-review',
+                        component: ExpenseReviewList,
+                    },
                     {
                         path: 'manage',
                         name: 'manage',
@@ -73,21 +139,31 @@ const routes = [
                         name: 'expense-list',
                         component: ExpenseList,
                     },
+                    {
+                        path: 'expense-review',
+                        name: 'expense-review',
+                        component: ExpenseReviewList,
+                    },
                 ],
             },
             {
-                path: 'personnel',
-                name: 'personnel',
+                path: 'business',
+                name: 'business',
                 children: [
                     {
-                        path: 'employee',
-                        name: 'employee',
-                        component: Employee,
+                        path: 'sales-plan',
+                        name: 'sales-plan',
+                        component: Plan,
                     },
                     {
-                        path: 'promotion',
-                        name: 'promotion',
-                        component: Promotion,
+                        path: 'sales-list',
+                        name: 'sales-list',
+                        component: PlanResult,
+                    },
+                    {
+                        path: 'estimate-list',
+                        name: 'estimate-list',
+                        component: Estimate,
                     },
                 ],
             },

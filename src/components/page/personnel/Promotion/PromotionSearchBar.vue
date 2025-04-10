@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, ref } from 'vue';
-import router from '../../../router';
+import router from '../../../../router';
 
 
 const searchId = ref();
@@ -41,6 +41,7 @@ const jobGradeGroupList = [
     { jobGradeDetailName: '부장' },
     { jobGradeDetailName: '과장' },
     { jobGradeDetailName: '대리' },
+    { jobGradeDetailName: '사원' },
 ];
 </script>
 <template>

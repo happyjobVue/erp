@@ -10,7 +10,6 @@
                                 type="text"
                                 v-model="expenseDetail.id"
                                 readonly
-                                :placeholder="!id ? '자동으로 입력됩니다.' : ''"
                             />
                         </td>
                         <td class="label">신청일자</td>
@@ -18,7 +17,7 @@
                             <input
                                 type="date"
                                 v-model="expenseDetail.req_date"
-                                :readonly="isReadOnly"
+                                readonly
                             />
                         </td>
                     </tr>
@@ -28,7 +27,7 @@
                             <input
                                 type="date"
                                 v-model="expenseDetail.use_date"
-                                :readonly="isReadOnly"
+                                readonly
                             />
                         </td>
                         <td class="label">사번</td>
@@ -36,7 +35,7 @@
                             <input
                                 type="text"
                                 v-model="expenseDetail.emp_no"
-                                :readonly="isReadOnly"
+                                readonly
                             />
                         </td>
                     </tr>
@@ -46,7 +45,7 @@
                             <input
                                 type="text"
                                 v-model="expenseDetail.name"
-                                :readonly="isReadOnly"
+                                readonly
                             />
                         </td>
                         <td class="label">사용부서</td>
@@ -54,27 +53,110 @@
                             <input
                                 type="text"
                                 v-model="expenseDetail.use_department"
-                                :readonly="isReadOnly"
+                                readonly
                             />
                         </td>
                     </tr>
                     <tr>
                         <td class="label">계정대분류명</td>
                         <td>
-                            <select
-                                v-model="expenseDetail.group_name"
-                                :disabled="isReadOnly"
-                            >
+                            <select v-model="expenseDetail.group_name" disabled>
+                                <option value="온라인매출">온라인매출</option>
+                                <option value="영업매출">영업매출</option>
                                 <option value="온라인지출">온라인지출</option>
                                 <option value="영업지출">영업지출</option>
+                                <option value="유동자산">유동자산</option>
                             </select>
                         </td>
                         <td class="label">계정과목</td>
                         <td>
                             <select
-                                v-model="expenseDetail.debit_code"
-                                :disabled="isReadOnly"
+                                v-model="expenseDetail.detail_name"
+                                disabled
                             >
+                                <option
+                                    v-for="item in expenseDetailName"
+                                    :key="item.detail_name"
+                                    :value="item.detail_name"
+                                >
+                                    {{ item.detail_name }}
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">거래처명</td>
+                        <td>
+                            <select
+                                v-model="expenseDetail.client_name"
+                                disabled
+                            >
+                                <option
+                                    v-for="client in clientList"
+                                    :key="client.id"
+                                    :value="client.clientName"
+                                >
+                                    {{ client.clientName }}
+                                </option>
+                            </select>
+                        </td>
+                        <td class="label">결의금액</td>
+                        <td>
+                            <input
+                                type="text"
+                                v-model="expenseDetail.expense_payment"
+                                readonly
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">승인여부</td>
+                        <td>
+                            <div
+                                v-if="expenseDetail.is_approval === 'W'"
+                                class="radio-group"
+                            >
+                                <label style="margin-right: 10px">
+                                    <input
+                                        type="radio"
+                                        value="F"
+                                        v-model="expenseDetail.is_approval"
+                                    />
+                                    승인대기
+                                </label>
+                                <label>
+                                    <input
+                                        type="radio"
+                                        value="N"
+                                        v-model="expenseDetail.is_approval"
+                                    />
+                                    반려
+                                </label>
+                            </div>
+                            <div v-else>
+                                {{ approvalMap[expenseDetail.is_approval] }}
+                            </div>
+                        </td>
+
+                        <td class="label">승인일자</td>
+                        <td>
+                            <input
+                                type="date"
+                                v-model="expenseDetail.approval_date"
+                                readonly
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">첨부파일</td>
+
+                        <button @click="downloadFileImage" class="button-box">
+                            <img v-if="imgUrl" :src="imgUrl" />다운로드
+                        </button>
+
+                        <td class="label">대변계정과목</td>
+                        <td>
+                            <select v-model="expenseDetail.crebit_code">
                                 <option
                                     v-for="item in expenseDetailName"
                                     :key="item.detail_code"
@@ -86,92 +168,27 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">거래처명</td>
-                        <td>
-                            <select
-                                v-model="expenseDetail.client_id"
-                                :disabled="isReadOnly"
-                            >
-                                <option
-                                    v-for="client in clientList"
-                                    :key="client.id"
-                                    :value="client.id"
-                                >
-                                    {{ client.clientName }}
-                                </option>
-                            </select>
-                        </td>
-                        <td class="label">결의금액</td>
-                        <td>
-                            <input
-                                type="text"
-                                v-model="expenseDetail.expense_payment"
-                                :readonly="isReadOnly"
-                            />
-                        </td>
-                    </tr>
-                    <tr v-if="id">
-                        <td class="label">승인여부</td>
-                        <td>
-                            <span class="approval-display">{{
-                                approvalMap[expenseDetail.is_approval]
-                            }}</span>
-                        </td>
-                        <td class="label">승인일자</td>
-                        <td>
-                            <input
-                                type="date"
-                                v-model="expenseDetail.approval_date"
-                                :readonly="isReadOnly"
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label">첨부파일</td>
-                        <td colspan="3">
-                            <div v-if="isReadOnly">
-                                <button
-                                    @click="downloadFileImage"
-                                    class="button-box"
-                                >
-                                    <img v-if="imgUrl" :src="imgUrl" />다운로드
-                                </button>
-                            </div>
-                            <div v-else>
-                                <input
-                                    type="file"
-                                    id="fileInput"
-                                    @change="fileHandler"
-                                />
-                                <label
-                                    class="img-label"
-                                    style="display: none"
-                                    htmlFor="fileInput"
-                                >
-                                    파일 첨부하기
-                                </label>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
                         <td class="label">비고</td>
                         <td colspan="3">
                             <textarea
                                 v-model="expenseDetail.memo"
-                                :readonly="isReadOnly"
+                                readonly
                             ></textarea>
                         </td>
                     </tr>
                 </table>
                 <div class="button-box">
-                    <button v-if="!isReadOnly" @click="expenseListSave()">
-                        신청
+                    <button
+                        v-if="expenseDetail.is_approval === 'W'"
+                        @click="expenseReviewUpdate()"
+                    >
+                        검토완료
                     </button>
                     <button
-                        v-if="id && expenseDetail.is_approval === 'W'"
-                        @click="expenseListDelete"
+                        v-if="expenseDetail.is_approval === 'S'"
+                        @click="goToPrintPage"
                     >
-                        삭제
+                        지출결의서 출력
                     </button>
                     <button @click="setModalState">나가기</button>
                 </div>
@@ -181,20 +198,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
-
+const emit = defineEmits(['modalClose', 'postSuccess']);
 const { setModalState } = useModalStore();
 const expenseDetail = ref({});
 const clientList = ref([]);
 const expenseDetailName = ref([]);
-const fileData = ref('');
-const imgUrl = ref('');
-const isReadOnly = ref(true);
-
 const { id } = defineProps(['id']);
-const emit = defineEmits(['postSuccess', 'modalClose']);
+const router = useRouter();
 
 const approvalMap = computed(() => ({
     W: '검토 대기',
@@ -203,24 +216,6 @@ const approvalMap = computed(() => ({
     N: '반려',
     C: '취소',
 }));
-
-const fetchLoginInfo = async () => {
-    try {
-        const res = await axios.post(
-            '/api/account/expenseLoginInfoBody.do',
-            {}
-        );
-        const info = res.data.lgnInfo;
-
-        expenseDetail.value.emp_no = info.usr_idx;
-        expenseDetail.value.name = info.usr_nm;
-        expenseDetail.value.use_department = info.detail_name;
-        clientList.value = res.data.clientList;
-        expenseDetailName.value = res.data.expenseDetailName;
-    } catch (e) {
-        console.error('사용자 정보 불러오기 실패:', e);
-    }
-};
 
 const searchDetail = async () => {
     try {
@@ -231,13 +226,16 @@ const searchDetail = async () => {
         clientList.value = response.data.clientList;
         expenseDetailName.value = response.data.expenseDetailName;
     } catch (e) {
-        console.error('상세정보 불러오기 실패:', e);
+        console.error(e);
     }
 };
 
 const downloadFileImage = async () => {
+    const expenseSeq = expenseDetail.value.id;
     const param = new URLSearchParams();
-    param.append('expenseSeq', expenseDetail.value.id);
+    param.append('id', id);
+    param.append('expenseSeq', expenseSeq);
+
     try {
         const res = await axios.post('/api/account/expenseDownload.do', param, {
             responseType: 'blob',
@@ -250,125 +248,54 @@ const downloadFileImage = async () => {
         link.click();
         link.remove();
     } catch (e) {
-        console.error('파일 다운로드 실패:', e);
+        console.error(e);
     }
 };
 
-const fileHandler = e => {
-    const fileInfo = e.target.files;
-    const fileInfoSplit = fileInfo[0].name.split('.');
-    const fileExtension = fileInfoSplit[1].toLowerCase();
-
+const expenseReviewUpdate = async () => {
+    if (!['F', 'N'].includes(expenseDetail.value.is_approval)) {
+        alert('승인여부를 선택해주세요. (승인대기 또는 반려)');
+        return;
+    }
     if (
-        fileExtension === 'jpg' ||
-        fileExtension === 'gif' ||
-        fileExtension === 'png' ||
-        fileExtension === 'jpeg'
+        !expenseDetail.value.crebit_code ||
+        expenseDetail.value.crebit_code.trim() === ''
     ) {
-        imgUrl.value = URL.createObjectURL(fileInfo[0]);
+        alert('대변과목을 입력해주세요.');
+        return;
     }
+    const param = new URLSearchParams();
+    param.append('checkApproval', expenseDetail.value.is_approval);
+    param.append('detail_code', expenseDetail.value.crebit_code);
+    param.append('exp_id', expenseDetail.value.id);
 
-    fileData.value = fileInfo[0];
-};
-
-const expenseListSave = async () => {
     try {
-        if (!expenseDetail.value.use_date) {
-            alert('사용일자를 입력해주세요.');
-            return;
-        }
-
-        if (!expenseDetail.value.group_name) {
-            alert('계정대분류명을 선택해주세요.');
-            return;
-        }
-
-        if (!expenseDetail.value.debit_code) {
-            alert('계정과목을 선택해주세요.');
-            return;
-        }
-
-        if (!expenseDetail.value.client_id) {
-            alert('거래처명을 선택해주세요.');
-            return;
-        }
-
-        if (!expenseDetail.value.expense_payment) {
-            alert('결의금액을 입력해주세요.');
-            return;
-        }
-
-        if (!fileData.value) {
-            alert('첨부파일을 선택해주세요.');
-            return;
-        }
-
-        const formData = new FormData();
-        const textData = {
-            req_date: expenseDetail.value.req_date,
-            use_date: expenseDetail.value.use_date,
-            emp_no: expenseDetail.value.emp_no,
-            name: expenseDetail.value.name,
-            use_dept: expenseDetail.value.use_department,
-            group_name: expenseDetail.value.group_name,
-            detail_name: expenseDetail.value.detail_name,
-            accountDetail: expenseDetail.value.debit_code,
-            clientId: expenseDetail.value.client_id,
-            exp_pay: expenseDetail.value.expense_payment,
-        };
-
-        Object.entries(textData).forEach(([key, value]) => {
-            formData.append(key, value);
-        });
-
-        if (fileData.value) {
-            formData.append('file', fileData.value);
-        }
-
-        const res = await axios.post(
-            '/api/account/expenseFileSave.do',
-            formData
-        );
+        const res = await axios.post('/api/account/expenseUpdate.do', param);
+        console.log('서버 응답:', res.data);
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
             alert('저장 실패');
         }
     } catch (e) {
+        console.error('저장 중 오류:', e);
         alert('저장 중 오류가 발생했습니다.');
     }
 };
 
-const expenseListDelete = async () => {
-    const param = new URLSearchParams();
-    param.append('id', id);
-    param.append('exp_id', expenseDetail.value.id);
-
-    try {
-        const res = await axios.post('/api/account/expenseDelete.do', param);
-        if (res.data.result === 'success') {
-            emit('postSuccess');
-        } else {
-            alert('삭제 실패');
-        }
-    } catch (e) {
-        console.error('삭제 중 오류 발생:', e);
-    }
+const goToPrintPage = () => {
+    const id = expenseDetail.value.id;
+    localStorage.setItem(
+        'printExpenseData',
+        JSON.stringify(expenseDetail.value)
+    );
+    const url = `/expense-review/print/${id}`;
+    window.open(url, '_blank');
 };
 
 onMounted(() => {
-    if (id) {
-        searchDetail();
-        isReadOnly.value = true;
-    } else {
-        fetchLoginInfo();
-        isReadOnly.value = false;
-
-        const today = new Date().toISOString().slice(0, 10);
-        expenseDetail.value.req_date = today;
-    }
+    if (id) searchDetail();
 });
-
 onUnmounted(() => {
     emit('modalClose', 0);
 });
@@ -401,19 +328,24 @@ onUnmounted(() => {
     border: 1px solid #ccc;
     padding: 10px;
 }
-.register-box {
+.radio-group {
     display: flex;
-    justify-content: flex-end;
-    margin-bottom: 10px;
+    gap: 20px;
+    align-items: center;
 }
+
+.radio-group input[type='radio'] {
+    display: inline-block;
+    margin-right: 5px;
+}
+
 .label {
     background: #f0f0f0;
     font-weight: bold;
     text-align: left;
     width: 150px;
 }
-.approval-display,
-input,
+input:not([type='radio']),
 select,
 span,
 textarea {
@@ -428,6 +360,7 @@ textarea {
     border-radius: 4px;
     border: 1px solid #ccc;
 }
+
 textarea {
     min-height: 80px;
     resize: vertical;
@@ -450,9 +383,11 @@ button {
     box-shadow: 0 2px #999;
     transition: 0.3s;
 }
+
 button:hover {
     background-color: #45a049;
 }
+
 button:active {
     background-color: #3e8e41;
     box-shadow: 0 2px #666;

@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, reactive } from 'vue';
-import PromotionSearchBar from '../../components/page/Promotion/PromotionSearchBar.vue';
+import PromotionSearchBar from '../../../components/page/personnel/Promotion/PromotionSearchBar.vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
-import Pagination from '../../components/common/Pagination.vue';
+import Pagination from '../../../components/common/Pagination.vue';
 
 const PromotionList = ref([]);
 const route = useRoute();

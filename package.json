@@ -11,12 +11,16 @@
         "format": "prettier --write src/"
     },
     "dependencies": {
+        "@fullcalendar/core": "^6.1.17",
+        "@fullcalendar/daygrid": "^6.1.17",
+        "@fullcalendar/vue3": "^6.1.17",
         "@jamescoyle/vue-icon": "^0.1.2",
         "@mdi/js": "^7.4.47",
         "@tanstack/vue-query": "^5.51.21",
         "axios": "^1.7.3",
         "chart.js": "^4.4.8",
         "date-fns": "^4.1.0",
+        "html2pdf.js": "^0.10.3",
         "http-proxy-middleware": "^3.0.0",
         "pinia": "^2.1.7",
         "pinia-plugin-persistedstate": "^3.2.1",

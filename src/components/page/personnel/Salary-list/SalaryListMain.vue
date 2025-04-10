@@ -15,7 +15,7 @@
                 <input class="employ-input" v-model="employeeInfo.workingYear" type="text">
             </div>
         </div>
-        <div class="salary-box" v-if="route.query.searchPaymentMonth && employeeInfo.salary">
+        <div class="salary-box" v-if="route.query.searchPaymentMonth && employeeInfo.nationalPension ">
             <div class="left-salary">
                 <table>
                     <tr>
@@ -86,7 +86,7 @@ const searchSalary = async () => {
     const param = new URLSearchParams({
         ...route.query,
     })
-    
+
     try {
         const res = await axios.post('/api/personnel/salaryListDetail.do', param)
         employeeInfo.value = res.data.salaryListDetail
@@ -95,8 +95,18 @@ const searchSalary = async () => {
     }
 }
 
+const searchInfo = async () => {
+    try {
+        const res = await axios.post('/api/personnel/salaryListDetail.do')
+        employeeInfo.value = res.data.salaryListDetail
+    } catch (e) {
+        console.error(e)
+    }
+
+}
+
 onMounted(() => {
-    searchSalary()
+    searchInfo()
 })
 
 watch(() => route.query, searchSalary)
