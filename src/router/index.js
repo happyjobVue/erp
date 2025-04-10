@@ -24,6 +24,7 @@ import Attendance from '../views/Personnel/Attendance/Attendance.vue';
 =======
 import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
 >>>>>>> edaa0420edc8497e245dc9daeb6f456b1bf01491
+import Order from '../views/Business/Order/Order.vue';
 
 const routes = [
     {
@@ -173,6 +174,22 @@ const routes = [
                         path: 'estimate-list',
                         name: 'estimate-list',
                         component: Estimate,
+                    },
+                    {
+                        path: 'order-information-list',
+                        name: 'order-information-list',
+                        component: Order,
+                    },
+                ],
+            },
+            {
+                path: 'personnel',
+                name: 'personnel',
+                children: [
+                    {
+                        path: 'employee',
+                        name: 'employee',
+                        component: Employee,
                     },
                 ],
             },

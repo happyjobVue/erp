@@ -17,7 +17,7 @@ const selectedProduct = ref(''); // 선택된 제품
 const quantity = ref(''); // 수량 저장
 const supplyPrice = ref(0); // 총 금액
 
-// 견적서 저장시 일정하게 넘겨져야하는 데이터
+// 견적서 저장
 
 const estimateDeliveryDate = ref('');
 const estimateSalesArea = ref('');
