@@ -21,6 +21,7 @@ const getOrder = () => {
     const param = {
         currentPage: cPage.value,
         pageSize: 5,
+        ...route.query,
     };
 
     axios
@@ -57,6 +58,8 @@ const onPostSuccess = () => {
     modalType.value = ''; // 모달 타입 초기화
     getOrder(); // 목록 새로고침
 };
+
+watch(() => route.query, getOrder);
 </script>
 
 <template>

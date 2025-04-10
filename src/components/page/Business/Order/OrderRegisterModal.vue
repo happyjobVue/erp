@@ -32,7 +32,7 @@ const emit = defineEmits(['modalClose', 'postSuccess']);
 onMounted(async () => {
     manufacturers.value = await fetchManufacturers();
     clients.value = await fetchClient();
-    getOrderEstimateList();
+    // getOrderEstimateList();
 });
 
 //수주 페이지에서 견적서 조회
@@ -60,6 +60,8 @@ async function orderEstiDetailList(estiId) {
             param
         );
         orderEstiProductList.value = response.data.estimateDetail;
+        orderEstimateList.value = '';
+        orderEstimateCnt.value = '';
 
         console.log(orderEstiProductList);
     } catch (error) {
@@ -118,7 +120,7 @@ const updateSupplyPrice = item => {
                     <button type="button" @click="closeModal()">취소</button>
 
                     <table>
-                        <tbody>
+                        <thead>
                             <tr>
                                 <th class="table-header">제조업체</th>
                                 <th class="table-header">제품명</th>
@@ -129,42 +131,56 @@ const updateSupplyPrice = item => {
                                 <th class="table-header">공급가액</th>
                                 <th class="table-header">삭제</th>
                             </tr>
-                            <tr
-                                v-for="(item, index) in orderEstiProductList"
-                                :key="index"
-                            >
-                                <td>{{ item.manufacturerName }}</td>
-                                <td>{{ item.productName }}</td>
-                                <td>
-                                    <input
-                                        type="date"
-                                        v-model="orderDeliveryDate"
-                                    />
-                                </td>
-                                <td>{{ item.salesArea }}</td>
-                                <td>{{ item.unitPrice }}</td>
-                                <td>
-                                    <input
-                                        type="number"
-                                        v-model="item.quantity"
-                                        @input="updateSupplyPrice(item)"
-                                        min="1"
-                                    />
-                                </td>
-                                <td>{{ item.supplyPrice }}</td>
-                                <td>
-                                    <button
-                                        @click="
-                                            orderEstiProductList.splice(
-                                                index,
-                                                1
-                                            )
-                                        "
-                                    >
-                                        삭제
-                                    </button>
-                                </td>
-                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-if="orderEstiProductList.length > 0">
+                                <tr
+                                    v-for="(
+                                        item, index
+                                    ) in orderEstiProductList"
+                                    :key="index"
+                                >
+                                    <td>{{ item.manufacturerName }}</td>
+                                    <td>{{ item.productName }}</td>
+                                    <td>
+                                        <input
+                                            type="date"
+                                            v-model="orderDeliveryDate"
+                                        />
+                                    </td>
+                                    <td>{{ item.salesArea }}</td>
+                                    <td>{{ item.unitPrice }}</td>
+                                    <td>
+                                        <input
+                                            type="number"
+                                            v-model="item.quantity"
+                                            @input="updateSupplyPrice(item)"
+                                            min="1"
+                                        />
+                                    </td>
+                                    <td>{{ item.supplyPrice }}</td>
+                                    <td>
+                                        <button
+                                            @click="
+                                                orderEstiProductList.splice(
+                                                    index,
+                                                    1
+                                                )
+                                            "
+                                        >
+                                            삭제
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else>
+                                <tr>
+                                    <td colspan="7">
+                                        견적서 내역에서 수주할 내역을
+                                        추가해주세요.
+                                    </td>
+                                </tr>
+                            </template>
                         </tbody>
                     </table>
                     <h3>견적서 조회</h3>
@@ -172,7 +188,7 @@ const updateSupplyPrice = item => {
                         <!-- search Box -->
                         <label for="">거래처 </label>
                         <select v-model="searchClient">
-                            <option value="" disabled>전체</option>
+                            <option value="">전체</option>
                             <option
                                 v-for="client in clients"
                                 :key="client.id"
@@ -184,49 +200,47 @@ const updateSupplyPrice = item => {
 
                         <button @click="getOrderEstimateList()">조회</button>
                     </div>
-                    <table>
-                        <tr>
-                            <th>견적일</th>
-                            <th>거래처</th>
-                            <th>제품명</th>
-                            <th>제품단가</th>
-                            <th>수량</th>
-                            <th>공급가액</th>
-                            <th>등록</th>
-                        </tr>
-                        <template v-if="orderEstimateList">
-                            <template v-if="orderEstimateCnt > 0">
-                                <tr
-                                    v-for="orderEsti in orderEstimateList"
-                                    :key="orderEsti.id"
-                                >
-                                    <td>{{ orderEsti.estimateDate }}</td>
-                                    <td>{{ orderEsti.clientName }}</td>
-                                    <td>{{ orderEsti.productName }}</td>
-                                    <td>{{ orderEsti.estimateDate }}</td>
-                                    <td>{{ orderEsti.estimateDate }}</td>
-                                    <td>{{ orderEsti.estimateDate }}</td>
-                                    <td>
-                                        <button
-                                            @click="
-                                                orderEstiDetailList(
-                                                    orderEsti.id
-                                                )
-                                            "
-                                        >
-                                            추가
-                                        </button>
-                                    </td>
-                                </tr>
-                            </template>
-                            <template v-else>
-                                <tr>
-                                    <td colspan="7">
-                                        일치하는 검색 결과가 없습니다
-                                    </td>
-                                </tr>
-                            </template>
-                        </template>
+
+                    <table v-if="orderEstimateList.length > 0">
+                        <thead>
+                            <tr>
+                                <th>견적일</th>
+                                <th>거래처</th>
+                                <th>제품명</th>
+                                <th>총 수량</th>
+                                <th>총 금액</th>
+                                <th>총 세금</th>
+                                <th>등록</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="orderEsti in orderEstimateList"
+                                :key="orderEsti.id"
+                            >
+                                <td>{{ orderEsti.estimateDate }}</td>
+                                <td>{{ orderEsti.clientName }}</td>
+                                <td>{{ orderEsti.productName }}</td>
+                                <td>{{ orderEsti.totalDeliveryCount }}</td>
+                                <td>{{ orderEsti.totalSupplyPrice }}</td>
+                                <td>{{ orderEsti.totalTax }}</td>
+                                <td>
+                                    <button
+                                        @click="
+                                            orderEstiDetailList(orderEsti.id)
+                                        "
+                                    >
+                                        추가
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr v-if="orderEstimateList.length === 0">
+                                <td colspan="7">
+                                    일치하는 검색 결과가 없습니다
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                     <!-- 페이징 -->
                     <Pagination
@@ -246,10 +260,11 @@ const updateSupplyPrice = item => {
 .search-box {
     margin-bottom: 10px;
     display: block;
+    width: 300px;
 }
 
 .search-select {
-    width: 90%;
+    width: 40%;
     padding: 8px;
     margin-top: 5px;
     margin-bottom: 10px;
