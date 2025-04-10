@@ -10,24 +10,22 @@ import axios from 'axios';
 const modalState = useModalStore();
 const clients = ref(''); // 고객 목록
 const manufacturers = ref(''); //제조사 목록
-const productList = ref([]); //제품 목록
 const selectedClient = ref('');
-const selectedManufacturer = ref(''); // 선택된 제조사
-const selectedProduct = ref(''); // 선택된 제품
-const quantity = ref(''); // 수량 저장
-const supplyPrice = ref(0); // 총 금액
 const modalType = ref('');
+const searchClient = ref('');
 const cPage = ref(1);
 
 // 수주 저장
 
 const orderDeliveryDate = ref('');
 const orderSalesArea = ref('');
-const orderList = ref([]);
-
+const orderEstiId = ref(0);
 //미수주 견적서 조회
 const orderEstimateList = ref('');
 const orderEstimateCnt = ref('');
+
+//견적서 조회 후 견적서 내 상품 데이터 조회
+const orderEstiProductList = ref([]);
 
 const emit = defineEmits(['modalClose', 'postSuccess']);
 
@@ -48,46 +46,57 @@ const getOrderEstimateList = () => {
     });
 };
 
-// 추가 버튼 클릭 시
-const addOrderItem = () => {
-    console.log('추가 버튼 클릭 후 ');
-    // 새로운 항목을 estimateList 배열에 추가
-    orderList.value.push({
-        manufacturerId: selectedManufacturer.value.manufacturerId,
-        majorCategoryId: selectedProduct.value.industry_code,
-        subCategoryId: selectedProduct.value.product_code,
-        productId: selectedProduct.value.id,
-        unitPrice: selectedProduct.value.unit_price,
-        quantity: quantity.value,
-        supplyPrice: supplyPrice.value, // 공급가액 포함
-        // 데이터 출력을 위한 것
-        productName: selectedProduct.value.name,
-        industryName: selectedManufacturer.value.industryName,
+// 견적서 내 상품 조회
+async function orderEstiDetailList(estiId) {
+    const param = new URLSearchParams({
+        estimateId: estiId,
     });
 
-    (selectedManufacturer.value = ''),
-        (selectedProduct.value = ''),
-        (quantity.value = ''),
-        (supplyPrice.value = '');
-};
+    try {
+        const response = await axios.post(
+            `/api/business/orderEstimateDetilBody`,
+            param
+        );
+        orderEstiProductList.value = response.data.estimateDetail;
 
-// 제품 선택 이벤트 핸들러
+        console.log(orderEstiProductList);
+    } catch (error) {
+        console.error('Error fetching estimate details:', error);
+    }
+}
 
-// async function handleManufacturerChange() {
-//     if (selectedManufacturer.value) {
-//         productList.value = await fetchProductsByManufacturer(
-//             selectedManufacturer.value.industryCode
-//         );
-//     }
-// }
+// 수주 저장
+// estimateId , clientId , orderDeliveryDate, orderSalesArea
+// orderList => {productId, unipPrice , quantity , supplyPrice }
+async function saveOrder() {
+    orderEstiId.value = orderEstiProductList.value[0]?.estimateId;
+    orderSalesArea.value = orderEstiProductList.value[0]?.salesArea;
+    selectedClient.value = orderEstiProductList.value[0]?.clientId;
+    const param = {
+        clientId: selectedClient.value,
+        orderDeliveryDate: orderDeliveryDate.value,
+        orderSalesArea: orderSalesArea.value,
+        orderList: orderEstiProductList.value,
+        estimateId: orderEstiId.value,
+    };
+
+    try {
+        await axios.post(`/api/business/saveOrder`, param);
+        alert('저장되었습니다.');
+        emit('postSuccess');
+        closeModal();
+    } catch (error) {
+        console.error('Error fetching estimate details:', error);
+    }
+}
 
 const closeModal = () => {
     modalState.setModalState();
 };
 
 //  총액 = 제품 단가 * 수량
-const calculateSupplyPrice = () => {
-    supplyPrice.value = quantity.value * selectedProduct.value.unit_price;
+const updateSupplyPrice = item => {
+    item.supplyPrice = item.unitPrice * item.quantity;
 };
 
 // {"estimateId":"58","clientId":"37","orderDeliveryDate":"2025-04-10","orderSalesArea":"SCM","orderList":[{"productId":1,"unitPrice":"80000","quantity":"10","supplyPrice":"800000"},{"productId":1,"unitPrice":"80000","quantity":"10","supplyPrice":"800000"}]}
@@ -99,9 +108,68 @@ const calculateSupplyPrice = () => {
             <div class="backdrop">
                 <div class="container">
                     <h2>수주 작성</h2>
+
+                    <h3>수주서 작성</h3>
+
+                    <button @click="saveOrder()">등록</button>
+
+                    <button type="button" @click="closeModal()">취소</button>
+
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th class="table-header">제조업체</th>
+                                <th class="table-header">제품명</th>
+                                <th class="table-header">납기일</th>
+                                <th class="table-header">영역구분</th>
+                                <th class="table-header">제품단가</th>
+                                <th class="table-header">수량</th>
+                                <th class="table-header">공급가액</th>
+                                <th class="table-header">삭제</th>
+                            </tr>
+                            <tr
+                                v-for="(item, index) in orderEstiProductList"
+                                :key="index"
+                            >
+                                <td>{{ item.manufacturerName }}</td>
+                                <td>{{ item.productName }}</td>
+                                <td>
+                                    <input
+                                        type="date"
+                                        v-model="orderDeliveryDate"
+                                    />
+                                </td>
+                                <td>{{ item.salesArea }}</td>
+                                <td>{{ item.unitPrice }}</td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        v-model="item.quantity"
+                                        @input="updateSupplyPrice(item)"
+                                        min="1"
+                                    />
+                                </td>
+                                <td>{{ item.supplyPrice }}</td>
+                                <td>
+                                    <button
+                                        @click="
+                                            orderEstiProductList.splice(
+                                                index,
+                                                1
+                                            )
+                                        "
+                                    >
+                                        삭제
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h3>견적서 조회</h3>
                     <div class="search-box">
+                        <!-- search Box -->
                         <label for="">거래처 </label>
-                        <select v-model="selectedClient">
+                        <select v-model="searchClient">
                             <option value="" disabled>전체</option>
                             <option
                                 v-for="client in clients"
@@ -111,14 +179,13 @@ const calculateSupplyPrice = () => {
                                 {{ client.client_name }}
                             </option>
                         </select>
-                        <label for="">납기일 </label>
-                        <input type="date" v-model="orderDeliveryDate" />
-                        <label for="">영역구분 </label>
+
+                        <!-- <label for="">영역구분 </label>
                         <select v-model="orderSalesArea">
                             <option value="" disabled>전체</option>
                             <option value="SCM">SCM</option>
                             <option value="영업">영업</option>
-                        </select>
+                        </select> -->
                     </div>
                     <table>
                         <tr>
@@ -142,7 +209,17 @@ const calculateSupplyPrice = () => {
                                     <td>{{ orderEsti.estimateDate }}</td>
                                     <td>{{ orderEsti.estimateDate }}</td>
                                     <td>{{ orderEsti.estimateDate }}</td>
-                                    <td><button>등록</button></td>
+                                    <td>
+                                        <button
+                                            @click="
+                                                orderEstiDetailList(
+                                                    orderEsti.id
+                                                )
+                                            "
+                                        >
+                                            추가
+                                        </button>
+                                    </td>
                                 </tr>
                             </template>
                             <template v-else>
@@ -153,104 +230,7 @@ const calculateSupplyPrice = () => {
                                 </tr>
                             </template>
                         </template>
-                        <!-- <tr>
-                            <th>제조업체</th>
-                            <td>
-                                <select
-                                    v-model="selectedManufacturer"
-                                    @change="handleManufacturerChange"
-                                >
-                                    <option value="" disabled>제조사</option>
-                                    <option
-                                        v-for="manufacturer in manufacturers"
-                                        :key="manufacturer.manufacturer_id"
-                                        :value="manufacturer"
-                                    >
-                                        {{ manufacturer.industryName }}
-                                    </option>
-                                </select>
-                            </td>
-                            <th>제품</th>
-                            <td>
-                                <select v-model="selectedProduct">
-                                    <option value="" disabled>제품</option>
-                                    <option
-                                        v-for="product in productList"
-                                        :key="product.id"
-                                        :value="product"
-                                    >
-                                        {{ product.name }}
-                                    </option>
-                                </select>
-                            </td>
-                            <th>제품 단가</th>
-                            <td>
-                                <input
-                                    type="text"
-                                    v-model="selectedProduct.unit_price"
-                                />
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>수량</th>
-                            <td>
-                                <input
-                                    type="text"
-                                    v-model="quantity"
-                                    @input="calculateSupplyPrice"
-                                />
-                            </td>
-                            <th>총액</th>
-                            <td>
-                                <input
-                                    type="text"
-                                    v-model="supplyPrice"
-                                    disabled
-                                />
-                            </td>
-                            <th></th>
-                            <td></td>
-                        </tr> -->
                     </table>
-
-                    <button @click="addEstimateItem">추가</button>
-                    <table>
-                        <tbody>
-                            <input type="text" hidden />
-
-                            <tr>
-                                <th class="table-header">제조업체</th>
-                                <th class="table-header">제품명</th>
-                                <th class="table-header">제품단가</th>
-                                <th class="table-header">수량</th>
-                                <th class="table-header">공급가액</th>
-                                <th class="table-header">삭제</th>
-                            </tr>
-                            <tr
-                                v-for="(item, index) in estimateList"
-                                :key="index"
-                            >
-                                <td>{{ item.industryName }}</td>
-                                <td>{{ item.productName }}</td>
-                                <td>{{ item.unitPrice }}</td>
-                                <td>{{ item.quantity }}</td>
-                                <td>{{ item.supplyPrice }}</td>
-                                <td>
-                                    <button @click="orderList.splice(index, 1)">
-                                        삭제
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="button-box">
-                        <button @click="saveOrder()">등록</button>
-                        <button>전체 삭제</button>
-                        <button type="button" @click="closeModal()">
-                            취소
-                        </button>
-                    </div>
                 </div>
             </div>
         </teleport>
