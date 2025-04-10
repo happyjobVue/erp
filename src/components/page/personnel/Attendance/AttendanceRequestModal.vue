@@ -11,7 +11,7 @@ const attendanceDetail = ref({});
 
 const form = ref({
   deptName: '', // lgnInfo.detail_name
-  empName: '',  // lgnInfo.usr_nm
+  name: '',  // lgnInfo.usr_nm
   number: '',   // lgnInfo.usr_idx
   reqType: '연차',
   reqSt: '',
@@ -32,19 +32,24 @@ const closeModal = () => {
 };
 
 const UserDetail = () => {
-    const form = new URLSearchParams();
+    const param = new URLSearchParams();
 
-    form.append('id', userInfo.user.empId);
+    param.append('id', userInfo.user.empId);
+    console.log(userInfo.user);
 
     axios
-        .post(`/api/personnel/attendanceDetail.do`,form)
+        .post(`/api/personnel/attendanceDetail.do`,param)
         .then(res => {
-            console.log(res.data);
-            attendanceDetail.value = res.data;
+            console.log(res.data.detail);
+            form.value.deptName = res.data.detail.deptName;
+            form.value.name = res.data.detail.name;
+            form.value.number = res.data.detail.number;
+
         })
         .catch(err => {
             console.error('에러 발생:', err);
         });
+
 
 }
 
@@ -72,7 +77,7 @@ onMounted(() => {
               <tr>
                 <th scope="row">성명</th>
                 <td>
-                  <input type="text" class="inputTxt p100" v-model="form.empName" readonly />
+                  <input type="text" class="inputTxt p100" v-model="form.name" readonly />
                 </td>
               </tr>
               <tr>
