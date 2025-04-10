@@ -35,10 +35,12 @@ onMounted(async () => {
     getOrderEstimateList();
 });
 
+//수주 페이지에서 견적서 조회
 const getOrderEstimateList = () => {
     const param = {
         currentPage: cPage.value,
         pageSize: 5,
+        clientId: searchClient.value,
     };
     axios.post('/api/business/orderEstimateListBody', param).then(res => {
         orderEstimateList.value = res.data.orderEstimateList;
@@ -180,12 +182,7 @@ const updateSupplyPrice = item => {
                             </option>
                         </select>
 
-                        <!-- <label for="">영역구분 </label>
-                        <select v-model="orderSalesArea">
-                            <option value="" disabled>전체</option>
-                            <option value="SCM">SCM</option>
-                            <option value="영업">영업</option>
-                        </select> -->
+                        <button @click="getOrderEstimateList()">조회</button>
                     </div>
                     <table>
                         <tr>
@@ -231,6 +228,14 @@ const updateSupplyPrice = item => {
                             </template>
                         </template>
                     </table>
+                    <!-- 페이징 -->
+                    <Pagination
+                        :totalItems="orderEstimateCnt"
+                        :items-per-page="5"
+                        :max-pages-shown="5"
+                        :onClick="getOrderEstimateList"
+                        v-model="cPage"
+                    />
                 </div>
             </div>
         </teleport>
