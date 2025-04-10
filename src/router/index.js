@@ -4,11 +4,12 @@ import DashBoard from '../views/DashBoard/DashBoard.vue';
 import Notice from '../views/System/Notice.vue';
 import Manage from '../views/Account/Manage.vue';
 import Department from '../views/System/Department.vue';
-import SalaryList from '../views/Personnel/Salary-list.vue';
+import SalaryList from '../views/Personnel/Salary/Salary-list.vue';
 import Daily from '../views/Sales/Daily.vue';
 import Monthly from '../views/Sales/Monthly.vue';
-import Employee from '../views/Employee/Employee.vue';
+import Employee from '../views/Personnel/Employee/Employee.vue';
 import ExpenseList from '../views/Account/ExpenseList.vue';
+import Promotion from '../views/Personnel/Promotion/Promotion.vue';
 import Annual from '../views/Sales/annual.vue';
 import ReceivablesList from '../views/Sales/ReceivablesList.vue';
 import Plan from '../views/Business/Plan/Plan.vue';
@@ -17,7 +18,12 @@ import PlanResult from '../views/Business/PlanResult/PlanResult.vue';
 import Estimate from '../views/Business/Estimate/Estimate.vue';
 import Code from '../views/System/Code.vue';
 import ExpenseReviewListPrint from '../components/page/Account/ExpenseReview/ExpenseReviewListPrint.vue';
+<<<<<<< HEAD
+import SalaryManage from '../views/Personnel/Salary/Salary-manage.vue';
+import Attendance from '../views/Personnel/Attendance/Attendance.vue';
+=======
 import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
+>>>>>>> edaa0420edc8497e245dc9daeb6f456b1bf01491
 import Order from '../views/Business/Order/Order.vue';
 
 const routes = [
@@ -67,9 +73,24 @@ const routes = [
                         component: SalaryList,
                     },
                     {
+                        path: 'salary-manage',
+                        name: 'salary-manage',
+                        component: SalaryManage,
+                    },
+                    {
                         path: 'employee',
                         name: 'employee',
                         component: Employee,
+                    },
+                    {
+                        path: 'promotion',
+                        name: 'promotion',
+                        component: Promotion,
+                    },
+                    {
+                        path: 'attendance-list',
+                        name: 'attendance-list',
+                        component: Attendance,
                     },
                 ],
             },
