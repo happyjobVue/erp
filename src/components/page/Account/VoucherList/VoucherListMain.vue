@@ -1,7 +1,12 @@
 <template>
     <div class="divExpenseReviewList">
         <VoucherListModal
-            v-if="modal.modalState"
+            v-if="
+                modal.modalState &&
+                selectedVoucher !== undefined &&
+                selectedVoucher !== null
+            "
+            :voucherDetail="selectedVoucher"
             :id="voucherNo"
             @modalClose="voucherNo = $event"
             @postSuccess="onPostSuccess"
@@ -9,13 +14,13 @@
         <table>
             <thead>
                 <tr>
-                    <th scope="col">전표번호</th>
-                    <th scope="col">일자</th>
-                    <th scope="col">구분</th>
-                    <th scope="col">거래처</th>
-                    <th scope="col">차변계정과목</th>
-                    <th scope="col">대변계정과목</th>
-                    <th scope="col">장부금액</th>
+                    <th>전표번호</th>
+                    <th>일자</th>
+                    <th>구분</th>
+                    <th>거래처</th>
+                    <th>차변계정과목</th>
+                    <th>대변계정과목</th>
+                    <th>장부금액</th>
                 </tr>
             </thead>
             <tbody>
@@ -27,7 +32,7 @@
                     >
                         <td>{{ voucher.voucher_no }}</td>
                         <td>{{ voucher.voucher_date }}</td>
-                        <td>{{ voucher.account_type }}</td>
+                        <td>{{ voucher.exp_id ? '비용' : '매출' }}</td>
                         <td>{{ voucher.client_name }}</td>
                         <td>{{ voucher.debit_name }}</td>
                         <td>{{ voucher.crebit_name }}</td>
@@ -85,6 +90,10 @@ const onPostSuccess = () => {
     modal.setModalState();
     searchList();
 };
+
+const selectedVoucher = computed(() =>
+    voucherList.value?.voucher.find(v => v.voucher_no === voucherNo.value)
+);
 
 onMounted(() => {
     searchList();

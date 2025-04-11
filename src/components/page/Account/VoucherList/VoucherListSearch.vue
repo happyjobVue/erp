@@ -9,6 +9,7 @@
             <div>
                 <label>구분 : </label>
                 <select v-model="searchType">
+                    <option value="">선택</option>
                     <option value="sales">매출</option>
                     <option value="expense">비용</option>
                 </select>
@@ -18,11 +19,11 @@
                 <select v-model="searchClientName">
                     <option value="">선택</option>
                     <option
-                        v-for="client in clientList"
-                        :key="client.client_name"
-                        :value="client.client_name"
+                        v-for="item in clientList"
+                        :key="item.clientName"
+                        :value="item.clientName"
                     >
-                        {{ client.clientName }}
+                        {{ item.clientName }}
                     </option>
                 </select>
             </div>
@@ -32,8 +33,8 @@
                     <option value="">선택</option>
                     <option
                         v-for="item in expenseDetailName"
-                        :key="item.debit_name"
-                        :value="item.debit_name"
+                        :key="item.detail_name"
+                        :value="item.detail_name"
                     >
                         {{ item.detail_name }}
                     </option>
@@ -44,9 +45,9 @@
                 <select v-model="searchCrebitName">
                     <option value="">선택</option>
                     <option
-                        v-for="item in expenseDetailName"
-                        :key="item.crebit_name"
-                        :value="item.crebit_name"
+                        v-for="item in crebitList"
+                        :key="item.detail_name"
+                        :value="item.detail_name"
                     >
                         {{ item.detail_name }}
                     </option>
@@ -68,6 +69,7 @@ const searchType = ref('expense');
 const searchClientName = ref('');
 const searchDebitName = ref('');
 const searchCrebitName = ref('');
+const crebitList = ref([]);
 const expenseDetailName = ref([]);
 const clientList = ref([]);
 
@@ -77,6 +79,7 @@ const fetchLoginInfo = async () => {
             '/api/account/expenseLoginInfoBody.do',
             {}
         );
+        crebitList.value = res.data.crebitList;
         expenseDetailName.value = res.data.expenseDetailName;
         clientList.value = res.data.clientList;
     } catch (e) {

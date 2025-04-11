@@ -76,7 +76,6 @@
                                 v-model="expenseDetail.debit_code"
                                 :disabled="isReadOnly"
                             >
-                                <option value="">선택</option>
                                 <option
                                     v-for="item in expenseDetailName"
                                     :key="item.detail_code"
@@ -94,7 +93,6 @@
                                 v-model="expenseDetail.client_id"
                                 :disabled="isReadOnly"
                             >
-                                <option value="">선택</option>
                                 <option
                                     v-for="client in clientList"
                                     :key="client.id"
@@ -188,9 +186,9 @@ import axios from 'axios';
 
 const { setModalState } = useModalStore();
 const expenseDetail = ref({
-    group_name: '',
+    group_name: '온라인지출',
     debit_code: '',
-    client_id: '',
+    client_id: '0',
 });
 const clientList = ref([]);
 const expenseDetailName = ref([]);

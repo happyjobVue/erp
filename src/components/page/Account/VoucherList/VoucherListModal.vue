@@ -8,23 +8,23 @@
                         <td>
                             <input
                                 type="text"
-                                v-model="expenseDetail.id"
+                                v-model="voucherDetail.voucher_no"
                                 readonly
                             />
                         </td>
                         <td class="label">구분</td>
                         <td>
                             <input
-                                type="date"
-                                v-model="expenseDetail.req_date"
+                                type="text"
+                                v-model="voucherDetail.account_type"
                                 readonly
                             />
                         </td>
                         <td class="label">담당자</td>
                         <td>
                             <input
-                                type="date"
-                                v-model="expenseDetail.req_date"
+                                type="text"
+                                v-model="voucherDetail.emp_name"
                                 readonly
                             />
                         </td>
@@ -32,7 +32,7 @@
                         <td>
                             <input
                                 type="date"
-                                v-model="expenseDetail.req_date"
+                                v-model="voucherDetail.voucher_date"
                                 readonly
                             />
                         </td>
@@ -42,7 +42,7 @@
                         <td>
                             <input
                                 type="date"
-                                v-model="expenseDetail.use_date"
+                                v-model="voucherDetail.client_name"
                                 readonly
                             />
                         </td>
@@ -50,7 +50,7 @@
                         <td>
                             <input
                                 type="text"
-                                v-model="expenseDetail.emp_no"
+                                v-model="voucherDetail.order_id"
                                 readonly
                             />
                         </td>
@@ -58,7 +58,7 @@
                         <td>
                             <input
                                 type="text"
-                                v-model="expenseDetail.name"
+                                v-model="voucherDetail.exp_id"
                                 readonly
                             />
                         </td>
@@ -73,31 +73,86 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(item, index) in detailList" :key="index">
-                            <td>{{ item.date }}</td>
-                            <td>{{ item.description }}</td>
-                            <td>{{ numberWithCommas(item.amount) }}</td>
+                        <tr>
+                            <td>
+                                <input
+                                    type="text"
+                                    v-model="voucherDetail.debit_name"
+                                    readonly
+                                />
+                            </td>
+                            <td>
+                                <input
+                                    type="text"
+                                    :value="
+                                        numberWithCommas(
+                                            voucherDetail.voucher_amount
+                                        )
+                                    "
+                                    readonly
+                                />
+                            </td>
+                            <td>
+                                <input />
+                            </td>
                         </tr>
-                        <!-- <tr class="total-row">
-                            <td colspan="2">합계</td>
-                            <td>{{ numberWithCommas(totalAmount) }}</td>
-                            <td></td>
-                        </tr> -->
+                        <tr>
+                            <td>
+                                <input
+                                    type="text"
+                                    v-model="voucherDetail.crebit_name"
+                                    readonly
+                                />
+                            </td>
+                            <td>
+                                <input />
+                            </td>
+                            <td>
+                                <input
+                                    type="text"
+                                    :value="
+                                        numberWithCommas(
+                                            voucherDetail.voucher_amount
+                                        )
+                                    "
+                                    readonly
+                                />
+                            </td>
+                        </tr>
+                        <tr class="row-table">
+                            <td>합계</td>
+                            <td>
+                                <input
+                                    type="text"
+                                    :value="
+                                        numberWithCommas(
+                                            voucherDetail.voucher_amount
+                                        )
+                                    "
+                                    readonly
+                                />
+                            </td>
+                            <td>
+                                <input
+                                    type="text"
+                                    :value="
+                                        numberWithCommas(
+                                            voucherDetail.voucher_amount
+                                        )
+                                    "
+                                    readonly
+                                />
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
                 <div class="button-box">
-                    <button
-                        v-if="showSubmitButton"
-                        @click="expenseReviewUpdate()"
-                    >
-                        검토완료
-                    </button>
-                    <button
-                        v-if="expenseDetail.is_approval === 'S'"
-                        @click="goToPrintPage"
-                    >
-                        지출결의서 출력
-                    </button>
+                    <div class="print-page" id="pdf-content">
+                        <button class="button" @click="downloadPdf">
+                            PDF 저장
+                        </button>
+                    </div>
+                    <button class="button" @click="printPage">인쇄</button>
                     <button @click="setModalState">나가기</button>
                 </div>
             </div>
@@ -106,112 +161,49 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
-import axios from 'axios';
+import html2pdf from 'html2pdf.js/dist/html2pdf.bundle.min';
+
 const emit = defineEmits(['modalClose', 'postSuccess']);
 const { setModalState } = useModalStore();
-const expenseDetail = ref({});
-const clientList = ref([]);
-const expenseDetailName = ref([]);
-const { id } = defineProps(['id']);
-const showRadio = ref(false);
-const showSubmitButton = ref(false);
-
-const approvalMap = computed(() => ({
-    W: '검토 대기',
-    F: '승인 대기',
-    S: '승인',
-    N: '반려',
-    C: '취소',
-}));
-
-const searchDetail = async () => {
-    try {
-        const response = await axios.post('/api/account/expenseDetail.do', {
-            id,
-        });
-        expenseDetail.value = response.data.expenseDetail;
-        clientList.value = response.data.clientList;
-        expenseDetailName.value = response.data.expenseDetailName;
-    } catch (e) {
-        console.error(e);
-    }
-};
-
-const downloadFileImage = async () => {
-    const expenseSeq = expenseDetail.value.id;
-    const param = new URLSearchParams();
-    param.append('id', id);
-    param.append('expenseSeq', expenseSeq);
-
-    try {
-        const res = await axios.post('/api/account/expenseDownload.do', param, {
-            responseType: 'blob',
-        });
-        const url = window.URL.createObjectURL(new Blob([res.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', expenseDetail.value.file_name);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-    } catch (e) {
-        console.error(e);
-    }
-};
-
-const expenseReviewUpdate = async () => {
-    if (!['F', 'N'].includes(expenseDetail.value.is_approval)) {
-        alert('승인여부를 선택해주세요. (승인대기 또는 반려)');
-        return;
-    }
-    if (
-        !expenseDetail.value.crebit_code ||
-        expenseDetail.value.crebit_code.trim() === ''
-    ) {
-        alert('대변과목을 입력해주세요.');
-        return;
-    }
-    const param = new URLSearchParams();
-    param.append('checkApproval', expenseDetail.value.is_approval);
-    param.append('detail_code', expenseDetail.value.crebit_code);
-    param.append('exp_id', expenseDetail.value.id);
-
-    try {
-        const res = await axios.post('/api/account/expenseUpdate.do', param);
-        console.log('서버 응답:', res.data);
-        if (res.data.result === 'success') {
-            emit('postSuccess');
-        } else {
-            alert('저장 실패');
-        }
-    } catch (e) {
-        console.error('저장 중 오류:', e);
-        alert('저장 중 오류가 발생했습니다.');
-    }
-};
-
-const goToPrintPage = () => {
-    const id = expenseDetail.value.id;
-    localStorage.setItem(
-        'printExpenseData',
-        JSON.stringify(expenseDetail.value)
-    );
-    const url = `/expense-review/print/${id}`;
-    window.open(url, '_blank');
-};
-
-onMounted(() => {
-    if (id) {
-        searchDetail().then(() => {
-            if (expenseDetail.value.is_approval === 'W') {
-                showRadio.value = true;
-                showSubmitButton.value = true;
-            }
-        });
-    }
+const { voucherDetail } = defineProps({
+    voucherDetail: {
+        type: Object,
+        required: true,
+    },
 });
+
+const setModalAndClose = () => {
+    console.log('✅ 나가기 버튼 클릭됨 - setModalState 호출');
+    setModalState();
+};
+
+// 숫자 천 단위 쉼표
+const numberWithCommas = x => {
+    if (typeof x !== 'number') return '';
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+const printPage = () => {
+    window.print();
+};
+
+const downloadPdf = () => {
+    const element = document.getElementById('pdf-content');
+    const opt = {
+        margin: 0.5,
+        filename: '지출결의서.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
+    };
+    html2pdf().set(opt).from(element).save();
+};
+
+// onMounted(() => {
+//     searchDetail();
+// });
 
 onUnmounted(() => {
     emit('modalClose', 0);
@@ -230,73 +222,62 @@ onUnmounted(() => {
     justify-content: center;
     align-items: center;
 }
+
 .modal-container {
     background: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
-    width: 700px;
-}
-.modal-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-.modal-table td {
-    border: 1px solid #ccc;
-    padding: 10px;
-}
-.modal-table td.button-box {
-    border: none;
-}
-.radio-group {
-    display: flex;
-    gap: 20px;
-    align-items: center;
+    width: 90vw;
+    max-width: 1000px;
+    overflow-x: auto;
 }
 
-.radio-group input[type='radio'] {
-    display: inline-block;
-    margin-right: 5px;
+.modal-table,
+.content-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.content-table th,
+tr.row-table {
+    background: #f4f4f4;
+    font-weight: bold; /* 굵게 */
+    text-align: center; /* 가운데 정렬 */
+    font-size: 14px; /* 글자 크기 */
 }
 
 .label {
     background: #f0f0f0;
     font-weight: bold;
     text-align: left;
-    width: 150px;
-}
-input:not([type='radio']),
-select,
-textarea {
-    display: block;
-    width: 100%;
-    color: black;
-    opacity: 1;
-    box-sizing: border-box;
-    padding: 8px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
 }
 
-textarea {
-    min-height: 80px;
-    resize: vertical;
+input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: #fdfdfd;
 }
+
 .button-box {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     margin-top: 10px;
 }
 
 button {
-    flex: 1;
     background-color: #3bb2ea;
     border: none;
     color: white;
-    padding: 10px;
-    margin: 0 5px;
+    padding: 10px 20px;
+    margin-left: 10px;
     font-size: 16px;
     cursor: pointer;
     border-radius: 6px;
@@ -312,5 +293,10 @@ button:active {
     background-color: #3e8e41;
     box-shadow: 0 2px #666;
     transform: translateY(2px);
+}
+@media print {
+    @page {
+        size: landscape;
+    }
 }
 </style>

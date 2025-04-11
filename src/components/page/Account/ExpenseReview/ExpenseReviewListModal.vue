@@ -95,9 +95,8 @@
                             </template>
                             <template v-else>
                                 <select v-model="expenseDetail.crebit_code">
-                                    <option value="">선택</option>
                                     <option
-                                        v-for="item in expenseDetailName"
+                                        v-for="item in crebitList"
                                         :key="item.detail_code"
                                         :value="item.detail_code"
                                     >
@@ -200,11 +199,10 @@ const emit = defineEmits(['modalClose', 'postSuccess']);
 const { setModalState } = useModalStore();
 const expenseDetail = ref({});
 const clientList = ref([]);
-const expenseDetailName = ref([]);
+const crebitList = ref({});
 const { id } = defineProps(['id']);
 const showRadio = ref(false);
 const showSubmitButton = ref(false);
-const isEditMode = computed(() => !!id);
 
 const approvalMap = computed(() => ({
     W: '검토 대기',
@@ -216,12 +214,15 @@ const approvalMap = computed(() => ({
 
 const searchDetail = async () => {
     try {
-        const response = await axios.post('/api/account/expenseDetail.do', {
-            id,
-        });
+        const response = await axios.post(
+            '/api/account/expense-reviewBody.do',
+            {
+                id,
+            }
+        );
         expenseDetail.value = response.data.expenseDetail;
         clientList.value = response.data.clientList;
-        expenseDetailName.value = response.data.expenseDetailName;
+        crebitList.value = response.data.crebitList;
     } catch (e) {
         console.error(e);
     }
@@ -310,7 +311,7 @@ onUnmounted(() => {
 watch(
     () => expenseDetail.value.crebit_code,
     newCode => {
-        const selected = expenseDetailName.value.find(
+        const selected = crebitList.value.find(
             item => item.detail_code === newCode
         );
         if (selected) {
