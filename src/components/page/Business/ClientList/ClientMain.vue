@@ -12,6 +12,7 @@ const clients = ref();
 const clientListCnt = ref();
 const selectedClient = ref();
 const route = useRoute();
+
 onMounted(() => {
     clientList();
 });
@@ -55,11 +56,10 @@ const clientList = () => {
 };
 
 // 검색된 견적서 목록 불러오는 함수
-const searchEClientList = () => {
+const searchClientList = () => {
     console.log('검색 로직 ');
     const param = {
-        client_name: route.query.client_name,
-        cust_update_date: route.query.cust_update_date,
+        ...route.query,
         currentPage: cPage.value,
         pageSize: 5,
     };
@@ -71,7 +71,7 @@ const searchEClientList = () => {
         });
 };
 
-watch(() => route.query, searchEClientList());
+watch(() => route.query, searchClientList);
 </script>
 
 <template>

@@ -9,8 +9,8 @@ const searchClient = () => {
     router.push({
         path: 'client-list',
         query: {
-            searchClientName: searchClientName.value,
-            searchCustUpdateDate: searchCustUpdateDate.value,
+            client_name: searchClientName.value,
+            cust_update_date: searchCustUpdateDate.value,
         },
     });
 };

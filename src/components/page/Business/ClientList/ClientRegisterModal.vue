@@ -32,6 +32,10 @@ const loadDaumPostcodeScript = () => {
     document.head.appendChild(script);
 };
 
+const closeModal = () => {
+    modalState.setModalState();
+};
+
 onMounted(() => {
     loadDaumPostcodeScript();
 });
@@ -64,6 +68,8 @@ function formatBankAccount(account) {
     return account.replace(/^(\d{3})(\d{3})(\d{6})$/, '$1-$2-$3');
 }
 
+const emit = defineEmits(['modalClose', 'postSuccess']);
+
 // 저장 함수
 const saveClient = () => {
     const param = {
@@ -82,7 +88,13 @@ const saveClient = () => {
         zip: postcode.value,
     };
 
-    axios.post('/api/business/client-list/insertClientListBody.do', param);
+    axios
+        .post('/api/business/client-list/insertClientListBody.do', param)
+        .then(() => {
+            alert('거래처가 등록되었습니다.');
+            emit('postSuccess');
+            closeModal();
+        });
 };
 </script>
 

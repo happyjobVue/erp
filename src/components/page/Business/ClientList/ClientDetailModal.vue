@@ -62,7 +62,11 @@ const editClient = () => {
 
     axios
         .post(`/api/business/client-list/updateClientListBody.do`, param)
-        .then('수정 되었습니다.');
+        .then(() => {
+            alert('거래처 내역이 수정되었습니다.');
+            emit('postSuccess');
+            closeModal();
+        });
 };
 
 onMounted(() => {
