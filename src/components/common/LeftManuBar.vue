@@ -1,9 +1,10 @@
 <template>
     <img :src="logo" alt="happyjob" class="home" />
     <div class="logo-box">
-        <img :src="noAvatar" alt="logoImage" class="profileImage" />
+        <img :src="profileImg"
+            class="profileImage" />
         <div class="user-info">
-            <div>{{ userInfo.user.loginId }}</div>
+            <div>{{ userInfo.user.userNm }}</div>
             <button @click="handlerLogout">로그아웃</button>
         </div>
     </div>
@@ -31,6 +32,7 @@ import noAvatar from '../../assets/noAvatar.png';
 
 const userInfo = useUserInfo();
 const router = useRouter();
+const profileImg = ref()
 
 const handlerClick = (menuId, e) => {
     const childMenuId = document.getElementById(menuId);
@@ -66,6 +68,19 @@ const handlerLogout = () => {
     sessionStorage.setItem('userInfo', '');
     router.push('/');
 };
+
+const getImageUrl = (path) => {
+    if (!path) return '/default-profile.png'; // 기본 이미지 처리
+    return `http://localhost:5173${path.replace(/\\/g, '/')}`;
+}
+
+onMounted(() => {
+    const transformUrl = getImageUrl(userInfo.user.profileImage)
+    console.log(transformUrl)
+    profileImg.value = transformUrl
+})
+
+
 </script>
 
 <style lang="scss" scoped>
@@ -117,8 +132,15 @@ button:active {
 
     .user-info {
         position: relative;
+        font-weight: bold;
+        color: white;
+        font-size: 18px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 60px;
         right: 120px;
-        top: 30px;
+        top: 17px;
         float: right;
     }
 }
