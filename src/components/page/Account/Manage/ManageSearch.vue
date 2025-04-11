@@ -4,7 +4,7 @@
             <div>
                 <label>계정대분류 : </label>
                 <select v-model="searchGroup">
-                    <option value="">전체</option>
+                    <option value="">선택</option>
                     <option value="AC01">온라인매출</option>
                     <option value="AC02">영업매출</option>
                     <option value="AC03">온라인지출</option>
@@ -19,23 +19,34 @@
             <div>
                 <label>구분 : </label>
                 <select v-model="searchCodeType">
-                    <option value="">전체</option>
+                    <option value="">선택</option>
                     <option value="수입">수입</option>
                     <option value="지출">지출</option>
                 </select>
             </div>
-            <div>
+            <!-- <div>
                 <label>사용여부 : </label>
                 <select v-model="searchUseYn">
-                    <option value="">전체</option>
+                    <option value="">선택</option>
                     <option value="Y">Y</option>
                     <option value="N">N</option>
                 </select>
-            </div>
+            </div> -->
 
             <button @click="handleSearch">검색</button>
+            <label class="toggle-switch">
+                <input
+                    type="checkbox"
+                    v-model="showInactive"
+                    true-value="true"
+                    false-value=""
+                />
+                <span class="slider"></span>
+                <span class="status-text">
+                    {{ showInactive === 'true' ? '미사용 코드' : '사용 코드' }}
+                </span>
+            </label>
         </div>
-
         <div class="register-box">
             <button @click="setModalState">등록</button>
         </div>
@@ -50,7 +61,7 @@ const { setModalState } = useModalStore();
 const searchGroup = ref('');
 const searchDetail = ref('');
 const searchCodeType = ref('');
-const searchUseYn = ref('');
+const showInactive = ref(false);
 
 const handleSearch = () => {
     const query = [];
@@ -58,7 +69,7 @@ const handleSearch = () => {
     !searchDetail.value || query.push(`searchDetail=${searchDetail.value}`);
     !searchCodeType.value ||
         query.push(`searchCode_type=${searchCodeType.value}`);
-    !searchUseYn.value || query.push(`searchUse_yn=${searchUseYn.value}`);
+    showInactive.value && query.push('showInactive=true');
     const queryString = query.length > 0 ? `?${query.join('&')}` : '';
 
     router.push(queryString);
@@ -67,9 +78,61 @@ const handleSearch = () => {
 onMounted(() => {
     window.location.search && router.replace(window.location.pathname);
 });
+
+watch(showInactive, () => {
+    handleSearch();
+});
 </script>
 
 <style lang="scss" scoped>
+.toggle-switch {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    margin-left: 10px;
+
+    input {
+        display: none;
+    }
+
+    .slider {
+        position: relative;
+        width: 40px;
+        height: 20px;
+        background-color: #ccc;
+        border-radius: 34px;
+        transition: 0.4s;
+        margin-right: 8px;
+    }
+
+    .slider::before {
+        content: '';
+        position: absolute;
+        height: 16px;
+        width: 16px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        border-radius: 50%;
+        transition: 0.4s;
+    }
+
+    input:checked + .slider {
+        background-color: #3bb2ea;
+    }
+
+    input:checked + .slider::before {
+        transform: translateX(20px);
+    }
+
+    .status-text {
+        font-size: 14px;
+        width: 80px; /* 고정 너비 */
+        text-align: center;
+        display: inline-block;
+    }
+}
 .search-container {
     display: flex;
     flex-direction: column;
@@ -82,7 +145,6 @@ onMounted(() => {
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
-    background-color: #e0e0e0;
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 12px 15px;

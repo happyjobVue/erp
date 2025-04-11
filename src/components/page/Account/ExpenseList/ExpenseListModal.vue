@@ -65,6 +65,7 @@
                                 v-model="expenseDetail.group_name"
                                 :disabled="isReadOnly"
                             >
+                                <option value="">선택</option>
                                 <option value="온라인지출">온라인지출</option>
                                 <option value="영업지출">영업지출</option>
                             </select>
@@ -106,6 +107,7 @@
                             <input
                                 type="text"
                                 v-model="expenseDetail.expense_payment"
+                                placeholder="결의금액 입력"
                                 :readonly="isReadOnly"
                             />
                         </td>
@@ -128,13 +130,13 @@
                     </tr>
                     <tr>
                         <td class="label">첨부파일</td>
-                        <td colspan="3">
+                        <td>
                             <div v-if="isReadOnly">
                                 <button
                                     @click="downloadFileImage"
                                     class="button-box"
                                 >
-                                    <img v-if="imgUrl" :src="imgUrl" />다운로드
+                                    다운로드
                                 </button>
                             </div>
                             <div v-else>
@@ -142,12 +144,9 @@
                                     type="file"
                                     id="fileInput"
                                     @change="fileHandler"
-                                />
-                                <label
-                                    class="img-label"
                                     style="display: none"
-                                    htmlFor="fileInput"
-                                >
+                                />
+                                <label class="img-label" htmlFor="fileInput">
                                     파일 첨부하기
                                 </label>
                             </div>
@@ -186,7 +185,11 @@ import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
 
 const { setModalState } = useModalStore();
-const expenseDetail = ref({});
+const expenseDetail = ref({
+    group_name: '온라인지출',
+    debit_code: '',
+    client_id: '0',
+});
 const clientList = ref([]);
 const expenseDetailName = ref([]);
 const fileData = ref('');
@@ -230,6 +233,7 @@ const searchDetail = async () => {
         expenseDetail.value = response.data.expenseDetail;
         clientList.value = response.data.clientList;
         expenseDetailName.value = response.data.expenseDetailName;
+        console.log('clientList:', clientList.value);
     } catch (e) {
         console.error('상세정보 불러오기 실패:', e);
     }
@@ -272,6 +276,7 @@ const fileHandler = e => {
 };
 
 const expenseListSave = async () => {
+    console.log('expenseListSave 함수가 호출되었습니다.');
     try {
         if (!expenseDetail.value.use_date) {
             alert('사용일자를 입력해주세요.');
@@ -325,6 +330,11 @@ const expenseListSave = async () => {
             formData.append('file', fileData.value);
         }
 
+        console.log(
+            'Sending request to /api/account/expenseFileSave.do with data:',
+            formData
+        );
+
         const res = await axios.post(
             '/api/account/expenseFileSave.do',
             formData
@@ -335,6 +345,7 @@ const expenseListSave = async () => {
             alert('저장 실패');
         }
     } catch (e) {
+        console.error('axios 요청 중 오류 발생:', e);
         alert('저장 중 오류가 발생했습니다.');
     }
 };
@@ -401,21 +412,25 @@ onUnmounted(() => {
     border: 1px solid #ccc;
     padding: 10px;
 }
-.register-box {
+.radio-group {
     display: flex;
-    justify-content: flex-end;
-    margin-bottom: 10px;
+    gap: 20px;
+    align-items: center;
 }
+
+.radio-group input[type='radio'] {
+    display: inline-block;
+    margin-right: 5px;
+}
+
 .label {
     background: #f0f0f0;
     font-weight: bold;
     text-align: left;
     width: 150px;
 }
-.approval-display,
-input,
+input:not([type='radio']),
 select,
-span,
 textarea {
     display: block;
     width: 100%;
@@ -428,6 +443,7 @@ textarea {
     border-radius: 4px;
     border: 1px solid #ccc;
 }
+
 textarea {
     min-height: 80px;
     resize: vertical;
@@ -437,6 +453,7 @@ textarea {
     justify-content: space-between;
     margin-top: 10px;
 }
+
 button {
     flex: 1;
     background-color: #3bb2ea;

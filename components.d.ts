@@ -77,5 +77,8 @@ declare module 'vue' {
     SalesPlanResultSearch: typeof import('./src/components/page/Business/PlanResult/SalesPlanResultSearch.vue')['default']
     SalesPlanSearch: typeof import('./src/components/page/Business/Plan/SalesPlanSearch.vue')['default']
     SalesRegisterModal: typeof import('./src/components/page/Business/Plan/SalesRegisterModal.vue')['default']
+    VoucherListMain: typeof import('./src/components/page/Account/VoucherList/VoucherListMain.vue')['default']
+    VoucherListModal: typeof import('./src/components/page/Account/VoucherList/VoucherListModal.vue')['default']
+    VoucherListSearch: typeof import('./src/components/page/Account/VoucherList/VoucherListSearch.vue')['default']
   }
 }

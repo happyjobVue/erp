@@ -22,19 +22,19 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">사용일자</td>
-                        <td>
-                            <input
-                                type="date"
-                                v-model="expenseDetail.use_date"
-                                readonly
-                            />
-                        </td>
                         <td class="label">사번</td>
                         <td>
                             <input
                                 type="text"
                                 v-model="expenseDetail.emp_no"
+                                readonly
+                            />
+                        </td>
+                        <td class="label">사용일자</td>
+                        <td>
+                            <input
+                                type="date"
+                                v-model="expenseDetail.use_date"
                                 readonly
                             />
                         </td>
@@ -60,53 +60,91 @@
                     <tr>
                         <td class="label">계정대분류명</td>
                         <td>
-                            <select v-model="expenseDetail.group_name" disabled>
-                                <option value="온라인매출">온라인매출</option>
-                                <option value="영업매출">영업매출</option>
-                                <option value="온라인지출">온라인지출</option>
-                                <option value="영업지출">영업지출</option>
-                                <option value="유동자산">유동자산</option>
-                            </select>
+                            <template v-if="isEditMode">
+                                <input
+                                    type="text"
+                                    v-model="expenseDetail.group_name"
+                                    readonly
+                                />
+                            </template>
+                            <template v-else>
+                                <select v-model="expenseDetail.group_name">
+                                    <option value="온라인매출">
+                                        온라인매출
+                                    </option>
+                                    <option value="영업매출">영업매출</option>
+                                    <option value="온라인지출">
+                                        온라인지출
+                                    </option>
+                                    <option value="영업지출">영업지출</option>
+                                    <option value="유동자산">유동자산</option>
+                                </select>
+                            </template>
                         </td>
-                        <td class="label">계정과목</td>
+                        <td class="label">거래처명</td>
                         <td>
-                            <select
-                                v-model="expenseDetail.detail_name"
-                                disabled
-                            >
-                                <option
-                                    v-for="item in expenseDetailName"
-                                    :key="item.detail_name"
-                                    :value="item.detail_name"
-                                >
-                                    {{ item.detail_name }}
-                                </option>
-                            </select>
+                            <template v-if="isEditMode">
+                                <input
+                                    type="text"
+                                    v-model="expenseDetail.client_name"
+                                    readonly
+                                />
+                            </template>
+                            <template v-else>
+                                <select v-model="expenseDetail.client_name">
+                                    <option
+                                        v-for="client in clientList"
+                                        :key="client.id"
+                                        :value="client.clientName"
+                                    >
+                                        {{ client.clientName }}
+                                    </option>
+                                </select>
+                            </template>
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">거래처명</td>
+                        <td class="label">차변계정과목</td>
                         <td>
-                            <select
-                                v-model="expenseDetail.client_name"
-                                disabled
-                            >
-                                <option
-                                    v-for="client in clientList"
-                                    :key="client.id"
-                                    :value="client.clientName"
-                                >
-                                    {{ client.clientName }}
-                                </option>
-                            </select>
+                            <template v-if="isEditMode">
+                                <input
+                                    type="text"
+                                    v-model="expenseDetail.detail_name"
+                                    readonly
+                                />
+                            </template>
+                            <template v-else>
+                                <select v-model="expenseDetail.detail_name">
+                                    <option
+                                        v-for="item in expenseDetailName"
+                                        :key="item.detail_name"
+                                        :value="item.detail_name"
+                                    >
+                                        {{ item.detail_name }}
+                                    </option>
+                                </select>
+                            </template>
                         </td>
-                        <td class="label">결의금액</td>
+                        <td class="label">대변계정과목</td>
                         <td>
-                            <input
-                                type="text"
-                                v-model="expenseDetail.expense_payment"
-                                readonly
-                            />
+                            <template v-if="isEditMode">
+                                <input
+                                    type="text"
+                                    v-model="expenseDetail.credit_name"
+                                    readonly
+                                />
+                            </template>
+                            <template v-else>
+                                <select v-model="expenseDetail.crebit_code">
+                                    <option
+                                        v-for="item in expenseDetailName"
+                                        :key="item.crebit_code"
+                                        :value="item.crebit_code"
+                                    >
+                                        {{ item.crebit_code }}
+                                    </option>
+                                </select>
+                            </template>
                         </td>
                     </tr>
                     <tr>
@@ -131,10 +169,15 @@
                                 </label>
                             </div>
                             <div v-else>
-                                {{ approvalMap[expenseDetail.is_approval] }}
+                                <input
+                                    type="text"
+                                    :value="
+                                        approvalMap[expenseDetail.is_approval]
+                                    "
+                                    readonly
+                                />
                             </div>
                         </td>
-
                         <td class="label">승인일자</td>
                         <td>
                             <input
@@ -146,22 +189,16 @@
                     </tr>
                     <tr>
                         <td class="label">첨부파일</td>
-
-                        <button @click="downloadFileImage" class="button-box">
-                            <img v-if="imgUrl" :src="imgUrl" />다운로드
-                        </button>
-
-                        <td class="label">대변계정과목</td>
+                        <td class="button-box">
+                            <button @click="downloadFileImage">다운로드</button>
+                        </td>
+                        <td class="label">결의금액</td>
                         <td>
-                            <select v-model="expenseDetail.crebit_code">
-                                <option
-                                    v-for="item in expenseDetailName"
-                                    :key="item.detail_code"
-                                    :value="item.detail_code"
-                                >
-                                    {{ item.detail_name }}
-                                </option>
-                            </select>
+                            <input
+                                type="text"
+                                v-model="expenseDetail.expense_payment"
+                                readonly
+                            />
                         </td>
                     </tr>
                     <tr>
@@ -207,6 +244,7 @@ const { id } = defineProps(['id']);
 const originalApproval = ref('');
 const showRadio = ref(false);
 const showSubmitButton = ref(false);
+const isEditMode = computed(() => !!id);
 
 const approvalMap = computed(() => ({
     W: '검토 대기',
@@ -306,6 +344,7 @@ onMounted(() => {
         });
     }
 });
+
 onUnmounted(() => {
     emit('modalClose', 0);
 });
@@ -338,17 +377,19 @@ onUnmounted(() => {
     border: 1px solid #ccc;
     padding: 10px;
 }
+.modal-table td.button-box {
+    border: none;
+    display: table-cell !important;
+}
 .radio-group {
     display: flex;
     gap: 20px;
     align-items: center;
 }
-
 .radio-group input[type='radio'] {
     display: inline-block;
     margin-right: 5px;
 }
-
 .label {
     background: #f0f0f0;
     font-weight: bold;
@@ -357,7 +398,6 @@ onUnmounted(() => {
 }
 input:not([type='radio']),
 select,
-span,
 textarea {
     display: block;
     width: 100%;
@@ -370,7 +410,6 @@ textarea {
     border-radius: 4px;
     border: 1px solid #ccc;
 }
-
 textarea {
     min-height: 80px;
     resize: vertical;
@@ -392,12 +431,11 @@ button {
     border-radius: 6px;
     box-shadow: 0 2px #999;
     transition: 0.3s;
+    text-align: center;
 }
-
 button:hover {
     background-color: #45a049;
 }
-
 button:active {
     background-color: #3e8e41;
     box-shadow: 0 2px #666;

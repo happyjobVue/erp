@@ -24,6 +24,7 @@ import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
 import AttendanceRequest from '../views/Personnel/Attendance/Attendance-request.vue';
 import Order from '../views/Business/Order/Order.vue';
 import ClientList from '../views/Business/ClientList/ClientList.vue';
+import VocherList from '../views/Account/VoucherList.vue';
 
 const routes = [
     {
@@ -157,6 +158,11 @@ const routes = [
                         path: 'expense-approval',
                         name: 'expense-approval',
                         component: ExpenseApproval,
+                    },
+                    {
+                        path: 'voucher-list',
+                        name: 'voucher-list',
+                        component: VocherList,
                     },
                 ],
             },

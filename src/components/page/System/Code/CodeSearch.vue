@@ -1,29 +1,34 @@
 <template>
-    <div class="search-box">
-        공통코드명 :
-        <input
-            v-model.lazy="searchGroupName"
-            placeholder="공통코드명을 입력해주세요."
-        />
-        비고 :
-        <input
-            v-model.lazy="searchGroupNote"
-            placeholder="비고를 입력해주세요."
-        />
-        <button @click="handleSearch">검색</button>
-        <button @click="setModalState">등록</button>
-        <label class="toggle-switch">
+    <div class="search-container">
+        <div class="search-box">
+            공통코드명 :
             <input
-                type="checkbox"
-                v-model="showInactive"
-                true-value="true"
-                false-value=""
+                v-model.lazy="searchGroupName"
+                placeholder="공통코드명을 입력해주세요."
             />
-            <span class="slider"></span>
-            <span class="status-text">
-                {{ showInactive === 'true' ? '미사용 코드' : '사용 코드' }}
-            </span>
-        </label>
+            비고 :
+            <input
+                v-model.lazy="searchGroupNote"
+                placeholder="비고를 입력해주세요."
+            />
+
+            <button @click="handleSearch">검색</button>
+            <label class="toggle-switch">
+                <input
+                    type="checkbox"
+                    v-model="showInactive"
+                    true-value="true"
+                    false-value=""
+                />
+                <span class="slider"></span>
+                <span class="status-text">
+                    {{ showInactive ? '미사용 코드' : '사용 코드' }}
+                </span>
+            </label>
+        </div>
+        <div class="register-box">
+            <button @click="setModalState">등록</button>
+        </div>
     </div>
 </template>
 
@@ -31,6 +36,8 @@
 import router from '@/router';
 import { onMounted } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
+import { useRoute } from 'vue-router';
+const route = useRoute();
 const { setModalState } = useModalStore();
 const searchGroupName = ref('');
 const searchGroupNote = ref('');
@@ -50,11 +57,30 @@ const handleSearch = () => {
 };
 
 onMounted(() => {
-    window.location.search && router.replace(window.location.pathname);
+    const isReload =
+        performance.getEntriesByType('navigation')[0]?.type === 'reload';
+    if (isReload) {
+        router.replace({ path: route.path });
+    }
+    showInactive.value = route.query.showInactive === 'true';
 });
-watch(showInactive, () => {
-    handleSearch();
+
+watch(showInactive, newVal => {
+    const query = {
+        ...route.query,
+        showInactive: newVal ? 'true' : '',
+    };
+
+    router.replace({ path: route.path, query });
 });
+
+watch(
+    () => route.query.showInactive,
+    newVal => {
+        showInactive.value = newVal === 'true';
+    },
+    { immediate: true }
+);
 </script>
 
 <style lang="scss" scoped>
@@ -106,11 +132,26 @@ watch(showInactive, () => {
         display: inline-block;
     }
 }
+.search-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
 .search-box {
-    margin-bottom: 10px;
-    display: block;
-    float: inline-end;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin: 10px 0;
+}
+.register-box {
+    display: flex;
+    justify-content: flex-end;
 }
 
 input {
