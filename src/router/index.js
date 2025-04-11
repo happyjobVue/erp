@@ -23,6 +23,7 @@ import AttendanceList from '../views/Personnel/Attendance/Attendance-list.vue';
 import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
 import AttendanceRequest from '../views/Personnel/Attendance/Attendance-request.vue';
 import Order from '../views/Business/Order/Order.vue';
+import AttendanceApproval from '../views/Personnel/Attendance/Attendance-approval.vue';
 
 const routes = [
     {
@@ -94,6 +95,10 @@ const routes = [
                         path: 'attendance-request',
                         name: 'attendance-request',
                         component: AttendanceRequest,
+                    },                    {
+                        path: 'attendance-approval',
+                        name: 'attendance-approval',
+                        component: AttendanceApproval,
                     },
                 ],
             },

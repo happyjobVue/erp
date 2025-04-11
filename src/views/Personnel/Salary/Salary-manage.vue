@@ -44,7 +44,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
             },
         })
         .then(res => {
-            valueName.value = res.data.salaryList;
+            valueName.value = res.data;
             console.log(valueName.value);
         })
         .catch(err => {
@@ -186,7 +186,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
         @allPaymentStatusUpdate="allPaymentStatusUpdate"
         @saveSalaryDate="saveSalaryDate"
       />
-      <table class="promotion-table">
+      <table class="promotion-table" style="max-width: 1300px;">
         <thead>
           <tr>
             <th>해당년월</th>
@@ -207,7 +207,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="List in SalaryList" :key="List.employeeId" @click="() => DetailSalary(List.employeeName)">
+          <tr v-for="List in SalaryList.salaryList" :key="List.employeeId" @click="() => DetailSalary(List.employeeName)">
                 <td>{{ List.paymentDate }}</td>
                 <td>{{ List.departmentDetailName }}</td>
                 <td>{{ List.jobGradeDetailName }}</td>
@@ -218,7 +218,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
                 <td>{{ List.nationalPension }}</td>
                 <td>{{ List.healthInsurance }}</td>
                 <td>{{ List.baseSalary }}</td>
-                <td>{{ List.employeeInsurance }}</td>
+                <td>{{ List.employmentInsurance }}</td>
                 <td></td>
                 <td>{{ List.totalSalary }}</td>
                 <td>{{ List.serverancePay }}</td>
@@ -234,7 +234,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
       <!-- 페이징 영역 -->
       <div class="paging_area">
         <Pagination
-            :totalItems="SalarySearchList?.salaryCnt"
+            :totalItems="SalaryList?.salaryCnt"
             :items-per-page="5"
             :max-pages-shown="5"
             :onClick="SalarySearchList"
@@ -266,10 +266,10 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
           </tr>
         </thead>
         <tbody>
-        <tr v-for="List in DetailSalaryList" :key="List.employeeId">
+        <tr v-for="List in DetailSalaryList.salaryList" :key="List.employeeId">
                 <td>{{ List.paymentDate }}</td>
                 <td>{{ List.departmentDetailName }}</td>
-                <td>{{ List.jobGradeDetailName }}</td>
+                <td>{{ List.jobGradeDetailName }}</td>  
                 <td>{{ List.employeeName }}</td>
                 <td>{{ List.employeeNumber }}</td>
                 <td>{{ List.salary }}</td>
@@ -285,7 +285,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
         </tbody>
       </table>  
         <Pagination
-            :totalItems="DetailSalary?.salaryCnt"
+            :totalItems="SalaryList?.salaryCnt"
             :items-per-page="5"
             :max-pages-shown="5"
             :onClick="handleDetailPageChange"

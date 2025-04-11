@@ -47,10 +47,6 @@ const checkPerson = (personnel) => {
         jobGradeCode: personnel.jobGradeCode,
     }
 
-    getFileImage(personnel.employeeId);
-
-
-
     axios
         .post(`/api/personnel/employeeDetailBody`, param, {
             headers: {
@@ -65,9 +61,12 @@ const checkPerson = (personnel) => {
                 employeeDetail.value.profileFileExt === 'gif' ||
                 employeeDetail.value.profileFileExt === 'png'
             ) {
+                getFileImage(personnel.employeeId);
+                isModalOpen.value = true;
+            } else {
+                isModalOpen.value = true; 
             }
 
-            isModalOpen.value = true;
         })
         .catch(err => {
             console.error('에러 발생:', err);
@@ -76,17 +75,26 @@ const checkPerson = (personnel) => {
 }
 
 const getFileImage = (val) => {
-    const param = new URLSearchParams();
-    param.append('employeeId', val);
-    axios
-        .post('/api/personnel/employeeDownload.do', param, {
-            responseType: 'blob',
-        })
-        .then(res => {
-            const contentType = res.headers['content-type']; // image/jpeg 등
-            const blob = new Blob([res.data], { type: contentType });
-            imgUrl.value = URL.createObjectURL(blob); // 이미지 URL 생성
-        });
+  const param = new URLSearchParams();
+  param.append('employeeId', val);
+
+  axios
+    .post('/api/personnel/employeeDownloadVue.do', param, {
+      responseType: 'blob',
+    })
+    .then(res => {
+      if (res.status === 204 || res.data.size === 0) {
+        imgUrl.value = '/images/default-profile.png'; // 기본 이미지 경로
+        return;
+      }
+
+      const blob = new Blob([res.data], { type: res.headers['content-type'] });
+      imgUrl.value = URL.createObjectURL(blob);
+    })
+    .catch(err => {
+      console.error('이미지 요청 실패:', err);
+      imgUrl.value = '/images/default-profile.png';
+    });
 };
 
 //2. 재직자, 퇴직자의 따른 재 검색 
@@ -185,7 +193,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
         })
         .then(res => {
             valueName.value = res.data;
-            console.log(res.value);
+            console.log(res.data);
         })
         .catch(err => {
             console.error('에러 발생:', err);
@@ -291,7 +299,7 @@ computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
         </tr>
     </table>
     <Pagination
-        :totalItems="personnelSearchList?.employeeCnt"
+        :totalItems="personnelList?.employeeCnt"
         :items-per-page="5"
         :max-pages-shown="5"
         :onClick="personnelSearchList"

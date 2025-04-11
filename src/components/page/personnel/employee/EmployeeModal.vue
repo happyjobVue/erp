@@ -1,11 +1,13 @@
 <script setup>
 import axios from 'axios';
 import { ref, onMounted, watch } from 'vue';
+import { useUserInfo } from '../../../../stores/userInfo';
 
 const address = ref('');
 const addressCode = ref('');
 const emit = defineEmits(['closeModal']);
 const props = defineProps(['modalType', 'UserDetail','employeeDetail','imgUrl']);
+const userInfo = useUserInfo();
 
 //사원 등록 및 파일업로드
 const employeeForm = ref({
@@ -27,7 +29,7 @@ const employeeForm = ref({
 });
 
 const fileData = ref('');
-const imgUrl = ref('');
+const localImgUrl = ref('');
 
 //퇴직이유
 const resignationReason = ref('');
@@ -116,8 +118,8 @@ const handlerFile = e => {
         fileExtension === 'gif' ||
         fileExtension === 'png'
     ) {
-        imgUrl.value = URL.createObjectURL(fileInfo[0]);
-        console.log(imgUrl.value);
+        localImgUrl.value = URL.createObjectURL(fileInfo[0]);
+        console.log(localImgUrl.value);
     }
     fileData.value = fileInfo[0];
     
@@ -132,22 +134,22 @@ const saveEmployee = () => {
     Onsalary(employeeForm.value.regDate);
 
     formData.append('employeeName', employeeForm.value.employeeName);
-    formData.append('registrationNumber ', employeeForm.value.registrationNumber );
-    formData.append('sex ', employeeForm.value.sex );
-    formData.append('birthday ', employeeForm.value.birthday );
-    formData.append('finalEducation   ', employeeForm.value.finalEducation   );
-    formData.append('email  ', employeeForm.value.email  );
-    formData.append('hp ', employeeForm.value.hp );
-    formData.append('address ', address.value );
-    formData.append('addressDetail ', employeeForm.value.addressDetail );
-    formData.append('bank ', employeeForm.value.bank );
-    formData.append('bankAccount ', employeeForm.value.bankAccount );
-    formData.append('departmentDetailName  ', employeeForm.value.departmentDetailName  );
-    formData.append('jobGradeDetailName  ', employeeForm.value.jobGradeDetailName  );
-    formData.append('jobRoleDetailName  ', employeeForm.value.jobRoleDetailName  );
-    formData.append('regDate  ', employeeForm.value.regDate  );
-    formData.append('emplStatus  ', employeeForm.value.emplStatus  );
-    formData.append('salary', 30000000);
+    formData.append('registrationNumber', employeeForm.value.registrationNumber );
+    formData.append('sex', employeeForm.value.sex );
+    formData.append('birthday', employeeForm.value.birthday );
+    formData.append('finalEducation', employeeForm.value.finalEducation   );
+    formData.append('email', employeeForm.value.email  );
+    formData.append('hp', employeeForm.value.hp );
+    formData.append('address', address.value );
+    formData.append('addressDetail', employeeForm.value.addressDetail );
+    formData.append('bank', employeeForm.value.bank );
+    formData.append('bankAccount', employeeForm.value.bankAccount );
+    formData.append('departmentDetailName', employeeForm.value.departmentDetailName  );
+    formData.append('jobGradeDetailName', employeeForm.value.jobGradeDetailName  );
+    formData.append('jobRoleDetailName', employeeForm.value.jobRoleDetailName  );
+    formData.append('regDate', employeeForm.value.regDate  );
+    formData.append('emplStatus', employeeForm.value.emplStatus  );
+    formData.append('salary', salary.value);
 
     axios.post('/api/personnel/employeeSave.do', formData).then(res => {
         if (res.data.result === 'success') {
@@ -165,21 +167,21 @@ const updateEmployee = () => {
     if (fileData.value) formData.append('file', fileData.value);
 
     formData.append('employeeName', employeeForm.value.employeeName);
-    formData.append('registrationNumber ', employeeForm.value.registrationNumber );
-    formData.append('sex ', employeeForm.value.sex );
-    formData.append('birthday ', employeeForm.value.birthday );
-    formData.append('finalEducation   ', employeeForm.value.finalEducation   );
-    formData.append('email  ', employeeForm.value.email  );
-    formData.append('hp ', employeeForm.value.hp );
-    formData.append('address ', address.value );
-    formData.append('addressDetail ', employeeForm.value.addressDetail );
-    formData.append('bank ', employeeForm.value.bank );
-    formData.append('bankAccount ', employeeForm.value.bankAccount );
-    formData.append('departmentDetailName  ', employeeForm.value.departmentDetailName  );
-    formData.append('jobGradeDetailName  ', employeeForm.value.jobGradeDetailName  );
-    formData.append('jobRoleDetailName  ', employeeForm.value.jobRoleDetailName  );
-    formData.append('regDate  ', employeeForm.value.regDate  );
-    formData.append('emplStatus  ', employeeForm.value.emplStatus  );
+    formData.append('registrationNumber', employeeForm.value.registrationNumber );
+    formData.append('sex', employeeForm.value.sex );
+    formData.append('birthday', employeeForm.value.birthday );
+    formData.append('finalEducation', employeeForm.value.finalEducation   );
+    formData.append('email', employeeForm.value.email  );
+    formData.append('hp', employeeForm.value.hp );
+    formData.append('address', address.value );
+    formData.append('addressDetail', employeeForm.value.addressDetail );
+    formData.append('bank', employeeForm.value.bank );
+    formData.append('bankAccount', employeeForm.value.bankAccount );
+    formData.append('departmentDetailName', employeeForm.value.departmentDetailName  );
+    formData.append('jobGradeDetailName', employeeForm.value.jobGradeDetailName  );
+    formData.append('jobRoleDetailName', employeeForm.value.jobRoleDetailName  );
+    formData.append('regDate', employeeForm.value.regDate  );
+    formData.append('emplStatus', employeeForm.value.emplStatus  );
     formData.append('employeeId', employeeForm.value.employeeId);
 
     axios.post('/api/personnel/employeeUpdate.do', formData).then(res => {
@@ -210,6 +212,10 @@ const closeModal = () => {
     emit('closeModal', isModalOpen.value);
 };
 
+const handleImgError = () => {
+  imgUrl.value = '/images/default-profile.png';
+}
+
 //퇴직 값이 들어오면 즉각 적용 
 watch(
     () => props.UserDetail,
@@ -234,7 +240,7 @@ watch(
         addressCode.value = newDetail.addressCode
         employeeForm.value.employeeId = newDetail.employeeId;
         Onsalary(employeeForm.value.regDate);
-        imgUrl.value = props.imgUrl;
+        localImgUrl.value = props.imgUrl;
         
     } 
   },
@@ -250,15 +256,18 @@ watch(
             addressCode.value = '';
             employeeForm.value.employeeId = '';
             salary.value = 0;
-            imgUrl.value = '';
+            localImgUrl.value = '';
             return;
         }
     }
 )
 
-// watch(() => props.imgUrl, (newVal) => {
-//   console.log('imgUrl 변경됨:', newVal);
-// });
+
+watch(() => props.imgUrl, (newVal) => {
+  if (newVal) {
+    localImgUrl.value = newVal || '/images/default-profile.png';
+  }
+});
 
 // 카카오 API 스크립트 로드
 onMounted(() => {
@@ -285,9 +294,9 @@ onMounted(() => {
                             <tr>
                                 <td rowspan="2" colspan="2">
                                     <div id="preview">
-                                        <img :src="imgUrl" 
+                                        <img :src="localImgUrl" 
                                         alt="미리보기 이미지" 
-                                        @error="onImgError"
+                                        @error="handleImgError "
                                         style="max-width: 150px; height: auto; border: 1px solid #ccc;"
                                         />
                                     </div>
@@ -820,7 +829,7 @@ onMounted(() => {
 
 .modal-container {
     background: #fff;
-    width: 700px;
+    width: 800px;
     max-height: 90vh;
     overflow-y: auto;
     border-radius: 10px;
