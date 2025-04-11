@@ -56,7 +56,6 @@ watch(() => route.query, salesPlanReultDefaultList); // route.query 변경 시 s
                     <th scope="col">목표수량</th>
                     <th scope="col">실정수량</th>
                     <th scope="col">달성률</th>
-                    <th scope="col">비고란</th>
                 </tr>
             </thead>
             <tbody>
@@ -74,7 +73,6 @@ watch(() => route.query, salesPlanReultDefaultList); // route.query 변경 시 s
                         <td>
                             {{ (plan.perform_qut / plan.goal_quanti) * 100 }}
                         </td>
-                        <td>{{ plan.plan_memo }}</td>
                     </tr>
                 </template>
                 <template v-else>
