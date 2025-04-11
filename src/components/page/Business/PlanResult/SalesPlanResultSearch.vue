@@ -26,7 +26,6 @@ const searchPlanResult = () => {
     !empId.value || query.push(`empId=${empId.value}`);
 
     const queryString = query.length > 0 ? `?${query.join('&')}` : '';
-    console.log(queryString);
 
     router.push(queryString);
 };
@@ -96,9 +95,8 @@ async function handleManufacturerChange() {
             </select>
             <label for="">날짜 </label>
             <input type="date" v-model="searchDate" />
-            <div class="button-box">
-                <button @click="searchPlanResult">조회</button>
-            </div>
+
+            <button @click="searchPlanResult">조회</button>
         </div>
     </div>
 </template>
