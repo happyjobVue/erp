@@ -1,7 +1,7 @@
 <script setup>
 import axios from 'axios';
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import ClientDetailModal from './ClientDetailModal.vue';
 import ClientRegisterModal from './ClientRegisterModal.vue';
@@ -11,8 +11,8 @@ const cPage = ref(1);
 const clients = ref();
 const clientListCnt = ref();
 const selectedClient = ref();
+const route = useRoute();
 onMounted(() => {
-    console.log('컴포넌트 마운트됨 ');
     clientList();
 });
 
@@ -53,6 +53,25 @@ const clientList = () => {
             clientListCnt.value = res.data.clientListCnt;
         });
 };
+
+// 검색된 견적서 목록 불러오는 함수
+const searchEClientList = () => {
+    console.log('검색 로직 ');
+    const param = {
+        client_name: route.query.client_name,
+        cust_update_date: route.query.cust_update_date,
+        currentPage: cPage.value,
+        pageSize: 5,
+    };
+    axios
+        .post('/api/business/client-list/searchClientListBody.do', param)
+        .then(res => {
+            clients.value = res.data.clientList;
+            clientListCnt.value = res.data.clientListCnt;
+        });
+};
+
+watch(() => route.query, searchEClientList());
 </script>
 
 <template>

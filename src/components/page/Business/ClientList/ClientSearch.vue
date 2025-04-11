@@ -1,12 +1,32 @@
-<script setup></script>
+<script setup>
+import router from '@/router';
+import { onMounted, ref } from 'vue';
+
+const searchClientName = ref('');
+const searchCustUpdateDate = ref('');
+
+const searchClient = () => {
+    router.push({
+        path: 'client-list',
+        query: {
+            searchClientName: searchClientName.value,
+            searchCustUpdateDate: searchCustUpdateDate.value,
+        },
+    });
+};
+
+onMounted(() => {
+    window.location.search && router.replace(window.location.pathname);
+});
+</script>
 
 <template>
     <div>
         <label>업체명</label>
-        <input type="text" />
+        <input type="text" v-model="searchClientName" />
         <label>날짜</label>
-        <input type="date" />
-        <button>조회</button>
+        <input type="date" v-model="searchCustUpdateDate" />
+        <button @click="searchClient()">조회</button>
     </div>
 </template>
 <style lang="scss" scoped>
