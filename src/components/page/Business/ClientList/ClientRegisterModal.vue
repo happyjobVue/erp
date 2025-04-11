@@ -356,7 +356,7 @@ button:active {
     text-align: center;
     justify-content: space-between;
     margin-top: 20px;
-    width: 300px;
+    width: 200px;
 }
 
 .button-box button {
