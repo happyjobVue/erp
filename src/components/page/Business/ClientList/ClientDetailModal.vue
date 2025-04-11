@@ -1,7 +1,11 @@
 <script setup>
 import { defineProps, onMounted, onUnmounted, ref } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
+import axios from 'axios';
 const modalState = useModalStore();
+const postcode = ref('');
+const roadAddress = ref('');
+const isScriptLoaded = ref(false); // 스크립트 로딩 상태를 추적하는 변수
 const emit = defineEmits(['modalClose', 'postSuccess']);
 const props = defineProps({
     client: {
@@ -9,6 +13,57 @@ const props = defineProps({
         required: true,
     },
 });
+
+// 다음 우편번호 스크립트 로드
+const loadDaumPostcodeScript = () => {
+    const script = document.createElement('script');
+    script.src =
+        '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+    script.onload = () => {
+        isScriptLoaded.value = true; // 스크립트가 로드되면 isScriptLoaded를 true로 설정
+    };
+    document.head.appendChild(script);
+};
+
+onMounted(() => {
+    loadDaumPostcodeScript();
+});
+
+const execDaumPostcode = () => {
+    if (isScriptLoaded.value && window.daum && window.daum.Postcode) {
+        new daum.Postcode({
+            oncomplete: data => {
+                props.client.zip = data.zonecode;
+                props.client.addr = data.address;
+            },
+        }).open();
+    } else {
+        console.error('Daum Postcode 스크립트가 로드되지 않았습니다.');
+    }
+};
+
+const editClient = () => {
+    const param = {
+        ISBN: '', // ISBN이 비어있는 경우
+        addr: props.client.addr, // 주소
+        bank: props.client.bank, // 은행
+        bank_account: props.client.bank_account, // 계좌번호
+        biz_num: props.client.biz_num, // 사업자 번호
+        client_name: props.client.client_name, // 거래처 이름
+        detail_addr: props.client.detail_addr, // 상세 주소
+        email: props.client.email, // 이메일
+        memo: props.client.memo, // 메모
+        person: props.client.person, // 담당자
+        person_ph: props.client.person_ph, // 담당자 연락처
+        ph: props.client.ph, // 회사 연락처
+        zip: props.client.zip, // 우편번호
+        id: props.client.id,
+    };
+
+    axios
+        .post(`/api/business/client-list/updateClientListBody.do`, param)
+        .then('수정 되었습니다.');
+};
 
 onMounted(() => {
     console.log('디테일 컴포넌트 마운트 됨 ');
@@ -70,6 +125,12 @@ onMounted(() => {
                                         type="text"
                                         v-model="props.client.zip"
                                     />
+                                    <button
+                                        @click="execDaumPostcode"
+                                        :disabled="!isScriptLoaded"
+                                    >
+                                        우편번호
+                                    </button>
                                 </td>
                                 <th class="table-header">주소</th>
                                 <td>
@@ -100,10 +161,25 @@ onMounted(() => {
                             <tr>
                                 <th class="table-header">은행</th>
                                 <td>
-                                    <input
+                                    <!-- <input
                                         type="text"
                                         v-model="props.client.bank"
-                                    />
+                                    /> -->
+                                    <select v-model="props.client.bank">
+                                        <option value="" disabled>전체</option>
+                                        <option value="신한은행">
+                                            신한은행
+                                        </option>
+                                        <option value="하나은행">
+                                            하나은행
+                                        </option>
+                                        <option value="우리은행">
+                                            우리은행
+                                        </option>
+                                        <option value="기타은행">
+                                            기타은행
+                                        </option>
+                                    </select>
                                 </td>
                                 <th class="table-header">메모</th>
                                 <td>
@@ -117,7 +193,7 @@ onMounted(() => {
                     </table>
 
                     <div class="button-box">
-                        <button>수정</button>
+                        <button @click="editClient()">수정</button>
                         <button
                             type="button"
                             @click="modalState.setModalState()"

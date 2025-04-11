@@ -1,12 +1,27 @@
 <script setup>
 import axios from 'axios';
 import { ref, onMounted } from 'vue';
-//우편번호
+import { useModalStore } from '../../../../stores/modalState';
+
+// 우편번호
 const postcode = ref('');
+const modalState = useModalStore();
 const roadAddress = ref('');
 const isScriptLoaded = ref(false); // 스크립트 로딩 상태를 추적하는 변수
-const saveData = ref({});
+const saveData = ref({
+    bank: '',
+    bank_account: '',
+    biz_num: '',
+    client_name: '',
+    detail_addr: '',
+    email: '',
+    memo: '',
+    person: '',
+    person_ph: '',
+    ph: '',
+});
 
+// 다음 우편번호 스크립트 로드
 const loadDaumPostcodeScript = () => {
     const script = document.createElement('script');
     script.src =
@@ -34,8 +49,22 @@ const execDaumPostcode = () => {
     }
 };
 
-//위의 코드는 다음 post 관련 코드
-// 저장
+// 전화번호 포맷팅 함수
+function formatPhoneNumber(phone) {
+    return phone.replace(/^(\d{2})(\d{3})(\d{4})$/, '$1-$2-$3');
+}
+
+// 사업자 번호 포맷팅 함수
+function formatBizNumber(bizNum) {
+    return bizNum.replace(/^(\d{3})(\d{4})(\d{4})$/, '$1-$2-$3');
+}
+
+// 계좌번호 포맷팅 함수
+function formatBankAccount(account) {
+    return account.replace(/^(\d{3})(\d{3})(\d{6})$/, '$1-$2-$3');
+}
+
+// 저장 함수
 const saveClient = () => {
     const param = {
         ISBN: '',
@@ -76,7 +105,15 @@ const saveClient = () => {
                                 </td>
                                 <th class="table-header">회사 연락처</th>
                                 <td>
-                                    <input type="text" v-model="saveData.ph" />
+                                    <input
+                                        type="text"
+                                        v-model="saveData.ph"
+                                        @input="
+                                            saveData.ph = formatPhoneNumber(
+                                                saveData.ph
+                                            )
+                                        "
+                                    />
                                 </td>
                             </tr>
 
@@ -94,6 +131,12 @@ const saveClient = () => {
                                     <input
                                         type="text"
                                         v-model="saveData.person_ph"
+                                        @input="
+                                            saveData.person_ph =
+                                                formatPhoneNumber(
+                                                    saveData.person_ph
+                                                )
+                                        "
                                     />
                                 </td>
                             </tr>
@@ -130,22 +173,44 @@ const saveClient = () => {
                                     <input
                                         type="text"
                                         v-model="saveData.biz_num"
+                                        @input="
+                                            saveData.biz_num = formatBizNumber(
+                                                saveData.biz_num
+                                            )
+                                        "
                                     />
                                 </td>
                             </tr>
                             <tr>
                                 <th class="table-header">은행</th>
                                 <td>
-                                    <input
-                                        type="text"
-                                        v-model="saveData.bank"
-                                    />
+                                    <select v-model="saveData.bank">
+                                        <option value="" disabled>전체</option>
+                                        <option value="신한은행">
+                                            신한은행
+                                        </option>
+                                        <option value="하나은행">
+                                            하나은행
+                                        </option>
+                                        <option value="우리은행">
+                                            우리은행
+                                        </option>
+                                        <option value="기타은행">
+                                            기타은행
+                                        </option>
+                                    </select>
                                 </td>
                                 <th class="table-header">계좌번호</th>
                                 <td>
                                     <input
                                         type="text"
                                         v-model="saveData.bank_account"
+                                        @input="
+                                            saveData.bank_account =
+                                                formatBankAccount(
+                                                    saveData.bank_account
+                                                )
+                                        "
                                     />
                                 </td>
                             </tr>
@@ -182,6 +247,7 @@ const saveClient = () => {
         </teleport>
     </div>
 </template>
+
 <style lang="scss" scoped>
 .backdrop {
     top: 0%;
