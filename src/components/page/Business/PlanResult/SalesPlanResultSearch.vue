@@ -54,9 +54,7 @@ async function handleManufacturerChange() {
     <!-- 사번,조회날짜,제품이름,제조사,거래처처 -->
     <div>
         <div class="search-box">
-            <label for="">사번: </label>
-            <input type="text" v-model="empId" />
-            <label for="">제조사:</label>
+            <label for="">제조사 </label>
             <select
                 v-model="selectedManufacturer"
                 @change="handleManufacturerChange"
@@ -70,7 +68,7 @@ async function handleManufacturerChange() {
                     {{ manufacturer.industryName }}
                 </option>
             </select>
-            <label for="">제품 이름</label>
+            <label for="">제품 이름 </label>
             <!-- 제품 목록 -->
             <select v-model="selectedProduct">
                 <option value="" disabled>제품</option>
@@ -93,6 +91,8 @@ async function handleManufacturerChange() {
                     {{ client.client_name }}
                 </option>
             </select>
+            <label for="">사번 </label>
+            <input type="text" v-model="empId" />
             <label for="">날짜 </label>
             <input type="date" v-model="searchDate" />
 
@@ -102,7 +102,8 @@ async function handleManufacturerChange() {
 </template>
 <style lang="scss" scoped>
 .search-box {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    margin-top: 15px;
     display: block;
 }
 
@@ -118,6 +119,8 @@ input {
 select {
     width: 15%;
     padding: 8px;
+    margin-right: 10px;
+    margin-left: 10px;
     margin-top: 5px;
     margin-bottom: 10px;
     border-radius: 4px;
@@ -125,6 +128,7 @@ select {
 }
 
 button {
+    margin-left: 20px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
