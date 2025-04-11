@@ -22,19 +22,19 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">사용일자</td>
-                        <td>
-                            <input
-                                type="date"
-                                v-model="expenseDetail.use_date"
-                                readonly
-                            />
-                        </td>
                         <td class="label">사번</td>
                         <td>
                             <input
                                 type="text"
                                 v-model="expenseDetail.emp_no"
+                                readonly
+                            />
+                        </td>
+                        <td class="label">사용일자</td>
+                        <td>
+                            <input
+                                type="date"
+                                v-model="expenseDetail.use_date"
                                 readonly
                             />
                         </td>
@@ -60,53 +60,50 @@
                     <tr>
                         <td class="label">계정대분류명</td>
                         <td>
-                            <select v-model="expenseDetail.group_name" disabled>
-                                <option value="온라인매출">온라인매출</option>
-                                <option value="영업매출">영업매출</option>
-                                <option value="온라인지출">온라인지출</option>
-                                <option value="영업지출">영업지출</option>
-                                <option value="유동자산">유동자산</option>
-                            </select>
+                            <input
+                                type="text"
+                                v-model="expenseDetail.group_name"
+                                readonly
+                            />
                         </td>
-                        <td class="label">계정과목</td>
-                        <td>
-                            <select
-                                v-model="expenseDetail.detail_name"
-                                disabled
-                            >
-                                <option
-                                    v-for="item in expenseDetailName"
-                                    :key="item.detail_name"
-                                    :value="item.detail_name"
-                                >
-                                    {{ item.detail_name }}
-                                </option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
                         <td class="label">거래처명</td>
-                        <td>
-                            <select
-                                v-model="expenseDetail.client_name"
-                                disabled
-                            >
-                                <option
-                                    v-for="client in clientList"
-                                    :key="client.id"
-                                    :value="client.clientName"
-                                >
-                                    {{ client.clientName }}
-                                </option>
-                            </select>
-                        </td>
-                        <td class="label">결의금액</td>
                         <td>
                             <input
                                 type="text"
-                                v-model="expenseDetail.expense_payment"
+                                v-model="expenseDetail.client_name"
                                 readonly
                             />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">차변계정과목</td>
+                        <td>
+                            <input
+                                type="text"
+                                v-model="expenseDetail.detail_name"
+                                readonly
+                            />
+                        </td>
+                        <td class="label">대변계정과목</td>
+                        <td>
+                            <template v-if="!showRadio">
+                                <input
+                                    type="text"
+                                    v-model="expenseDetail.credit_name"
+                                    readonly
+                                />
+                            </template>
+                            <template v-else>
+                                <select v-model="expenseDetail.crebit_code">
+                                    <option
+                                        v-for="item in crebitList"
+                                        :key="item.detail_code"
+                                        :value="item.detail_code"
+                                    >
+                                        {{ item.detail_name }}
+                                    </option>
+                                </select>
+                            </template>
                         </td>
                     </tr>
                     <tr>
@@ -131,7 +128,13 @@
                                 </label>
                             </div>
                             <div v-else>
-                                {{ approvalMap[expenseDetail.is_approval] }}
+                                <input
+                                    type="text"
+                                    :value="
+                                        approvalMap[expenseDetail.is_approval]
+                                    "
+                                    readonly
+                                />
                             </div>
                         </td>
                         <td class="label">승인일자</td>
@@ -147,20 +150,15 @@
                         <td class="label">첨부파일</td>
 
                         <button @click="downloadFileImage" class="button-box">
-                            <img v-if="imgUrl" :src="imgUrl" />다운로드
+                            다운로드
                         </button>
-
-                        <td class="label">대변계정과목</td>
+                        <td class="label">결의금액</td>
                         <td>
-                            <select v-model="expenseDetail.crebit_code">
-                                <option
-                                    v-for="item in expenseDetailName"
-                                    :key="item.detail_code"
-                                    :value="item.detail_code"
-                                >
-                                    {{ item.detail_name }}
-                                </option>
-                            </select>
+                            <input
+                                type="text"
+                                v-model="expenseDetail.expense_payment"
+                                readonly
+                            />
                         </td>
                     </tr>
                     <tr>
@@ -201,7 +199,7 @@ const emit = defineEmits(['modalClose', 'postSuccess']);
 const { setModalState } = useModalStore();
 const expenseDetail = ref({});
 const clientList = ref([]);
-const expenseDetailName = ref([]);
+const crebitList = ref({});
 const { id } = defineProps(['id']);
 const showRadio = ref(false);
 const showSubmitButton = ref(false);
@@ -216,12 +214,15 @@ const approvalMap = computed(() => ({
 
 const searchDetail = async () => {
     try {
-        const response = await axios.post('/api/account/expenseDetail.do', {
-            id,
-        });
+        const response = await axios.post(
+            '/api/account/expense-reviewBody.do',
+            {
+                id,
+            }
+        );
         expenseDetail.value = response.data.expenseDetail;
         clientList.value = response.data.clientList;
-        expenseDetailName.value = response.data.expenseDetailName;
+        crebitList.value = response.data.crebitList;
     } catch (e) {
         console.error(e);
     }
@@ -264,7 +265,9 @@ const expenseReviewUpdate = async () => {
     const param = new URLSearchParams();
     param.append('checkApproval', expenseDetail.value.is_approval);
     param.append('detail_code', expenseDetail.value.crebit_code);
+    param.append('detail_name', expenseDetail.value.detail_name);
     param.append('exp_id', expenseDetail.value.id);
+    param.append('credit_name', expenseDetail.value.credit_name);
 
     try {
         const res = await axios.post('/api/account/expenseUpdate.do', param);
@@ -304,6 +307,18 @@ onMounted(() => {
 onUnmounted(() => {
     emit('modalClose', 0);
 });
+
+watch(
+    () => expenseDetail.value.crebit_code,
+    newCode => {
+        const selected = crebitList.value.find(
+            item => item.detail_code === newCode
+        );
+        if (selected) {
+            expenseDetail.value.credit_name = selected.detail_name;
+        }
+    }
+);
 </script>
 
 <style scoped>
@@ -333,6 +348,9 @@ onUnmounted(() => {
     border: 1px solid #ccc;
     padding: 10px;
 }
+.modal-table td.button-box {
+    border: none;
+}
 .radio-group {
     display: flex;
     gap: 20px;
@@ -352,7 +370,6 @@ onUnmounted(() => {
 }
 input:not([type='radio']),
 select,
-span,
 textarea {
     display: block;
     width: 100%;
@@ -375,6 +392,7 @@ textarea {
     justify-content: space-between;
     margin-top: 10px;
 }
+
 button {
     flex: 1;
     background-color: #3bb2ea;

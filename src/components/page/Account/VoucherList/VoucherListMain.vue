@@ -1,35 +1,42 @@
 <template>
-    <div class="divManage">
-        <ManageModal
-            v-if="modal.modalState"
-            :id="detail_code"
-            @modalClose="detail_code = $event"
+    <div class="divExpenseReviewList">
+        <VoucherListModal
+            v-if="
+                modal.modalState &&
+                selectedVoucher !== undefined &&
+                selectedVoucher !== null
+            "
+            :voucherDetail="selectedVoucher"
+            :id="voucherNo"
+            @modalClose="voucherNo = $event"
             @postSuccess="onPostSuccess"
         />
         <table>
             <thead>
                 <tr>
-                    <th>계정대분류코드</th>
-                    <th>계정대분류명</th>
-                    <th>계정세부코드</th>
-                    <th>계정세부명</th>
+                    <th>전표번호</th>
+                    <th>일자</th>
                     <th>구분</th>
-                    <th>상세내용</th>
+                    <th>거래처</th>
+                    <th>차변계정과목</th>
+                    <th>대변계정과목</th>
+                    <th>장부금액</th>
                 </tr>
             </thead>
             <tbody>
-                <template v-if="accountList">
+                <template v-if="voucherList">
                     <tr
-                        v-for="account in accountList.account"
-                        :key="account.detail_code"
-                        @click="handlerModal(account.detail_code)"
+                        v-for="voucher in voucherList.voucher"
+                        :key="voucher.voucher_no"
+                        @click="handlerModal(voucher.voucher_no)"
                     >
-                        <td>{{ account.group_code }}</td>
-                        <td>{{ account.group_name }}</td>
-                        <td>{{ account.detail_code }}</td>
-                        <td>{{ account.detail_name }}</td>
-                        <td>{{ account.code_type }}</td>
-                        <td>{{ account.content }}</td>
+                        <td>{{ voucher.voucher_no }}</td>
+                        <td>{{ voucher.voucher_date }}</td>
+                        <td>{{ voucher.exp_id ? '비용' : '매출' }}</td>
+                        <td>{{ voucher.client_name }}</td>
+                        <td>{{ voucher.debit_name }}</td>
+                        <td>{{ voucher.crebit_name }}</td>
+                        <td>{{ voucher.voucher_amount }}</td>
                     </tr>
                 </template>
                 <template v-else>
@@ -40,7 +47,7 @@
             </tbody>
         </table>
         <Pagination
-            :totalItems="accountList?.accountCnt"
+            :totalItems="voucherList?.voucherCnt"
             :items-per-page="5"
             :max-pages-shown="10"
             :onClick="searchList"
@@ -53,11 +60,11 @@
 import axios from 'axios';
 import { watch } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
-const route = useRoute();
-const accountList = ref();
 const modal = useModalStore();
 const cPage = ref(1);
-const detail_code = ref(0);
+const route = useRoute();
+const voucherList = ref();
+const voucherNo = ref(0);
 
 const searchList = async () => {
     const param = new URLSearchParams({
@@ -67,15 +74,15 @@ const searchList = async () => {
     });
 
     try {
-        const response = await axios.post('/api/account/accountList.do', param);
-        accountList.value = response.data;
+        const response = await axios.post('/api/account/voucherList.do', param);
+        voucherList.value = response.data;
     } catch (e) {
         console.error('Axios Error:', e);
     }
 };
 
 const handlerModal = id => {
-    detail_code.value = id;
+    voucherNo.value = id;
     modal.setModalState();
 };
 
@@ -83,6 +90,10 @@ const onPostSuccess = () => {
     modal.setModalState();
     searchList();
 };
+
+const selectedVoucher = computed(() =>
+    voucherList.value?.voucher.find(v => v.voucher_no === voucherNo.value)
+);
 
 onMounted(() => {
     searchList();
@@ -100,8 +111,8 @@ table {
 
     th,
     td {
+        padding: 8px;
         border: 1px solid #ddd;
-        padding: 10px;
         text-align: center;
     }
 

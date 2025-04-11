@@ -14,6 +14,10 @@ declare module 'vue' {
     AttendanceCompanionModal: typeof import('./src/components/page/personnel/Attendance/AttendanceCompanionModal.vue')['default']
     AttendanceModal: typeof import('./src/components/page/personnel/Attendance/AttendanceModal.vue')['default']
     AttendanceRequestModal: typeof import('./src/components/page/personnel/Attendance/AttendanceRequestModal.vue')['default']
+    ClientDetailModal: typeof import('./src/components/page/Business/ClientList/ClientDetailModal.vue')['default']
+    ClientMain: typeof import('./src/components/page/Business/ClientList/ClientMain.vue')['default']
+    ClientRegisterModal: typeof import('./src/components/page/Business/ClientList/ClientRegisterModal.vue')['default']
+    ClientSearch: typeof import('./src/components/page/Business/ClientList/ClientSearch.vue')['default']
     CodeMain: typeof import('./src/components/page/System/Code/CodeMain.vue')['default']
     CodeModal: typeof import('./src/components/page/System/Code/CodeModal.vue')['default']
     CodeSearch: typeof import('./src/components/page/System/Code/CodeSearch.vue')['default']
@@ -73,5 +77,8 @@ declare module 'vue' {
     SalesPlanResultSearch: typeof import('./src/components/page/Business/PlanResult/SalesPlanResultSearch.vue')['default']
     SalesPlanSearch: typeof import('./src/components/page/Business/Plan/SalesPlanSearch.vue')['default']
     SalesRegisterModal: typeof import('./src/components/page/Business/Plan/SalesRegisterModal.vue')['default']
+    VoucherListMain: typeof import('./src/components/page/Account/VoucherList/VoucherListMain.vue')['default']
+    VoucherListModal: typeof import('./src/components/page/Account/VoucherList/VoucherListModal.vue')['default']
+    VoucherListSearch: typeof import('./src/components/page/Account/VoucherList/VoucherListSearch.vue')['default']
   }
 }

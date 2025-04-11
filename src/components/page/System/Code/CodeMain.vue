@@ -5,13 +5,14 @@
             :id="groupCode"
             @modalClose="groupCode = $event"
             @postSuccess="onPostSuccess"
+            @searchGroupCode="handleSearchGroupCode"
         />
         <table>
             <thead>
                 <tr>
-                    <th scope="col">공통코드</th>
-                    <th scope="col">공통코드명</th>
-                    <th scope="col">비고</th>
+                    <th>공통코드</th>
+                    <th>공통코드명</th>
+                    <th>비고</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,6 +50,8 @@
 import axios from 'axios';
 import { watch } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
+import { useRouter, useRoute } from 'vue-router';
+const router = useRouter();
 const route = useRoute();
 const modal = useModalStore();
 const groupCodeList = ref();
@@ -56,7 +59,6 @@ const groupCode = ref(0);
 const cPage = ref(1);
 
 const searchList = async () => {
-    console.log('route.query:', route.query);
     const param = new URLSearchParams({
         ...route.query,
         pageSize: 5,
@@ -74,6 +76,15 @@ const searchList = async () => {
     }
 };
 
+const handleSearchGroupCode = groupCode => {
+    const query = {
+        searchGroupName: groupCode,
+        showInactive: 'true',
+    };
+
+    router.replace({ path: route.path, query }).then(() => {});
+};
+
 const handlerModal = id => {
     groupCode.value = id;
     modal.setModalState();
@@ -88,7 +99,13 @@ onMounted(() => {
     searchList();
 });
 
-watch(() => route.query, searchList);
+watch(
+    () => route.query,
+    () => {
+        searchList();
+    },
+    { deep: true, immediate: true }
+);
 watch(cPage, searchList);
 </script>
 
@@ -101,14 +118,14 @@ table {
 
     th,
     td {
-        padding: 8px;
         border: 1px solid #ddd;
+        padding: 10px;
         text-align: center;
     }
 
     th {
-        background-color: #2676bf;
-        color: #ddd;
+        background: #f4f4f4;
+        font-weight: bold;
     }
 
     /* 테이블 올렸을 때 */

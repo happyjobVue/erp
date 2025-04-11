@@ -77,7 +77,6 @@ const approvalMap = computed(() => ({
 }));
 
 const searchList = async () => {
-    console.log('onMounted');
     const param = new URLSearchParams({
         ...route.query,
         pageSize: 5,
@@ -103,7 +102,6 @@ const onPostSuccess = () => {
 };
 
 onMounted(() => {
-    console.log('onMounted');
     searchList();
 });
 
@@ -119,14 +117,14 @@ table {
 
     th,
     td {
-        padding: 8px;
         border: 1px solid #ddd;
+        padding: 10px;
         text-align: center;
     }
 
     th {
-        background-color: #2676bf;
-        color: #ddd;
+        background: #f4f4f4;
+        font-weight: bold;
     }
 
     /* 테이블 올렸을 때 */

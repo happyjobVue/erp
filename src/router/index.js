@@ -23,7 +23,12 @@ import AttendanceList from '../views/Personnel/Attendance/Attendance-list.vue';
 import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
 import AttendanceRequest from '../views/Personnel/Attendance/Attendance-request.vue';
 import Order from '../views/Business/Order/Order.vue';
+<<<<<<< HEAD
 import AttendanceApproval from '../views/Personnel/Attendance/Attendance-approval.vue';
+=======
+import ClientList from '../views/Business/ClientList/ClientList.vue';
+import VocherList from '../views/Account/VoucherList.vue';
+>>>>>>> c7b939c0c2a722b5e8cc2ce62d046995d51c30eb
 
 const routes = [
     {
@@ -162,6 +167,11 @@ const routes = [
                         name: 'expense-approval',
                         component: ExpenseApproval,
                     },
+                    {
+                        path: 'voucher-list',
+                        name: 'voucher-list',
+                        component: VocherList,
+                    },
                 ],
             },
             {
@@ -187,6 +197,11 @@ const routes = [
                         path: 'order-information-list',
                         name: 'order-information-list',
                         component: Order,
+                    },
+                    {
+                        path: 'client-list',
+                        name: 'client-list',
+                        component: ClientList,
                     },
                 ],
             },
