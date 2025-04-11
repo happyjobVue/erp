@@ -76,7 +76,8 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .search-box {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    margin-top: 15px;
     display: block;
 }
 
@@ -92,6 +93,8 @@ input {
 select {
     width: 15%;
     padding: 8px;
+    margin-right: 10px;
+    margin-left: 10px;
     margin-top: 5px;
     margin-bottom: 10px;
     border-radius: 4px;
@@ -99,6 +102,7 @@ select {
 }
 
 button {
+    margin-left: 20px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
