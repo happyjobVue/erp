@@ -98,26 +98,39 @@ const calculateSupplyPrice = () => {
         <div class="backdrop">
             <div class="container">
                 <h2>견적서 작성</h2>
-                <div class="search-box">
-                    <label for="">거래처 </label>
-                    <select v-model="selectedClient">
-                        <option value="" disabled>전체</option>
-                        <option
-                            v-for="client in clients"
-                            :key="client.id"
-                            :value="client.id"
-                        >
-                            {{ client.client_name }}
-                        </option>
-                    </select>
-                    <label for="">납기일 </label>
-                    <input type="date" v-model="estimateDeliveryDate" />
-                    <label for="">영역구분 </label>
-                    <select v-model="estimateSalesArea">
-                        <option value="" disabled>전체</option>
-                        <option value="SCM">SCM</option>
-                        <option value="영업">영업</option>
-                    </select>
+
+                <table>
+                    <tr>
+                        <th>거래처</th>
+                        <td>
+                            <select v-model="selectedClient">
+                                <option value="" disabled>전체</option>
+                                <option
+                                    v-for="client in clients"
+                                    :key="client.id"
+                                    :value="client.id"
+                                >
+                                    {{ client.client_name }}
+                                </option>
+                            </select>
+                        </td>
+                        <th>납기일</th>
+                        <td>
+                            <input type="date" v-model="estimateDeliveryDate" />
+                        </td>
+                        <th>영역구분</th>
+                        <td>
+                            <select v-model="estimateSalesArea">
+                                <option value="" disabled>전체</option>
+                                <option value="SCM">SCM</option>
+                                <option value="영업">영업</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <hr />
+                <div class="button-box">
+                    <button @click="addEstimateItem">추가</button>
                 </div>
                 <table>
                     <tr>
@@ -175,7 +188,7 @@ const calculateSupplyPrice = () => {
                         <td></td>
                     </tr>
                 </table>
-                <button @click="addEstimateItem">추가</button>
+
                 <table>
                     <tbody>
                         <input type="text" hidden />
@@ -205,7 +218,7 @@ const calculateSupplyPrice = () => {
 
                 <div class="button-box">
                     <button @click="saveEstimate()">등록</button>
-                    <button>전체 삭제</button>
+
                     <button type="button" @click="closeModal()">취소</button>
                 </div>
             </div>
@@ -215,16 +228,10 @@ const calculateSupplyPrice = () => {
 <style lang="scss" scoped>
 .search-box {
     margin-bottom: 10px;
-    display: block;
-}
-
-.search-select {
-    width: 90%;
-    padding: 8px;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+    display: flex;
+    text-align: center;
+    width: 700px;
+    height: 50px;
 }
 
 .backdrop {
@@ -311,7 +318,7 @@ button:active {
     text-align: center;
     justify-content: space-between;
     margin-top: 20px;
-    width: 300px;
+    width: 200px;
 }
 
 .button-box button {
@@ -340,5 +347,24 @@ input {
     margin-right: 5px;
     border-radius: 4px;
     border: 1px solid #ccc;
+}
+
+.button-box {
+    display: flex;
+    text-align: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    width: 300px;
+}
+
+.button-box button {
+    width: 48%;
+}
+
+input[type='text']:focus,
+input[type='date']:focus,
+select:focus {
+    border-color: #3bb2ea;
+    outline: none;
 }
 </style>
