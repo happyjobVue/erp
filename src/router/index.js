@@ -23,6 +23,7 @@ import AttendanceList from '../views/Personnel/Attendance/Attendance-list.vue';
 import ExpenseApproval from '../views/Account/ExpenseApproval.vue';
 import AttendanceRequest from '../views/Personnel/Attendance/Attendance-request.vue';
 import Order from '../views/Business/Order/Order.vue';
+import ClientList from '../views/Business/ClientList/ClientList.vue';
 import VocherList from '../views/Account/VoucherList.vue';
 
 const routes = [
@@ -188,6 +189,11 @@ const routes = [
                         path: 'order-information-list',
                         name: 'order-information-list',
                         component: Order,
+                    },
+                    {
+                        path: 'client-list',
+                        name: 'client-list',
+                        component: ClientList,
                     },
                 ],
             },

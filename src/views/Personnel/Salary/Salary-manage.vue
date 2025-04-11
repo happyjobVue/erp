@@ -223,7 +223,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
                 <td>{{ List.totalSalary }}</td>
                 <td>{{ List.serverancePay }}</td>
                 <td>
-                    <button :disabled="List.paymentStatus === 1" @click="() => PaymentStatusUpdate(List.baseSalary, List.salaryId)">
+                    <button :disabled="List.paymentStatus === 1" @click.stop="() => PaymentStatusUpdate(List.baseSalary, List.salaryId)">
                         지급
                     </button>
                 </td>

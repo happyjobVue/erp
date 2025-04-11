@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue';
 import axios from 'axios';
 import AttendanceRequestModal from '../../../components/page/personnel/Attendance/AttendanceRequestModal.vue';
 import { useUserInfo } from '../../../stores/userInfo';
+import AttendanceCompanionModal from '../../../components/page/personnel/Attendance/AttendanceCompanionModal.vue';
 
 const searchStDate = ref('');
 const searchEdDate = ref('');
@@ -10,21 +11,41 @@ const searchReqType = ref('');
 const searchReqStatus = ref('');
 
 const attendanceList = ref([]);
+
+//총연차, 남은 연차 등등  담을 변수 
 const summary = ref({});
+
+//등록 모달창용 v-if 변수 
 const visible = ref(false);
 
+//반려 모달창용 v-if 변수 
+const companionVisible = ref(false);
+const AttIdInfo = ref('');
+
+//유저 정보 
 const userInfo = useUserInfo();
+
+const cPage = ref(1);
 
 //리스트 데이터 불러오기 
 const search = () => {
+
+    //검색 값이 존재하면 cPage 1로 초기화 
+    if(searchStDate.value != '' || searchEdDate.value != '' ||
+       searchReqType.value != '' || searchReqStatus.value != '' 
+    ){
+      cPage.value = 1;
+    }  
+  
     const form = new URLSearchParams();
+
     form.append('searchStDate', searchStDate.value);
     form.append('searchEdDate', searchEdDate.value);
     form.append('searchReqType', searchReqType.value);
     form.append('searchReqStatus', searchReqStatus.value);
 
     form.append('pageSize', 5);
-    form.append('currentPage', 1);
+    form.append('currentPage', cPage.value);
 
     axios
         .post(`/api/personnel/attendanceList.do`, form)
@@ -51,6 +72,7 @@ const anualLeave = () => {
         .then(res => {
             console.log(res.data);
             summary.value = res.data.attendanceCnt[0];
+            console.log(summary.value.id);
         })
         .catch(err => {
             console.error('에러 발생:', err);
@@ -60,9 +82,28 @@ const anualLeave = () => {
 
 //등록 창 변수값 하위에서 다시 받기 
 //안하면 modal에서 창당하기하면 위에서 visible 값이 안바뀜 
+//등록창 v-if 변수 
 const visibleval = (val) => {
     visible.value = false;
 } 
+
+//등록이 완료되었을때 창 없애는 역할 
+const reLoadCloseModal = (val) => {
+    visible.value = false;
+
+    search();
+    anualLeave();
+
+}
+
+const CompanionReason = (attid) => {
+  AttIdInfo.value = attid;
+  companionVisible.value = true;
+}
+
+const close = () => {
+  companionVisible.value = false;
+}
 
 
 const openModal = () => {
@@ -126,9 +167,20 @@ onMounted(() => {
         </div>
 
         <!-- 등록 모달 -->
-        <AttendanceRequestModal v-if="visible" 
+        <AttendanceRequestModal v-if="visible && summary.leftAttCnt !== undefined"
             @visibleval="visibleval"
+            @reLoadCloseModal="reLoadCloseModal"
+            :summary="summary"
         /> 
+
+
+        <!-- 반려 모달 -->
+
+        <AttendanceCompanionModal v-if="companionVisible"
+        :companionVisible="companionVisible"
+        :AttIdInfo="AttIdInfo"
+        @close="close"
+        />
   
           <!-- 연차 요약 -->
           <div class="summary-box">
@@ -178,19 +230,32 @@ onMounted(() => {
                 <td>{{ item.reqEd }}</td>
                 <td>{{ item.appType }}</td>
                 <td>{{ item.reqStatus }}</td>
-                <td v-if="item.rejectReason">
-                    <button>반려사유</button>
+                <td v-if="item.reqStatus === '반려'" style="width: 100px;">
+                    <button @click="() =>CompanionReason(item.id)">반려사유</button>
                 </td>
-                <td v-else>
+                <td v-else style="width: 100px;">
                     -
                 </td>
               </tr>
             </tbody>
           </table>
+
+                <!-- 페이징 영역 -->
+      <div class="paging_area">
+        <Pagination
+            :totalItems="attendanceList?.attendanceCnt"
+            :items-per-page="5"
+            :max-pages-shown="5"
+            :onClick="search"
+            v-model="cPage"
+         />
+      </div>
   
         </div>
       </div>
     </div>
+
+
   </template>
   
   <style scoped>
@@ -300,9 +365,33 @@ onMounted(() => {
   content: '🔄';
     }
 
-    .att-table tbody tr:hover {
-  background-color: #f0f8ff; /* 연한 파란 배경 */
-  cursor: pointer; /* 마우스 커서 바꾸기 */
-    }   
+
+  /* 테이블 전체 스타일 */
+table {
+    width: 1240px;
+    border-collapse: collapse;
+    margin: 0 auto;
+    margin-top: 15px;
+    border: 2px solid #ccc; /* 테두리 추가 */
+}
+
+/* 테이블 헤더 스타일 */
+th {
+    background: #e9ecef;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid #ccc;
+    padding: 12px;
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+}
+
+/* 테이블 셀 스타일 */
+td {
+    border: 2px solid #ddd;
+    padding: 12px;
+    text-align: center;
+    white-space: nowrap;
+}
+ 
   </style>
   
