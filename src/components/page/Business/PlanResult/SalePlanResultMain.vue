@@ -8,7 +8,6 @@ const salesPlanResultListCnt = ref();
 const route = useRoute();
 // 판매 계획 목록을 불러오는 함수
 const salesPlanReultDefaultList = () => {
-    console.log('영업 실적');
     const param = {
         empId: route.query.empId || '', // route.query에서 empId 값 가져오기
         clientId: route.query.clientId || '', // route.query에서 clientId 값 가져오기
@@ -24,16 +23,6 @@ const salesPlanReultDefaultList = () => {
             salesPlanResultListData.value = res.data.searchPlanResultList;
             salesPlanResultListCnt.value = res.data.salesPlanCnt;
         });
-};
-
-// route.query를 사용하여 검색 조건을 파라미터로 전달하는 함수
-
-const salesPlanResultSearchList = () => {
-    const param = new URLSearchParams({
-        ...route.query,
-        pageSize: 5,
-        currentPage: cPage.value,
-    });
 };
 
 onMounted(() => {
@@ -60,25 +49,32 @@ watch(() => route.query, salesPlanReultDefaultList); // route.query 변경 시 s
             </thead>
             <tbody>
                 <template v-if="salesPlanResultListData">
-                    <tr
-                        v-for="plan in salesPlanResultListData"
-                        :key="plan.plan_num"
-                    >
-                        <td>{{ plan.employee_name }}</td>
-                        <td>{{ plan.client_name }}</td>
-                        <td>{{ plan.detail_code }}</td>
-                        <td>{{ plan.product_name }}</td>
-                        <td>{{ plan.goal_quanti }}</td>
-                        <td>{{ plan.perform_qut }}</td>
-                        <td>
-                            {{ (plan.perform_qut / plan.goal_quanti) * 100 }}
-                        </td>
-                    </tr>
-                </template>
-                <template v-else>
-                    <tr>
-                        <td colspan="7">일치하는 검색 결과가 없습니다</td>
-                    </tr>
+                    <template v-if="salesPlanResultListCnt > 0">
+                        <tr
+                            v-for="plan in salesPlanResultListData"
+                            :key="plan.plan_num"
+                        >
+                            <td>{{ plan.employee_name }}</td>
+                            <td>{{ plan.client_name }}</td>
+                            <td>{{ plan.detail_code }}</td>
+                            <td>{{ plan.product_name }}</td>
+                            <td>{{ plan.goal_quanti }}</td>
+                            <td>{{ plan.perform_qut }}</td>
+                            <td>
+                                {{
+                                    Math.round(
+                                        (plan.perform_qut / plan.goal_quanti) *
+                                            100
+                                    )
+                                }}%
+                            </td>
+                        </tr>
+                    </template>
+                    <template v-else>
+                        <tr>
+                            <td colspan="7">일치하는 검색 결과가 없습니다</td>
+                        </tr>
+                    </template>
                 </template>
             </tbody>
         </table>
@@ -113,13 +109,6 @@ table {
     th {
         background-color: #2676bf;
         color: #ddd;
-    }
-
-    /* 테이블 올렸을 때 */
-    tbody tr:hover {
-        background-color: #d3d3d3;
-        opacity: 0.9;
-        cursor: pointer;
     }
 }
 
