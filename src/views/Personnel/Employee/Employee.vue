@@ -221,6 +221,7 @@ onMounted(() => {
 });
 
 watch(() => route.query, () => {
+    cPage.value = 1;
     personnelSearchList();
 });
 
@@ -297,7 +298,7 @@ computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
         v-model="cPage"
     />
 </template>
-<style>
+<style scoped>
 /* 테이블 전체 스타일 */
 table {
     width: 1240px;

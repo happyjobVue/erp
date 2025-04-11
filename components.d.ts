@@ -11,6 +11,7 @@ declare module 'vue' {
     AnnualMain: typeof import('./src/components/page/Sales/annual/annualMain.vue')['default']
     AnnualProductModal: typeof import('./src/components/page/Sales/annual/annualProductModal.vue')['default']
     AnnualSearch: typeof import('./src/components/page/Sales/annual/annualSearch.vue')['default']
+    AttendanceCompanionModal: typeof import('./src/components/page/personnel/Attendance/AttendanceCompanionModal.vue')['default']
     AttendanceModal: typeof import('./src/components/page/personnel/Attendance/AttendanceModal.vue')['default']
     AttendanceRequestModal: typeof import('./src/components/page/personnel/Attendance/AttendanceRequestModal.vue')['default']
     CodeMain: typeof import('./src/components/page/System/Code/CodeMain.vue')['default']
