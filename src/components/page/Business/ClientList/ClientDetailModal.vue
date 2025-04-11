@@ -1,33 +1,19 @@
 <script setup>
 import { defineProps, onMounted, onUnmounted, ref } from 'vue';
-const clientListCnt = ref();
-const cPage = ref(1);
-const clients = ref();
+import { useModalStore } from '../../../../stores/modalState';
+const modalState = useModalStore();
 const emit = defineEmits(['modalClose', 'postSuccess']);
 const props = defineProps({
-    clientName: {
-        type: String,
+    client: {
+        type: Object,
         required: true,
     },
 });
 
-async function clientDetail() {
-    const param = {
-        currentPage: cPage.value,
-        pageSize: 5,
-        client_name: props.clientName,
-    };
-    axios
-        .post('/api/business/client-list/searchClientListBody.do', param)
-        .then(res => {
-            clients.value = res.data.clientList;
-            clientListCnt.value = res.data.clientListCnt;
-        });
-}
-
 onMounted(() => {
-    if (props.productName) {
-        clientDetail();
+    console.log('디테일 컴포넌트 마운트 됨 ');
+    if (props.client) {
+        console.log('props' + props.client.client_name);
     }
 });
 </script>
@@ -37,57 +23,101 @@ onMounted(() => {
         <teleport to="body">
             <div class="backdrop">
                 <div class="container">
-                    <h2>영업 계획 상세</h2>
+                    <h2>거래처 상세</h2>
                     <table>
                         <tbody>
                             <!-- 사원 -->
                             <tr>
-                                <th class="table-header">사원</th>
+                                <th class="table-header">거래처</th>
                                 <td>
-                                    <input type="text" readonly />
+                                    <input
+                                        type="text"
+                                        v-model="props.client.client_name"
+                                    />
                                 </td>
-                                <th class="table-header">목표 일자</th>
+                                <th class="table-header">회사 연락처</th>
                                 <td>
-                                    <input type="date" readonly />
+                                    <input
+                                        type="text"
+                                        v-model="props.client.ph"
+                                    />
                                 </td>
                             </tr>
 
                             <!-- 제조사 -->
                             <tr>
-                                <th class="table-header">제조사</th>
+                                <th class="table-header">담당자</th>
                                 <td>
-                                    <input type="text" readonly />
+                                    <input
+                                        type="text"
+                                        v-model="props.client.person"
+                                    />
                                 </td>
-                                <th class="table-header">상품명</th>
+                                <th class="table-header">담당자 연락처</th>
                                 <td>
-                                    <input type="text" readonly />
+                                    <input
+                                        type="text"
+                                        v-model="props.client.person_ph"
+                                    />
                                 </td>
                             </tr>
 
                             <!-- 거래처 -->
                             <tr>
-                                <th class="table-header">거래처</th>
+                                <th class="table-header">우편번호</th>
                                 <td>
-                                    <input type="text" readonly />
+                                    <input
+                                        type="text"
+                                        v-model="props.client.zip"
+                                    />
                                 </td>
-                                <th class="table-header">목표 수량</th>
+                                <th class="table-header">주소</th>
                                 <td>
-                                    <input type="text" />
+                                    <input
+                                        type="text"
+                                        v-model="props.client.addr"
+                                    />
                                 </td>
                             </tr>
 
                             <!-- 메모 -->
                             <tr>
+                                <th class="table-header">상세주소</th>
+                                <td>
+                                    <input
+                                        type="text"
+                                        v-model="props.client.detail_addr"
+                                    />
+                                </td>
+                                <th class="table-header">사업자 번호</th>
+                                <td>
+                                    <input
+                                        type="text"
+                                        v-model="props.client.biz_num"
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="table-header">은행</th>
+                                <td>
+                                    <input
+                                        type="text"
+                                        v-model="props.client.bank"
+                                    />
+                                </td>
                                 <th class="table-header">메모</th>
                                 <td>
-                                    <input type="text" />
+                                    <input
+                                        type="text"
+                                        v-model="props.client.memo"
+                                    />
                                 </td>
                             </tr>
                         </tbody>
                     </table>
 
                     <div class="button-box">
-                        <button @click="updateSalesPlan()">수정</button>
+                        <button>수정</button>
                         <button
                             type="button"
                             @click="modalState.setModalState()"

@@ -4,29 +4,41 @@ import axios from 'axios';
 import { ref } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import ClientDetailModal from './ClientDetailModal.vue';
+import ClientRegisterModal from './ClientRegisterModal.vue';
 const modalType = ref('');
 const modalState = useModalStore();
 const cPage = ref(1);
 const clients = ref();
 const clientListCnt = ref();
-const clientName = ref('');
+const selectedClient = ref();
 onMounted(() => {
+    console.log('컴포넌트 마운트됨 ');
     clientList();
 });
 
 //등록 모달 열기
-const registerEstiModal = () => {
+const registerClientModal = () => {
     console.log('등록');
     modalType.value = 'register';
     modalState.setModalState(true);
 };
+// 모달이 성공적으로 닫힌 후 실행될 함수
+const onPostSuccess = () => {
+    modalState.setModalState(); // 모달 열기
+    modalType.value = ''; // 모달 타입 초기화
+    getAllEstimate(); // 목록 새로고침
+};
+
+const onModalClose = () => {
+    console.log('모달 close');
+};
 
 //상세 보기 모달
-const detailClient = client_name => {
-    console.log('상세' + client_name);
+const detailClient = client => {
+    console.log('상세' + client);
     modalType.value = 'view';
     modalState.setModalState(true);
-    clientName.value = client_name;
+    selectedClient.value = client;
 };
 
 const clientList = () => {
@@ -48,17 +60,18 @@ const clientList = () => {
         <!-- 상세 보기 모달 -->
         <ClientDetailModal
             v-if="modalState.modalState && modalType === 'view'"
-            :client_name="clientName"
+            :client="selectedClient"
             @modalClose="onModalClose"
             @postSuccess="onPostSuccess"
         />
 
         <!-- 등록 모달  -->
-        <!-- <EstimateRegisModal
+        <ClientRegisterModal
             v-if="modalState.modalState && modalType === 'register'"
             @postSucess="onPostSuccess"
             @modalClose="onModalClose"
-        /> -->
+        />
+        <button @click="registerClientModal()">등록</button>
         <table>
             <thead>
                 <tr>
@@ -79,7 +92,7 @@ const clientList = () => {
                         <tr
                             v-for="client in clients"
                             :key="client.id"
-                            @click="detailClient(client.clientName)"
+                            @click="detailClient(client)"
                         >
                             <td>{{ client.id }}</td>
                             <td>{{ client.cust_update_date }}</td>
