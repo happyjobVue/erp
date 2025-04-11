@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { defineProps, onMounted, onUnmounted, ref } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
+import { deprecations } from 'sass';
 const estimate = ref('');
 const estimateDetailData = ref([]);
 
@@ -41,8 +42,33 @@ async function estimateDetail() {
     }
 }
 
+async function updateEstimateDetail() {
+    const param = {
+        estimateId: props.estimateId,
+        clientId: props.clientId,
+        // 견적 배송 날짜
+        estimateDeliveryDate: estimate.deliveryDate,
+        // 견적 구분
+        estimateSalesArea: estimate.estimateSalesArea,
+        // 리스트
+        estimateList: estimateDetailData.value,
+    };
+
+    console.log('update' + param);
+    axios.post(`/api/business/updateEstimate`, param).then(() => {
+        alert('수정되었습니다.');
+        emit('postSuccess');
+        closeModal();
+    });
+}
+
 const closeModal = () => {
     modalState.setModalState();
+};
+
+//  총액 = 제품 단가 * 수량
+const updateSupplyPrice = detail => {
+    detail.supplyPrice = detail.unitPrice * detail.quantity;
 };
 
 onMounted(() => {
@@ -136,7 +162,6 @@ onUnmounted(() => {
                                 <th class="table-header">제품</th>
                                 <th class="table-header">납품개수</th>
                                 <th class="table-header">제품단가</th>
-                                <th class="table-header">세액</th>
                                 <th class="table-header">총액</th>
                             </tr>
                             <tr
@@ -144,9 +169,16 @@ onUnmounted(() => {
                                 :key="index"
                             >
                                 <td>{{ detail.productName }}</td>
-                                <td>{{ detail.quantity }}</td>
+                                <!-- <td>{{ detail.quantity }}</td> -->
+                                <td>
+                                    <input
+                                        type="number"
+                                        v-model="detail.quantity"
+                                        @input="updateSupplyPrice(detail)"
+                                        min="1"
+                                    />
+                                </td>
                                 <td>{{ detail.unitPrice }}</td>
-                                <td>{{ estimate.totalTax }}</td>
                                 <td>{{ detail.supplyPrice }}</td>
                             </tr>
                         </tbody>
@@ -155,6 +187,9 @@ onUnmounted(() => {
                     <div class="button-box">
                         <button type="button" @click="closeModal()">
                             취소
+                        </button>
+                        <button type="button" @click="updateEstimateDetail()">
+                            수정
                         </button>
                     </div>
                 </div>
@@ -270,5 +305,13 @@ input[type='date']:focus,
 select:focus {
     border-color: #3bb2ea;
     outline: none;
+}
+input {
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
 }
 </style>

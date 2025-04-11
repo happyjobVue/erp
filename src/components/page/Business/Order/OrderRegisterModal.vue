@@ -129,7 +129,6 @@ const updateSupplyPrice = item => {
                                 <th class="table-header">제품단가</th>
                                 <th class="table-header">수량</th>
                                 <th class="table-header">공급가액</th>
-                                <th class="table-header">삭제</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -151,26 +150,9 @@ const updateSupplyPrice = item => {
                                     <td>{{ item.salesArea }}</td>
                                     <td>{{ item.unitPrice }}</td>
                                     <td>
-                                        <input
-                                            type="number"
-                                            v-model="item.quantity"
-                                            @input="updateSupplyPrice(item)"
-                                            min="1"
-                                        />
+                                        {{ item.quantity }}
                                     </td>
                                     <td>{{ item.supplyPrice }}</td>
-                                    <td>
-                                        <button
-                                            @click="
-                                                orderEstiProductList.splice(
-                                                    index,
-                                                    1
-                                                )
-                                            "
-                                        >
-                                            삭제
-                                        </button>
-                                    </td>
                                 </tr>
                             </template>
                             <template v-else>
