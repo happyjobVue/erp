@@ -72,7 +72,6 @@
 import { onMounted, onUnmounted } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
-
 const { setModalState } = useModalStore();
 const { id } = defineProps(['id']);
 const emit = defineEmits(['modalClose', 'postSuccess']);
@@ -214,12 +213,10 @@ onUnmounted(() => {
     gap: 20px;
     align-items: center;
 }
-
 .radio-group input[type='radio'] {
     display: inline-block;
     margin-right: 5px;
 }
-
 .label {
     background: #f0f0f0;
     font-weight: bold;
@@ -240,7 +237,6 @@ textarea {
     border-radius: 4px;
     border: 1px solid #ccc;
 }
-
 textarea {
     min-height: 80px;
     resize: vertical;
@@ -250,7 +246,6 @@ textarea {
     justify-content: space-between;
     margin-top: 10px;
 }
-
 button {
     flex: 1;
     background-color: #3bb2ea;
@@ -264,11 +259,9 @@ button {
     box-shadow: 0 2px #999;
     transition: 0.3s;
 }
-
 button:hover {
     background-color: #45a049;
 }
-
 button:active {
     background-color: #3e8e41;
     box-shadow: 0 2px #666;

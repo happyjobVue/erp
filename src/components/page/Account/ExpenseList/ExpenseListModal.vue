@@ -61,46 +61,67 @@
                     <tr>
                         <td class="label">계정대분류명</td>
                         <td>
-                            <select
-                                v-model="expenseDetail.group_name"
-                                :disabled="isReadOnly"
-                            >
-                                <option value="">선택</option>
-                                <option value="온라인지출">온라인지출</option>
-                                <option value="영업지출">영업지출</option>
-                            </select>
+                            <template v-if="isEditMode">
+                                <input
+                                    type="text"
+                                    v-model="expenseDetail.group_name"
+                                    readonly
+                                />
+                            </template>
+                            <template v-else>
+                                <select v-model="expenseDetail.group_name">
+                                    <option value="">선택</option>
+                                    <option value="온라인지출">
+                                        온라인지출
+                                    </option>
+                                    <option value="영업지출">영업지출</option>
+                                </select>
+                            </template>
                         </td>
+
                         <td class="label">계정과목</td>
                         <td>
-                            <select
-                                v-model="expenseDetail.debit_code"
-                                :disabled="isReadOnly"
-                            >
-                                <option
-                                    v-for="item in expenseDetailName"
-                                    :key="item.detail_code"
-                                    :value="item.detail_code"
-                                >
-                                    {{ item.detail_name }}
-                                </option>
-                            </select>
+                            <template v-if="isEditMode">
+                                <input
+                                    type="text"
+                                    v-model="expenseDetail.detail_name"
+                                    readonly
+                                />
+                            </template>
+                            <template v-else>
+                                <select v-model="expenseDetail.debit_code">
+                                    <option
+                                        v-for="item in expenseDetailName"
+                                        :key="item.detail_code"
+                                        :value="item.detail_code"
+                                    >
+                                        {{ item.detail_name }}
+                                    </option>
+                                </select>
+                            </template>
                         </td>
                     </tr>
                     <tr>
                         <td class="label">거래처명</td>
                         <td>
-                            <select
-                                v-model="expenseDetail.client_id"
-                                :disabled="isReadOnly"
-                            >
-                                <option
-                                    v-for="client in clientList"
-                                    :key="client.id"
-                                    :value="client.id"
-                                >
-                                    {{ client.clientName }}
-                                </option>
-                            </select>
+                            <template v-if="isEditMode">
+                                <input
+                                    type="text"
+                                    v-model="expenseDetail.client_name"
+                                    readonly
+                                />
+                            </template>
+                            <template v-else>
+                                <select v-model="expenseDetail.client_id">
+                                    <option
+                                        v-for="client in clientList"
+                                        :key="client.id"
+                                        :value="client.id"
+                                    >
+                                        {{ client.clientName }}
+                                    </option>
+                                </select>
+                            </template>
                         </td>
                         <td class="label">결의금액</td>
                         <td>
@@ -112,7 +133,7 @@
                             />
                         </td>
                     </tr>
-                    <tr v-if="id">
+                    <tr v-if="isEditMode">
                         <td class="label">승인여부</td>
                         <td>
                             <span class="approval-display">{{
@@ -121,25 +142,27 @@
                         </td>
                         <td class="label">승인일자</td>
                         <td>
-                            <input
-                                type="date"
-                                v-model="expenseDetail.approval_date"
-                                :readonly="isReadOnly"
-                            />
+                            <template>
+                                <input
+                                    type="date"
+                                    v-model="expenseDetail.approval_date"
+                                    :readonly="isReadOnly"
+                                />
+                            </template>
                         </td>
                     </tr>
                     <tr>
                         <td class="label">첨부파일</td>
                         <td>
-                            <div v-if="isReadOnly">
+                            <template v-if="isReadOnly">
                                 <button
                                     @click="downloadFileImage"
                                     class="button-box"
                                 >
                                     다운로드
                                 </button>
-                            </div>
-                            <div v-else>
+                            </template>
+                            <template v-else>
                                 <input
                                     type="file"
                                     id="fileInput"
@@ -149,7 +172,7 @@
                                 <label class="img-label" htmlFor="fileInput">
                                     파일 첨부하기
                                 </label>
-                            </div>
+                            </template>
                         </td>
                     </tr>
                     <tr>
@@ -183,11 +206,11 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
-
 const { setModalState } = useModalStore();
+const isEditMode = computed(() => !!id);
 const expenseDetail = ref({
     group_name: '온라인지출',
-    debit_code: '',
+    debit_code: 'AC03101',
     client_id: '0',
 });
 const clientList = ref([]);
@@ -195,7 +218,6 @@ const expenseDetailName = ref([]);
 const fileData = ref('');
 const imgUrl = ref('');
 const isReadOnly = ref(true);
-
 const { id } = defineProps(['id']);
 const emit = defineEmits(['postSuccess', 'modalClose']);
 
@@ -214,7 +236,6 @@ const fetchLoginInfo = async () => {
             {}
         );
         const info = res.data.lgnInfo;
-
         expenseDetail.value.emp_no = info.usr_idx;
         expenseDetail.value.name = info.usr_nm;
         expenseDetail.value.use_department = info.detail_name;
@@ -324,16 +345,8 @@ const expenseListSave = async () => {
 
         Object.entries(textData).forEach(([key, value]) => {
             formData.append(key, value);
-        });
-
-        if (fileData.value) {
             formData.append('file', fileData.value);
-        }
-
-        console.log(
-            'Sending request to /api/account/expenseFileSave.do with data:',
-            formData
-        );
+        });
 
         const res = await axios.post(
             '/api/account/expenseFileSave.do',
@@ -352,7 +365,6 @@ const expenseListSave = async () => {
 
 const expenseListDelete = async () => {
     const param = new URLSearchParams();
-    param.append('id', id);
     param.append('exp_id', expenseDetail.value.id);
 
     try {
@@ -417,7 +429,6 @@ onUnmounted(() => {
     gap: 20px;
     align-items: center;
 }
-
 .radio-group input[type='radio'] {
     display: inline-block;
     margin-right: 5px;
@@ -443,7 +454,6 @@ textarea {
     border-radius: 4px;
     border: 1px solid #ccc;
 }
-
 textarea {
     min-height: 80px;
     resize: vertical;
@@ -453,7 +463,6 @@ textarea {
     justify-content: space-between;
     margin-top: 10px;
 }
-
 button {
     flex: 1;
     background-color: #3bb2ea;

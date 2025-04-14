@@ -60,91 +60,37 @@
                     <tr>
                         <td class="label">계정대분류명</td>
                         <td>
-                            <template v-if="isEditMode">
-                                <input
-                                    type="text"
-                                    v-model="expenseDetail.group_name"
-                                    readonly
-                                />
-                            </template>
-                            <template v-else>
-                                <select v-model="expenseDetail.group_name">
-                                    <option value="온라인매출">
-                                        온라인매출
-                                    </option>
-                                    <option value="영업매출">영업매출</option>
-                                    <option value="온라인지출">
-                                        온라인지출
-                                    </option>
-                                    <option value="영업지출">영업지출</option>
-                                    <option value="유동자산">유동자산</option>
-                                </select>
-                            </template>
+                            <input
+                                type="text"
+                                v-model="expenseDetail.group_name"
+                                readonly
+                            />
                         </td>
                         <td class="label">거래처명</td>
                         <td>
-                            <template v-if="isEditMode">
-                                <input
-                                    type="text"
-                                    v-model="expenseDetail.client_name"
-                                    readonly
-                                />
-                            </template>
-                            <template v-else>
-                                <select v-model="expenseDetail.client_name">
-                                    <option
-                                        v-for="client in clientList"
-                                        :key="client.id"
-                                        :value="client.clientName"
-                                    >
-                                        {{ client.clientName }}
-                                    </option>
-                                </select>
-                            </template>
+                            <input
+                                type="text"
+                                v-model="expenseDetail.client_name"
+                                readonly
+                            />
                         </td>
                     </tr>
                     <tr>
                         <td class="label">차변계정과목</td>
                         <td>
-                            <template v-if="isEditMode">
-                                <input
-                                    type="text"
-                                    v-model="expenseDetail.detail_name"
-                                    readonly
-                                />
-                            </template>
-                            <template v-else>
-                                <select v-model="expenseDetail.detail_name">
-                                    <option
-                                        v-for="item in expenseDetailName"
-                                        :key="item.detail_name"
-                                        :value="item.detail_name"
-                                    >
-                                        {{ item.detail_name }}
-                                    </option>
-                                </select>
-                            </template>
+                            <input
+                                type="text"
+                                v-model="expenseDetail.detail_name"
+                                readonly
+                            />
                         </td>
                         <td class="label">대변계정과목</td>
                         <td>
-                            <template v-if="isEditMode">
-                                <input
-                                    type="text"
-                                    v-model="expenseDetail.credit_name"
-                                    readonly
-                                />
-                            </template>
-                            <template v-else>
-                                <select v-model="expenseDetail.crebit_code">
-                                    <option
-                                        v-for="item in expenseDetailName"
-                                        :key="item.crebit_code"
-                                        :value="item.crebit_code"
-                                    >
-                                        {{ item.crebit_code }}
-                                    </option>
-                                </select>
-                            </template>
+                            <input
+                                type="text"
+                                v-model="expenseDetail.credit_name"
+                                readonly
+                            />
                         </td>
                     </tr>
                     <tr>
@@ -238,13 +184,10 @@ import axios from 'axios';
 const emit = defineEmits(['modalClose', 'postSuccess']);
 const { setModalState } = useModalStore();
 const expenseDetail = ref({});
-const clientList = ref([]);
-const expenseDetailName = ref([]);
 const { id } = defineProps(['id']);
 const originalApproval = ref('');
 const showRadio = ref(false);
 const showSubmitButton = ref(false);
-const isEditMode = computed(() => !!id);
 
 const approvalMap = computed(() => ({
     W: '검토 대기',
@@ -260,8 +203,6 @@ const searchDetail = async () => {
             id,
         });
         expenseDetail.value = response.data.expenseDetail;
-        clientList.value = response.data.clientList;
-        expenseDetailName.value = response.data.expenseDetailName;
         originalApproval.value = response.data.expenseDetail.is_approval;
     } catch (e) {
         console.error(e);

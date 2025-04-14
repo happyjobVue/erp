@@ -57,11 +57,7 @@ const handleSearch = () => {
 };
 
 onMounted(() => {
-    const isReload =
-        performance.getEntriesByType('navigation')[0]?.type === 'reload';
-    if (isReload) {
-        router.replace({ path: route.path });
-    }
+    window.location.search && router.replace(window.location.pathname);
     showInactive.value = route.query.showInactive === 'true';
 });
 
@@ -137,7 +133,6 @@ watch(
     flex-direction: column;
     gap: 10px;
 }
-
 .search-box {
     display: flex;
     justify-content: flex-end;
@@ -153,7 +148,6 @@ watch(
     display: flex;
     justify-content: flex-end;
 }
-
 input {
     padding: 8px;
     margin-top: 5px;
@@ -162,7 +156,6 @@ input {
     border-radius: 4px;
     border: 1px solid #ccc;
 }
-
 button {
     text-align: center;
     text-decoration: none;

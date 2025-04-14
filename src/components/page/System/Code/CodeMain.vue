@@ -104,7 +104,7 @@ watch(
     () => {
         searchList();
     },
-    { deep: true, immediate: true }
+    { deep: true }
 );
 watch(cPage, searchList);
 </script>

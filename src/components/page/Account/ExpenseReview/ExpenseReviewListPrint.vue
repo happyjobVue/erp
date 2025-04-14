@@ -43,11 +43,10 @@
                     </td>
                 </tr>
             </table>
-
             <table class="content-table">
                 <thead>
                     <tr>
-                        <th>월/일</th>
+                        <th>날짜</th>
                         <th>적요</th>
                         <th>금액</th>
                         <th>비고</th>
@@ -60,7 +59,6 @@
                         <td>{{ numberWithCommas(item.amount) }}</td>
                         <td>{{ item.note }}</td>
                     </tr>
-                    <!-- 빈 줄 6개 -->
                     <tr v-for="n in 7 - detailList.length" :key="'empty-' + n">
                         <td></td>
                         <td></td>
@@ -91,7 +89,6 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue';
 import html2pdf from 'html2pdf.js/dist/html2pdf.bundle.min';
-
 const expenseData = ref(null);
 const expenseDetail = ref({});
 const today = new Date();
@@ -104,7 +101,7 @@ const formatDate = dateStr => {
 };
 
 const totalAmount = computed(() =>
-    detailList.value.reduce((sum, item) => sum + (item.amount || 0), 0)
+    detailList.value.reduce((sum, item) => sum + item.amount, 0)
 );
 
 const numberWithCommas = num => {
@@ -112,8 +109,8 @@ const numberWithCommas = num => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
-// 숫자를 한글 금액으로 변환하는 함수 (간단 버전)
 const convertToKoreanNumber = number => {
+    if (number === 0) return '영';
     if (!number) return '';
     const hanA = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
     const danA = ['', '십', '백', '천'];
@@ -129,7 +126,7 @@ const convertToKoreanNumber = number => {
         }
 
         if (i % 4 === 3 && i !== strNum.length - 1) {
-            result.unshift('만'); 
+            result.unshift('만');
         }
     }
     return result.join('').replace(/undefined/g, '');
@@ -140,11 +137,10 @@ const detailList = ref([
         date: expenseDetail.value.use_date,
         description: expenseDetail.value.detail_name,
         amount: expenseDetail.value.expense_payment,
-        note: expenseDetail.value.group_name || '',
+        note: expenseDetail.value.group_name,
     },
 ]);
 
-// 인쇄 함수
 const printPage = () => {
     window.print();
 };
@@ -183,7 +179,6 @@ onMounted(() => {
     width: 800px;
     margin: 0 auto;
 }
-
 .button {
     background-color: transparent;
     color: #000;
@@ -201,13 +196,11 @@ onMounted(() => {
         color 0.2s ease-in-out,
         border-color 0.2s ease-in-out;
 }
-
 .button:hover {
     background-color: #f2f2f2;
     color: #000;
     border-color: #333;
 }
-
 .print-page {
     width: 800px;
     margin: 0 auto;
@@ -216,38 +209,31 @@ onMounted(() => {
     font-size: 14px;
     color: #000;
 }
-
 h1.title {
     text-align: center;
     margin-bottom: 30px;
     font-size: 24px;
 }
-
 table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
 }
-
 table td,
 table th {
     border: 1px solid #000;
     padding: 8px;
     text-align: center;
 }
-
 .info-table td {
     width: 25%;
 }
-
 .title-table td {
     width: auto;
 }
-
 .content-table {
     table-layout: fixed;
 }
-
 .content-table td,
 .content-table th {
     height: 10px;
@@ -255,24 +241,19 @@ table th {
     padding: 8px;
     text-align: center;
 }
-
 .total-row td {
     font-weight: bold;
 }
-
 .footer {
     text-align: center;
     margin-top: 40px;
 }
-
 .sign-box {
     display: inline-block;
     width: 80px;
     border-bottom: 1px solid #000;
     margin-left: 10px;
 }
-
-/* 인쇄 전용 스타일 */
 @media print {
     body {
         margin: 0;
