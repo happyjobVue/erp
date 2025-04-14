@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, readonly } from 'vue';
 import { useUserInfo } from '../../../../stores/userInfo';
 
 const address = ref('');
@@ -44,6 +44,9 @@ const NowregDate = new Date();
 
 //근무 연차 
 const years = ref('');
+
+//연봉 정보 리스트
+const totalSalary = ref({});
 
 //연봉 계산기 계산하기
 const Onsalary = (joinDate) => {
@@ -95,7 +98,6 @@ const getFullYearDiff = (startDate, endDate) => {
 
 //퇴직 
 const OnRetire = () => {
-    Onsalary(NowregDate);
 
     emit('update-retire-info', {
         resignationReason: resignationReason.value,
@@ -131,7 +133,7 @@ const saveEmployee = () => {
     const formData = new FormData();
     if (fileData.value) formData.append('file', fileData.value);
 
-    Onsalary(employeeForm.value.regDate);
+    // Onsalary(employeeForm.value.regDate);
 
     formData.append('employeeName', employeeForm.value.employeeName);
     formData.append('registrationNumber', employeeForm.value.registrationNumber );
@@ -150,6 +152,7 @@ const saveEmployee = () => {
     formData.append('regDate', employeeForm.value.regDate  );
     formData.append('emplStatus', employeeForm.value.emplStatus  );
     formData.append('salary', salary.value);
+    formData.append('paymentDate', employeeForm.value.regDate.slice(0, 7));
 
     axios.post('/api/personnel/employeeSave.do', formData).then(res => {
         if (res.data.result === 'success') {
@@ -239,13 +242,27 @@ watch(
         address.value = newDetail.address
         addressCode.value = newDetail.addressCode
         employeeForm.value.employeeId = newDetail.employeeId;
-        Onsalary(employeeForm.value.regDate);
+        salary.value = employeeForm.value.salary;
+        console.log(salary.value);
+        // Onsalary(employeeForm.value.regDate);
         localImgUrl.value = props.imgUrl;
         
     } 
   },
   { immediate: true } // 모달 열릴 때도 바로 반영
 )
+
+//연봉 감지
+watch(
+  () => props.employeeDetail?.salary,
+  (newSalary) => {
+    if (newSalary !== undefined) {
+      salary.value = newSalary;
+      console.log('연봉 감지됨:', salary.value);
+    }
+  },
+  { immediate: true }
+);
 
 watch(
     () => props.modalType ,
@@ -551,10 +568,12 @@ onMounted(() => {
                                     <select
                                         class="inputSelect"
                                         id="jobRoleGroup"
-                                        v-model="employeeForm.jobGradeCode"
+                                        v-model="employeeForm.jobRoleDetailName"
                                     >
                                         <option value="">-</option>
-                                        <option value="테스트">테스트</option>
+                                        <option v-if="employeeForm.departmentDetailName == '회계부'" value="회계분개">회계분개</option>
+                                        <option v-if="employeeForm.departmentDetailName == '영업부'" value="배송기사">배송기사</option>
+                                        <option v-if="employeeForm.departmentDetailName == '총무부'" value="예산기획">예산기획</option>
                                     </select>
                                 </td>
                             </tr>
@@ -659,6 +678,7 @@ onMounted(() => {
                                         @input="formatSalary"
                                         placeholder="자동 입력됨"
                                         v-model="salary"
+                                        :readonly="modalType === 'update'"
                                     />
                                 </td>
                                 <th>퇴직금</th>
