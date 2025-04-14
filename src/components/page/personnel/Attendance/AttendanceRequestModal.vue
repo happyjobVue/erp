@@ -10,6 +10,8 @@ const props = defineProps(['summary']);
 const userInfo = useUserInfo();
 const attendanceDetail = ref({});
 
+const attendanceList = ref('');
+
 const form = ref({
     id: '',
     empId: '',
@@ -47,12 +49,48 @@ const UserDetail = () => {
         });
 };
 
+//리스트 데이터 불러오기 
+const search = () => {
+
+const form = new URLSearchParams();
+
+form.append('searchStDate', '');
+form.append('searchEdDate', '');
+form.append('searchReqType', '');
+form.append('searchReqStatus', '');
+
+form.append('pageSize', 20);
+form.append('currentPage', 1);
+
+axios
+    .post(`/api/personnel/attendanceList.do`, form)
+    .then(res => {
+        console.log(res.data.attendanceList);
+        attendanceList.value = res.data.attendanceList;
+    })
+    .catch(err => {
+        console.error('에러 발생:', err);
+    });
+
+}
+
 // 연차 신청
 const submitForm = () => {
-    if (form.value.reqReason === '') {
-        alert('신청 사유를 입력해주세요 .');
+    if (form.value.reqReason === '' || form.value.reqSt === '' 
+    || form.value.reqEd === '' || form.value.reqTel === '') {
+        alert('기간 및 신청 사유, 비상 연락망을 입력해주세요.');
         return;
     } 
+
+    const startDate = form.value.reqSt; // 사용자 선택 시작일
+    const endDate = form.value.reqEd;   // 사용자 선택 종료일
+    const selectedName = form.value.name;
+
+    if (isOverlappingRange(startDate, endDate, selectedName)) {
+        alert('이미 겹치는 휴가 신청이 존재합니다.');
+        return;
+    }
+
 
     const params = new URLSearchParams();
 
@@ -108,6 +146,27 @@ const submitForm = () => {
         });
 };
 
+//겹치는 날짜 거르기 시작 날자, 끝날짜 , 이름으로 
+const isOverlappingRange = (selectedStartDate, selectedEndDate, selectedName) => {
+  const selectedStart = new Date(selectedStartDate);
+  const selectedEnd = new Date(selectedEndDate);
+
+  return attendanceList.value.some(item => {
+    if (!item.reqSt || !item.reqEd || !item.name) return false;
+
+    const existingStart = new Date(item.reqSt);
+    const existingEnd = new Date(item.reqEd);
+
+    // 💥 이름도 같고 날짜도 겹치는 경우
+    return (
+      item.name === selectedName &&
+      selectedStart <= existingEnd &&
+      selectedEnd >= existingStart
+    );
+  });
+};
+
+
 const closeModal = () => {
     visible.value = false;
     emit('visibleval', visible.value);
@@ -120,6 +179,7 @@ const reLoadCloseModal = () => {
 
 onMounted(() => {
     UserDetail();
+    search();
 });
 </script>
 

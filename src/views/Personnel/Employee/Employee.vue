@@ -151,6 +151,7 @@ const Onretire = (personnel) => {
 
     modalType.value = 'retire'
 
+
     const param = JSON.parse(JSON.stringify(personnel));
 
 /*     AxiosRequest('employeeDetailBody', param, UserDetail);
@@ -173,6 +174,36 @@ const Onretire = (personnel) => {
 
 }
 
+//모달창에서 상위컴포넌트에서 모달창 열리게하기
+const OpenRetireModal = (val) => {
+    modalType.value = 'retire'
+
+    /*     AxiosRequest('employeeDetailBody', param, UserDetail);
+    */
+
+    const param = {
+        employeeId: val.employeeId,
+        jobGradeCode: val.jobGradeCode
+    };
+
+    axios
+        .post(`/api/personnel/employeeDetailBody`, param, {
+            headers: {
+                'Content-Type': 'application/json', // JSON 형식으로 전송
+            },
+        })
+        .then(res => {
+            UserDetail.value = res.data;
+            console.log(UserDetail.value);
+            isModalOpen.value = true;
+        })
+        .catch(err => {
+            console.error('에러 발생:', err);
+        });
+
+}
+
+
 //퇴직 처리 하기 
 const handleRetireInfo = (retireData) => {
   console.log("퇴직 정보:", retireData);
@@ -181,7 +212,7 @@ const handleRetireInfo = (retireData) => {
   const { resignationReason, resignationDate, severancePay, salary, employeeId } = retireData;
   
   //퇴직사유나 퇴직급여 입력 유효성 검사 
-  if(resignationReason !== '' && severancePay !== ''){
+  if(resignationReason !== '' && severancePay !== '' && resignationDate !== ''){
 
     //응답형이 @RequestParam임 
     const params = new URLSearchParams();
@@ -285,6 +316,7 @@ computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
 
         @closeModal="closeModal"
         @update-retire-info="handleRetireInfo"
+        @OpenRetireModal="OpenRetireModal"
 
         />
     </div> 
