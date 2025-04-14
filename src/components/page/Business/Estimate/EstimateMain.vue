@@ -97,7 +97,9 @@ const onModalClose = () => {
             @modalClose="onModalClose"
         />
         <!-- 신규 등록 버튼 -->
-        <button @click="registerEstiModal()">거래처 등록</button>
+        <div class="button-container">
+            <button @click="registerEstiModal()">견적서 등록</button>
+        </div>
         <table>
             <thead>
                 <tr>
@@ -188,7 +190,7 @@ button {
     display: inline-block;
     border: none;
     color: white;
-    width: 70px;
+    width: 100px;
     padding-top: 8px;
     padding-bottom: 8px;
     font-size: 12px;
@@ -207,5 +209,12 @@ button {
         box-shadow: 0 2px #666;
         transform: translateY(2px);
     }
+}
+
+/* 버튼을 오른쪽 정렬하기 위한 스타일 */
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin-bottom: 20px;
 }
 </style>

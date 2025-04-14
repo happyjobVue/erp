@@ -91,8 +91,9 @@ watch(() => route.query, searchList);
         />
 
         <!-- 신규 등록 버튼 -->
-        <button @click="openRegisterModal()">신규 등록</button>
-
+        <div class="button-container">
+            <button @click="openRegisterModal()">신규 등록</button>
+        </div>
         <!-- 판매 계획 목록 테이블 -->
         <table>
             <thead>
@@ -103,7 +104,6 @@ watch(() => route.query, searchList);
                     <th scope="col">제품코드</th>
                     <th scope="col">제품명</th>
                     <th scope="col">목표수량</th>
-                    <th scope="col">비고란</th>
                 </tr>
             </thead>
             <tbody>
@@ -120,7 +120,6 @@ watch(() => route.query, searchList);
                             <td>{{ plan.detail_code }}</td>
                             <td>{{ plan.product_name }}</td>
                             <td>{{ plan.goal_quanti }}</td>
-                            <td>{{ plan.plan_memo }}</td>
                         </tr>
                     </template>
                     <template v-else>
@@ -184,7 +183,7 @@ button {
     font-size: 12px;
     margin: 4px 2px;
     cursor: pointer;
-    border-radius: 12px;
+    border-radius: 5px;
     box-shadow: 0 4px #999;
     background-color: #3bb2ea;
 
@@ -197,5 +196,12 @@ button {
         box-shadow: 0 2px #666;
         transform: translateY(2px);
     }
+}
+
+/* 버튼을 오른쪽 정렬하기 위한 스타일 */
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin-bottom: 20px;
 }
 </style>

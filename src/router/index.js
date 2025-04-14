@@ -97,7 +97,8 @@ const routes = [
                         path: 'attendance-request',
                         name: 'attendance-request',
                         component: AttendanceRequest,
-                    },                    {
+                    },
+                    {
                         path: 'attendance-approval',
                         name: 'attendance-approval',
                         component: AttendanceApproval,
