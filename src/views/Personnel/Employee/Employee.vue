@@ -55,6 +55,7 @@ const checkPerson = (personnel) => {
         })
         .then(res => {
             employeeDetail.value = res.data.detail;
+            OntotalSalary(employeeDetail.value.employeeName)
             console.log(employeeDetail.value);
             if (
                 employeeDetail.value.profileFileExt === 'jpg' ||
@@ -62,16 +63,42 @@ const checkPerson = (personnel) => {
                 employeeDetail.value.profileFileExt === 'png'
             ) {
                 getFileImage(personnel.employeeId);
-                isModalOpen.value = true;
-            } else {
-                isModalOpen.value = true; 
-            }
+
+            } 
+
+            isModalOpen.value = true;
 
         })
         .catch(err => {
             console.error('에러 발생:', err);
         });
 
+}
+
+
+//연봉 정보 불러오기 
+const OntotalSalary = (val) => {
+
+const param = {
+    searchEmployeeName: val,
+    pageSize: 1,
+    currentPage: 1,
+};
+
+axios
+    .post(`/api/personnel/salaryListBody`, param, {
+        headers: {
+            'Content-Type': 'application/json', // JSON 형식으로 전송
+        },
+    })
+    .then(res => {
+        console.log(res.data.salaryList[0].salary);
+        employeeDetail.value.salary = res.data.salaryList[0].salary;
+        console.log(employeeDetail.value);
+    })
+    .catch(err => {
+        console.error('에러 발생:', err);
+    });
 }
 
 const getFileImage = (val) => {
