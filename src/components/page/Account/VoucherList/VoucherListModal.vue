@@ -2,6 +2,7 @@
     <teleport to="body">
         <div class="backdrop">
             <div class="modal-container">
+                <h1 class="title print-only">회계전표</h1>
                 <table class="modal-table">
                     <tr>
                         <td class="label">전표번호</td>
@@ -146,7 +147,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <div class="button-box">
+                <div class="button-box no-print">
                     <div class="print-page" id="pdf-content">
                         <button class="button" @click="downloadPdf">
                             PDF 저장
@@ -161,10 +162,8 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import html2pdf from 'html2pdf.js/dist/html2pdf.bundle.min';
-
 const emit = defineEmits(['modalClose', 'postSuccess']);
 const { setModalState } = useModalStore();
 const { voucherDetail } = defineProps({
@@ -174,12 +173,6 @@ const { voucherDetail } = defineProps({
     },
 });
 
-const setModalAndClose = () => {
-    console.log('✅ 나가기 버튼 클릭됨 - setModalState 호출');
-    setModalState();
-};
-
-// 숫자 천 단위 쉼표
 const numberWithCommas = x => {
     if (typeof x !== 'number') return '';
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -201,10 +194,6 @@ const downloadPdf = () => {
     html2pdf().set(opt).from(element).save();
 };
 
-// onMounted(() => {
-//     searchDetail();
-// });
-
 onUnmounted(() => {
     emit('modalClose', 0);
 });
@@ -222,7 +211,6 @@ onUnmounted(() => {
     justify-content: center;
     align-items: center;
 }
-
 .modal-container {
     background: white;
     padding: 20px;
@@ -232,28 +220,30 @@ onUnmounted(() => {
     max-width: 1000px;
     overflow-x: auto;
 }
-
 .modal-table,
 .content-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 15px;
 }
-
+.modal-table td,
+.content-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+}
 .content-table th,
 tr.row-table {
+    border: 1px solid #ccc;
     background: #f4f4f4;
-    font-weight: bold; /* 굵게 */
-    text-align: center; /* 가운데 정렬 */
-    font-size: 14px; /* 글자 크기 */
+    font-weight: bold;
+    text-align: center;
+    font-size: 14px;
 }
-
 .label {
     background: #f0f0f0;
     font-weight: bold;
     text-align: left;
 }
-
 input {
     display: block;
     width: 100%;
@@ -265,13 +255,11 @@ input {
     font-size: 14px;
     background-color: #fdfdfd;
 }
-
 .button-box {
     display: flex;
     justify-content: flex-end;
     margin-top: 10px;
 }
-
 button {
     background-color: #3bb2ea;
     border: none;
@@ -284,19 +272,50 @@ button {
     box-shadow: 0 2px #999;
     transition: 0.3s;
 }
-
 button:hover {
     background-color: #45a049;
 }
-
 button:active {
     background-color: #3e8e41;
     box-shadow: 0 2px #666;
     transform: translateY(2px);
 }
+.print-only {
+    display: none;
+}
 @media print {
     @page {
-        size: landscape;
+        size: A4 landscape;
+        margin: 0;
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    body {
+        margin: 0;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .print-page {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        page-break-after: always;
+    }
+
+    h1.title {
+        margin-top: 0;
+    }
+
+    .content-table th {
+        background-color: #eee !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .no-print {
+        display: none !important;
     }
 }
 </style>

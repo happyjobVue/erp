@@ -38,7 +38,6 @@
                     </option>
                 </select>
             </div>
-
             <button @click="handleSearch">검색</button>
         </div>
     </div>
@@ -92,7 +91,6 @@ onMounted(() => {
     flex-direction: column;
     gap: 10px;
 }
-
 .search-box {
     display: flex;
     justify-content: flex-end;
@@ -104,19 +102,16 @@ onMounted(() => {
     padding: 12px 15px;
     margin: 10px 0;
 }
-
 .register-box {
     display: flex;
     justify-content: flex-end;
 }
-
 select,
 input {
     padding: 8px;
     border-radius: 4px;
     border: 1px solid #ccc;
 }
-
 button {
     width: 70px;
     padding: 8px;

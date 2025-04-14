@@ -140,8 +140,9 @@
                         <td class="label">승인일자</td>
                         <td>
                             <input
-                                type="date"
+                                type="text"
                                 v-model="expenseDetail.approval_date"
+                                placeholder="자동으로 입력됩니다."
                                 readonly
                             />
                         </td>
@@ -198,7 +199,6 @@ import axios from 'axios';
 const emit = defineEmits(['modalClose', 'postSuccess']);
 const { setModalState } = useModalStore();
 const expenseDetail = ref({});
-const clientList = ref([]);
 const crebitList = ref({});
 const { id } = defineProps(['id']);
 const showRadio = ref(false);
@@ -221,7 +221,6 @@ const searchDetail = async () => {
             }
         );
         expenseDetail.value = response.data.expenseDetail;
-        clientList.value = response.data.clientList;
         crebitList.value = response.data.crebitList;
     } catch (e) {
         console.error(e);
@@ -278,8 +277,7 @@ const expenseReviewUpdate = async () => {
             alert('저장 실패');
         }
     } catch (e) {
-        console.error('저장 중 오류:', e);
-        alert('저장 중 오류가 발생했습니다.');
+        alert('저장 중 오류가 발생했습니다.', e);
     }
 };
 
@@ -356,12 +354,10 @@ watch(
     gap: 20px;
     align-items: center;
 }
-
 .radio-group input[type='radio'] {
     display: inline-block;
     margin-right: 5px;
 }
-
 .label {
     background: #f0f0f0;
     font-weight: bold;
@@ -382,7 +378,6 @@ textarea {
     border-radius: 4px;
     border: 1px solid #ccc;
 }
-
 textarea {
     min-height: 80px;
     resize: vertical;
@@ -392,7 +387,6 @@ textarea {
     justify-content: space-between;
     margin-top: 10px;
 }
-
 button {
     flex: 1;
     background-color: #3bb2ea;
@@ -406,11 +400,9 @@ button {
     box-shadow: 0 2px #999;
     transition: 0.3s;
 }
-
 button:hover {
     background-color: #45a049;
 }
-
 button:active {
     background-color: #3e8e41;
     box-shadow: 0 2px #666;

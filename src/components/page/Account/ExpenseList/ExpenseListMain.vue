@@ -81,7 +81,6 @@ const searchList = async () => {
 
     try {
         const response = await axios.post('/api/account/expenseList.do', param);
-        console.log(response.data);
         expenseList.value = response.data;
     } catch (e) {
         console.error('Axios Error:', e);

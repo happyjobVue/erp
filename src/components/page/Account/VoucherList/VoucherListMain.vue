@@ -1,11 +1,7 @@
 <template>
     <div class="divExpenseReviewList">
         <VoucherListModal
-            v-if="
-                modal.modalState &&
-                selectedVoucher !== undefined &&
-                selectedVoucher !== null
-            "
+            v-if="modal.modalState && selectedVoucher"
             :voucherDetail="selectedVoucher"
             :id="voucherNo"
             @modalClose="voucherNo = $event"

@@ -21,7 +21,7 @@
                             />
                         </td>
                     </tr>
-                    <tr v-if="!id">
+                    <tr v-if="!id || groupDetail.useYn === 'N'">
                         <td class="label">사용여부</td>
                         <td>
                             <select v-model="groupDetail.useYn">
@@ -101,11 +101,10 @@ const groupDetailSave = async () => {
     param.append('use_yn', groupDetail.value.useYn);
     try {
         const res = await axios.post('/api/system/groupSave.do', param);
-        console.log(res);
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
-            if (res.data.message === '미사용 코드입니다.') {
+            if (res.data.message === '이미 존재하는 공통 코드입니다.') {
                 alert(res.data.message);
                 emit('postSuccess');
                 emit('searchGroupCode', groupDetail.value.groupCode);
@@ -114,7 +113,7 @@ const groupDetailSave = async () => {
             }
         }
     } catch (e) {
-        console.error(e);
+        alert(res.data.message);
     }
 };
 
@@ -203,12 +202,10 @@ onUnmounted(() => {
     gap: 20px;
     align-items: center;
 }
-
 .radio-group input[type='radio'] {
     display: inline-block;
     margin-right: 5px;
 }
-
 .label {
     background: #f0f0f0;
     font-weight: bold;
@@ -229,7 +226,6 @@ textarea {
     border-radius: 4px;
     border: 1px solid #ccc;
 }
-
 textarea {
     min-height: 80px;
     resize: vertical;
@@ -239,7 +235,6 @@ textarea {
     justify-content: space-between;
     margin-top: 10px;
 }
-
 button {
     flex: 1;
     background-color: #3bb2ea;
@@ -253,11 +248,9 @@ button {
     box-shadow: 0 2px #999;
     transition: 0.3s;
 }
-
 button:hover {
     background-color: #45a049;
 }
-
 button:active {
     background-color: #3e8e41;
     box-shadow: 0 2px #666;

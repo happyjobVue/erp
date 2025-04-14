@@ -24,15 +24,6 @@
                     <option value="지출">지출</option>
                 </select>
             </div>
-            <!-- <div>
-                <label>사용여부 : </label>
-                <select v-model="searchUseYn">
-                    <option value="">선택</option>
-                    <option value="Y">Y</option>
-                    <option value="N">N</option>
-                </select>
-            </div> -->
-
             <button @click="handleSearch">검색</button>
             <label class="toggle-switch">
                 <input
@@ -138,7 +129,6 @@ watch(showInactive, () => {
     flex-direction: column;
     gap: 10px;
 }
-
 .search-box {
     display: flex;
     justify-content: flex-end;
@@ -150,19 +140,16 @@ watch(showInactive, () => {
     padding: 12px 15px;
     margin: 10px 0;
 }
-
 .register-box {
     display: flex;
     justify-content: flex-end;
 }
-
 select,
 input {
     padding: 8px;
     border-radius: 4px;
     border: 1px solid #ccc;
 }
-
 button {
     width: 70px;
     padding: 8px;

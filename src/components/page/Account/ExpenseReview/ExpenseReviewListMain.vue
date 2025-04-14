@@ -9,16 +9,16 @@
         <table>
             <thead>
                 <tr>
-                    <th scope="col">결의번호</th>
-                    <th scope="col">신청일자</th>
-                    <th scope="col">사용일자</th>
-                    <th scope="col">사번</th>
-                    <th scope="col">사원명</th>
-                    <th scope="col">계정대분류명</th>
-                    <th scope="col">계정과목</th>
-                    <th scope="col">사용부서</th>
-                    <th scope="col">결의금액</th>
-                    <th scope="col">승인여부</th>
+                    <th>결의번호</th>
+                    <th>신청일자</th>
+                    <th>사용일자</th>
+                    <th>사번</th>
+                    <th>사원명</th>
+                    <th>계정대분류명</th>
+                    <th>계정과목</th>
+                    <th>사용부서</th>
+                    <th>결의금액</th>
+                    <th>승인여부</th>
                 </tr>
             </thead>
             <tbody>
