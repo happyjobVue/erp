@@ -153,7 +153,7 @@ async function updateSalesPlan() {
                         </tbody>
                     </table>
 
-                    <div class="button-box">
+                    <div class="button-container">
                         <button @click="updateSalesPlan()">수정</button>
                         <button
                             type="button"
@@ -246,7 +246,8 @@ button {
     border-radius: 12px;
     box-shadow: 0 4px #999;
     transition: 0.3s;
-    width: 30px;
+    width: 120px;
+    margin: 4px 2px;
 }
 
 button:hover {
@@ -259,16 +260,15 @@ button:active {
     transform: translateY(2px);
 }
 
-.button-box {
-    display: flex;
-    text-align: center;
-    justify-content: space-between;
-    margin-top: 20px;
-    width: 300px;
-}
-
 .button-box button {
     width: 48%;
+}
+
+/* 버튼을 오른쪽 정렬하기 위한 스타일 */
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin-bottom: 20px;
 }
 
 input[type='text']:focus,

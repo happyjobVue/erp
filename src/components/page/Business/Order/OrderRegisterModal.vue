@@ -112,12 +112,73 @@ const updateSupplyPrice = item => {
             <div class="backdrop">
                 <div class="container">
                     <h2>수주 작성</h2>
+                    <h3>견적서 조회</h3>
+
+                    <!-- search Box -->
+                    <label for="">거래처 </label>
+                    <select v-model="searchClient">
+                        <option value="">전체</option>
+                        <option
+                            v-for="client in clients"
+                            :key="client.id"
+                            :value="client.id"
+                        >
+                            {{ client.client_name }}
+                        </option>
+                    </select>
+
+                    <button @click="getOrderEstimateList()">조회</button>
+
+                    <table v-if="orderEstimateList.length > 0">
+                        <thead>
+                            <tr>
+                                <th>견적일</th>
+                                <th>거래처</th>
+                                <th>제품명</th>
+                                <th>총 수량</th>
+                                <th>총 금액</th>
+                                <th>총 세금</th>
+                                <th>등록</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="orderEsti in orderEstimateList"
+                                :key="orderEsti.id"
+                            >
+                                <td>{{ orderEsti.estimateDate }}</td>
+                                <td>{{ orderEsti.clientName }}</td>
+                                <td>{{ orderEsti.productName }}</td>
+                                <td>{{ orderEsti.totalDeliveryCount }}</td>
+                                <td>{{ orderEsti.totalSupplyPrice }}</td>
+                                <td>{{ orderEsti.totalTax }}</td>
+                                <td>
+                                    <button
+                                        @click="
+                                            orderEstiDetailList(orderEsti.id)
+                                        "
+                                    >
+                                        추가
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr v-if="orderEstimateList.length === 0">
+                                <td colspan="7">
+                                    일치하는 검색 결과가 없습니다
+                                </td>
+                                <Pagination
+                                    :totalItems="orderEstimateCnt"
+                                    :items-per-page="5"
+                                    :max-pages-shown="5"
+                                    :onClick="getOrderEstimateList"
+                                    v-model="cPage"
+                                />
+                            </tr>
+                        </tbody>
+                    </table>
 
                     <h3>수주서 작성</h3>
-
-                    <button @click="saveOrder()">등록</button>
-
-                    <button type="button" @click="closeModal()">취소</button>
 
                     <table>
                         <thead>
@@ -165,73 +226,18 @@ const updateSupplyPrice = item => {
                             </template>
                         </tbody>
                     </table>
-                    <h3>견적서 조회</h3>
-                    <div class="search-box">
-                        <!-- search Box -->
-                        <label for="">거래처 </label>
-                        <select v-model="searchClient">
-                            <option value="">전체</option>
-                            <option
-                                v-for="client in clients"
-                                :key="client.id"
-                                :value="client.id"
-                            >
-                                {{ client.client_name }}
-                            </option>
-                        </select>
+                    <div class="button-container">
+                        <button
+                            v-if="orderEstiProductList.length > 0"
+                            @click="saveOrder()"
+                        >
+                            등록
+                        </button>
 
-                        <button @click="getOrderEstimateList()">조회</button>
+                        <button type="button" @click="closeModal()">
+                            취소
+                        </button>
                     </div>
-
-                    <table v-if="orderEstimateList.length > 0">
-                        <thead>
-                            <tr>
-                                <th>견적일</th>
-                                <th>거래처</th>
-                                <th>제품명</th>
-                                <th>총 수량</th>
-                                <th>총 금액</th>
-                                <th>총 세금</th>
-                                <th>등록</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="orderEsti in orderEstimateList"
-                                :key="orderEsti.id"
-                            >
-                                <td>{{ orderEsti.estimateDate }}</td>
-                                <td>{{ orderEsti.clientName }}</td>
-                                <td>{{ orderEsti.productName }}</td>
-                                <td>{{ orderEsti.totalDeliveryCount }}</td>
-                                <td>{{ orderEsti.totalSupplyPrice }}</td>
-                                <td>{{ orderEsti.totalTax }}</td>
-                                <td>
-                                    <button
-                                        @click="
-                                            orderEstiDetailList(orderEsti.id)
-                                        "
-                                    >
-                                        추가
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <tr v-if="orderEstimateList.length === 0">
-                                <td colspan="7">
-                                    일치하는 검색 결과가 없습니다
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- 페이징 -->
-                    <Pagination
-                        :totalItems="orderEstimateCnt"
-                        :items-per-page="5"
-                        :max-pages-shown="5"
-                        :onClick="getOrderEstimateList"
-                        v-model="cPage"
-                    />
                 </div>
             </div>
         </teleport>
@@ -315,12 +321,12 @@ button {
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    margin: 10px 0;
+    margin: 10px 10px;
     cursor: pointer;
     border-radius: 12px;
     box-shadow: 0 4px #999;
     transition: 0.3s;
-    width: 30px;
+    width: 100px;
 }
 
 button:hover {
@@ -333,16 +339,11 @@ button:active {
     transform: translateY(2px);
 }
 
-.button-box {
+/* 버튼을 오른쪽 정렬하기 위한 스타일 */
+.button-container {
     display: flex;
-    text-align: center;
-    justify-content: space-between;
-    margin-top: 20px;
-    width: 300px;
-}
-
-.button-box button {
-    width: 48%;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin-bottom: 20px;
 }
 
 input[type='text']:focus,
@@ -352,10 +353,11 @@ select:focus {
     outline: none;
 }
 select {
-    width: 90%;
+    width: 200px;
     padding: 8px;
     margin-top: 5px;
     margin-bottom: 10px;
+    margin: 10px 15px;
     border-radius: 4px;
     border: 1px solid #ccc;
 }
