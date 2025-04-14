@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios';
-import { defineProps, onMounted, onUnmounted, ref } from 'vue';
+import { computed, defineProps, onMounted, onUnmounted, ref } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 const modalState = useModalStore();
 //response 데이터 저장
@@ -37,6 +37,17 @@ async function orderDetail() {
         console.log('에러');
     }
 }
+
+const totalOrderAmount = computed(() => {
+    if (!orderDetailData.value || !Array.isArray(orderDetailData.value))
+        return 0;
+
+    return orderDetailData.value.reduce((sum, detail) => {
+        const supply = detail.supplyPrice ?? 0;
+        const tax = supply * 0.1;
+        return sum + supply + tax;
+    }, 0);
+});
 
 onMounted(() => {
     if (props.clientId && props.orderId) {
@@ -121,7 +132,7 @@ onUnmounted(() => {
                     </table>
                     <h3>
                         귀사의 일이 번창하시길 기원합니다. 하기와 같이
-                        견적내용을 보내드리오니 확인바랍니다.
+                        수주내용을 보내드리오니 확인바랍니다.
                     </h3>
 
                     <h3>견적 상세 내용</h3>
@@ -132,6 +143,9 @@ onUnmounted(() => {
                                 <th class="table-header">제품</th>
                                 <th class="table-header">납품개수</th>
                                 <th class="table-header">제품단가</th>
+                                <th class="table-header">
+                                    제품단가 * 납품개수
+                                </th>
                                 <th class="table-header">세액</th>
                                 <th class="table-header">총액</th>
                             </tr>
@@ -142,10 +156,20 @@ onUnmounted(() => {
                                 <td>{{ detail.productName }}</td>
                                 <td>{{ detail.quantity }}</td>
                                 <td>{{ detail.unitPrice }}</td>
-                                <td>{{ orderData.totalTax }}</td>
                                 <td>{{ detail.supplyPrice }}</td>
+                                <td>{{ detail.supplyPrice * 0.1 }}</td>
+                                <td>
+                                    {{
+                                        detail.supplyPrice +
+                                        detail.supplyPrice * 0.1
+                                    }}
+                                </td>
                             </tr>
                         </tbody>
+                    </table>
+                    <table>
+                        <th class="table-header">수주 총 금액</th>
+                        <td>{{ totalOrderAmount.toLocaleString() }}</td>
                     </table>
 
                     <div class="button-box">

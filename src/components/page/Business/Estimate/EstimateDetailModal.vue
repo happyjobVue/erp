@@ -5,6 +5,7 @@ import { useModalStore } from '../../../../stores/modalState';
 import { deprecations } from 'sass';
 const estimate = ref('');
 const estimateDetailData = ref([]);
+const productDeposit = ref();
 
 const client = ref('');
 const modalState = useModalStore();
@@ -46,10 +47,9 @@ async function updateEstimateDetail() {
     const param = {
         estimateId: props.estimateId,
         clientId: props.clientId,
-        // 견적 배송 날짜
-        estimateDeliveryDate: estimate.deliveryDate,
-        // 견적 구분
-        estimateSalesArea: estimate.estimateSalesArea,
+        estimateDeliveryDate: estimate.value.deliveryDate, // ✅ 수정
+        estimateSalesArea: estimate.value.salesArea, // ✅ 수정
+        depositAmount: estimate.value.depositAmount,
         // 리스트
         estimateList: estimateDetailData.value,
     };
@@ -69,6 +69,14 @@ const closeModal = () => {
 //  총액 = 제품 단가 * 수량
 const updateSupplyPrice = detail => {
     detail.supplyPrice = detail.unitPrice * detail.quantity;
+    updateTotalEstimateAmount();
+};
+
+const updateTotalEstimateAmount = () => {
+    const totalSupply = estimateDetailData.value.reduce((sum, detail) => {
+        return sum + detail.unitPrice * detail.quantity;
+    }, 0);
+    estimate.value.depositAmount = Math.floor(totalSupply * 1.1); // 10% 세금 포함
 };
 
 onMounted(() => {
@@ -163,13 +171,15 @@ onUnmounted(() => {
                                 <th class="table-header">납품개수</th>
                                 <th class="table-header">제품단가</th>
                                 <th class="table-header">총액</th>
+                                <th class="table-header">세금</th>
+                                <th class="table-header">총 금액</th>
                             </tr>
                             <tr
                                 v-for="(detail, index) in estimateDetailData"
                                 :key="index"
                             >
                                 <td>{{ detail.productName }}</td>
-                                <!-- <td>{{ detail.quantity }}</td> -->
+
                                 <td>
                                     <input
                                         type="number"
@@ -180,8 +190,16 @@ onUnmounted(() => {
                                 </td>
                                 <td>{{ detail.unitPrice }}</td>
                                 <td>{{ detail.supplyPrice }}</td>
+                                <td>{{ detail.supplyPrice * 0.1 }}</td>
+                                <td>
+                                    {{ (detail.supplyPrice * 1.1).toFixed(0) }}
+                                </td>
                             </tr>
                         </tbody>
+                    </table>
+                    <table>
+                        <th class="table-header">견적서 총 금액</th>
+                        <td>{{ estimate.depositAmount }}</td>
                     </table>
 
                     <div class="button-box">
