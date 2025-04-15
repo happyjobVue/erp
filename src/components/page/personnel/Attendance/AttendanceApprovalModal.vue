@@ -179,7 +179,7 @@ onMounted(() => {
                 <tr>
                   <th scope="row">사유</th>
                   <td colspan="3">
-                    <textarea class="inputTxt p100" v-model="ApprovalReason"></textarea>
+                    <textarea class="inputTxt p100" v-model="attendanceApprovalDetail.appReason"></textarea>
                   </td>
                 </tr>
                 <tr>

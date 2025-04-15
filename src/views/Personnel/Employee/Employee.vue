@@ -151,6 +151,7 @@ const OnEmplStatus = () => {
 const Onretire = (personnel) => {
 
     modalType.value = 'retire'
+    UserDetail.value = '';
 
 
     const param = JSON.parse(JSON.stringify(personnel));

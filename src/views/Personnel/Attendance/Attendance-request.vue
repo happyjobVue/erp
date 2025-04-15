@@ -67,8 +67,8 @@ const anualLeave = () => {
 
     const form = new URLSearchParams();
 
-    // form.append('userIdx', userInfo.user.empId);
-    // console.log(userInfo.user.empId);
+    form.append('userIdx', userInfo.user.empId);
+    console.log(userInfo.user.empId);
 
     axios
         .post(`/api/personnel/attendanceCnt.do`,form)
@@ -234,7 +234,9 @@ onMounted(() => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in attendanceList.attendanceList" :key="item.id" @click="() => AttendanceStatus(item)">
+              <tr v-for="(item, index) in attendanceList.attendanceList" :key="item.id" @click="() => AttendanceStatus(item)"
+                style="hover:"
+                >
                 <td>{{ item.id }}</td>
                 <td>{{ item.reqType }}</td>
                 <td>{{ item.number }}</td>
@@ -405,6 +407,11 @@ td {
     text-align: center;
     white-space: nowrap;
 }
+
+tr:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+  }
  
   </style>
   
