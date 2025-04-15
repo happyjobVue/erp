@@ -27,7 +27,17 @@ const emit = defineEmits(['modalClose', 'postSuccess']);
 
 // 추가 버튼 클릭 시
 const addEstimateItem = () => {
-    console.log('추가 버튼 클릭 후 ');
+    // 유효성 검사
+    if (!selectedManufacturer.value || !selectedProduct.value) {
+        alert('제조사와 제품을 선택해주세요.');
+        return;
+    }
+    if (!quantity.value || isNaN(quantity.value) || quantity.value <= 0) {
+        alert('유효한 수량을 입력해주세요.');
+        return;
+    }
+
+    // 총액 계산
     // 새로운 항목을 estimateList 배열에 추가
     estimateList.value.push({
         manufacturerId: selectedManufacturer.value.manufacturerId,
@@ -49,6 +59,20 @@ const addEstimateItem = () => {
 };
 
 const saveEstimate = async () => {
+    // 유효성 검사
+    if (!selectedClient.value) {
+        alert('거래처를 선택해주세요.');
+        return;
+    }
+
+    if (!estimateDeliveryDate.value) {
+        alert('납기일을 선택해주세요.');
+        return;
+    }
+
+    if (!estimateSalesArea.value) {
+        alert('영역구분을 선택해주세요.');
+    }
     const param = {
         clientId: selectedClient.value,
         estimateDeliveryDate: estimateDeliveryDate.value,
@@ -130,9 +154,7 @@ const calculateSupplyPrice = () => {
                     </tr>
                 </table>
                 <hr />
-                <div class="button-box">
-                    <button @click="addEstimateItem">추가</button>
-                </div>
+
                 <table>
                     <tr>
                         <th>제조업체</th>
@@ -185,10 +207,11 @@ const calculateSupplyPrice = () => {
                         <td>
                             <input type="text" v-model="supplyPrice" disabled />
                         </td>
-                        <th></th>
-                        <td></td>
                     </tr>
                 </table>
+                <div class="button-container">
+                    <button @click="addEstimateItem">추가</button>
+                </div>
 
                 <table>
                     <tbody>
@@ -209,17 +232,22 @@ const calculateSupplyPrice = () => {
                             <td>{{ item.quantity }}</td>
                             <td>{{ item.supplyPrice }}</td>
                             <td>
-                                <button @click="estimateList.splice(index, 1)">
-                                    삭제
-                                </button>
+                                <div>
+                                    <button
+                                        @click="estimateList.splice(index, 1)"
+                                    >
+                                        삭제
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
 
-                <div class="button-box">
-                    <button @click="saveEstimate()">등록</button>
-
+                <div class="button-container">
+                    <div v-if="estimateList.length > 0">
+                        <button @click="saveEstimate()">등록</button>
+                    </div>
                     <button type="button" @click="closeModal()">취소</button>
                 </div>
             </div>
@@ -296,12 +324,13 @@ button {
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    margin: 10px 0;
+
     cursor: pointer;
     border-radius: 12px;
     box-shadow: 0 4px #999;
     transition: 0.3s;
-    width: 30px;
+    width: 100px;
+    margin: 10px 10px;
 }
 
 button:hover {
@@ -312,18 +341,6 @@ button:active {
     background-color: #3e8e41;
     box-shadow: 0 2px #666;
     transform: translateY(2px);
-}
-
-.button-box {
-    display: flex;
-    text-align: center;
-    justify-content: space-between;
-    margin-top: 20px;
-    width: 200px;
-}
-
-.button-box button {
-    width: 48%;
 }
 
 input[type='text']:focus,
@@ -350,14 +367,6 @@ input {
     border: 1px solid #ccc;
 }
 
-.button-box {
-    display: flex;
-    text-align: center;
-    justify-content: space-between;
-    margin-top: 20px;
-    width: 300px;
-}
-
 .button-box button {
     width: 48%;
 }
@@ -367,5 +376,11 @@ input[type='date']:focus,
 select:focus {
     border-color: #3bb2ea;
     outline: none;
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin-bottom: 20px;
 }
 </style>
