@@ -157,13 +157,19 @@ const saveClient = () => {
                             <tr>
                                 <th class="table-header">우편번호</th>
                                 <td>
-                                    <input type="text" v-model="postcode" />
-                                    <button
-                                        @click="execDaumPostcode"
-                                        :disabled="!isScriptLoaded"
-                                    >
-                                        우편번호
-                                    </button>
+                                    <div class="postcode-group">
+                                        <input
+                                            class="post-code"
+                                            type="text"
+                                            v-model="postcode"
+                                        />
+                                        <button
+                                            @click="execDaumPostcode"
+                                            :disabled="!isScriptLoaded"
+                                        >
+                                            우편번호
+                                        </button>
+                                    </div>
                                 </td>
                                 <th class="table-header">주소</th>
                                 <td>
@@ -245,7 +251,7 @@ const saveClient = () => {
                         </tbody>
                     </table>
 
-                    <div class="button-box">
+                    <div class="button-container">
                         <button @click="saveClient()">등록</button>
                         <button
                             type="button"
@@ -324,6 +330,21 @@ select {
     border: 1px solid #ccc;
 }
 
+.postcode-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .post-code {
+        flex: 1;
+        width: auto; // 필요시 너비 자동 조정
+    }
+
+    button {
+        flex-shrink: 0; // 버튼 크기 줄어들지 않도록
+    }
+}
+
 button {
     background-color: #3bb2ea;
     border: none;
@@ -338,7 +359,9 @@ button {
     border-radius: 12px;
     box-shadow: 0 4px #999;
     transition: 0.3s;
-    width: 30px;
+    width: 110px;
+    height: 45px;
+    margin: 4px 2px;
 }
 
 button:hover {
@@ -351,16 +374,15 @@ button:active {
     transform: translateY(2px);
 }
 
-.button-box {
-    display: flex;
-    text-align: center;
-    justify-content: space-between;
-    margin-top: 20px;
-    width: 300px;
-}
-
 .button-box button {
     width: 48%;
+}
+
+/* 버튼을 오른쪽 정렬하기 위한 스타일 */
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin-bottom: 20px;
 }
 
 input[type='text']:focus,

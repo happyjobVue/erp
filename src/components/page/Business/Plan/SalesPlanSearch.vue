@@ -44,11 +44,12 @@ onMounted(async () => {
 <template>
     <div class="search-box">
         <!-- 제조사 셀렉트 박스 -->
+        제조사
         <select
             v-model="selectedManufacturer"
             @change="handleManufacturerChange"
         >
-            <option value="" disabled>제조사</option>
+            <option value="" disabled>전체</option>
             <option
                 v-for="manufacturer in manufacturers"
                 :key="manufacturer.manufacturer_id"
@@ -59,6 +60,7 @@ onMounted(async () => {
         </select>
 
         <!-- 제품 목록 -->
+        제품
         <select v-model="selectedProduct">
             <option value="" disabled>제품</option>
             <option
@@ -69,6 +71,7 @@ onMounted(async () => {
                 {{ product.name }}
             </option>
         </select>
+        목표 날짜
         <input type="date" v-model="searchStDate" />
         <button @click="handlerSearch">조회</button>
     </div>

@@ -109,8 +109,9 @@ const onModalClose = () => {
                     <th scope="col">제품</th>
                     <th scope="col">납기일자</th>
                     <th scope="col">납품수량</th>
-                    <th scope="col">공급가액</th>
+                    <th scope="col">단가 총금액</th>
                     <th scope="col">세액</th>
+                    <th scope="col">총 금액</th>
                     <th scope="col">영역구분</th>
                     <th scope="col">상세조회</th>
                 </tr>
@@ -127,6 +128,9 @@ const onModalClose = () => {
                             <td>{{ est.totalDeliveryCount }}</td>
                             <td>{{ est.totalSupplyPrice }}</td>
                             <td>{{ est.totalTax }}</td>
+                            <td>
+                                {{ est.depositAmount }}
+                            </td>
                             <td>{{ est.salesArea }}</td>
                             <td>
                                 <button
