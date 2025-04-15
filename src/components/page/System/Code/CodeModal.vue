@@ -52,10 +52,9 @@
 </template>
 
 <script setup>
-rom '../../../../stores/modalState';import { onMounted, onUnmounted } from 'vue';
-import { useModalStore } f
+import { onMounted, onUnmounted } from 'vue';
+import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
-import Swal from 'sweetalert2';
 const { setModalState } = useModalStore();
 const { id } = defineProps(['id']);
 const emit = defineEmits(['modalClose', 'postSuccess']);
@@ -84,26 +83,14 @@ const groupDetailSave = async () => {
         !groupDetail.value.groupCode ||
         groupDetail.value.groupCode.trim() === ''
     ) {
-        Swal.fire({
-            icon: 'warning',
-            title: '공통코드를 입력해주세요.',
-            text: '필수항목입니다.',
-            confirmButtonText: '확인',
-        });
-        return;
+        alert('공통코드를 입력해주세요.');
         return;
     }
     if (
         !groupDetail.value.groupName ||
         groupDetail.value.groupName.trim() === ''
     ) {
-        Swal.fire({
-            icon: 'warning',
-            title: '대변과목을 입력해주세요.',
-            text: '필수항목입니다.',
-            confirmButtonText: '확인',
-        });
-        return;
+        alert('공통코드명을 입력해주세요.');
         return;
     }
 
@@ -118,31 +105,15 @@ const groupDetailSave = async () => {
             emit('postSuccess');
         } else {
             if (res.data.message === '이미 존재하는 공통 코드입니다.') {
-                Swal.fire({
-                    icon: 'warning',
-                    title: '경고',
-                    text: res.data.message,
-                    confirmButtonText: '확인',
-                }).then(() => {
-                    emit('postSuccess');
-                    emit('searchGroupCode', groupDetail.value.groupCode);
-                });
+                alert(res.data.message);
+                emit('postSuccess');
+                emit('searchGroupCode', groupDetail.value.groupCode);
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: '오류 발생',
-                    text: res.data.message,
-                    confirmButtonText: '확인',
-                });
+                alert(res.data.message);
             }
         }
     } catch (e) {
-        Swal.fire({
-            icon: 'error',
-            title: '오류 발생',
-            text: res.data.message,
-            confirmButtonText: '확인',
-        });
+        alert(res.data.message);
     }
 };
 
@@ -159,31 +130,15 @@ const groupDetailUpdate = async () => {
             emit('postSuccess');
         } else {
             if (res.data.message === '미사용 코드입니다.') {
-                Swal.fire({
-                    icon: 'warning',
-                    title: '경고',
-                    text: res.data.message,
-                    confirmButtonText: '확인',
-                }).then(() => {
-                    emit('postSuccess');
-                    emit('searchGroupCode', groupDetail.value.groupCode);
-                });
+                alert(res.data.message);
+                emit('postSuccess');
+                emit('searchGroupCode', groupDetail.value.groupCode);
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: '오류 발생',
-                    text: res.data.message,
-                    confirmButtonText: '확인',
-                });
+                alert(res.data.message);
             }
         }
     } catch (e) {
-        Swal.fire({
-            icon: 'error',
-            title: '오류 발생',
-            text: res.data.message,
-            confirmButtonText: '확인',
-        });
+        alert('수정 중 오류가 발생했습니다.');
     }
 };
 
@@ -196,20 +151,10 @@ const groupDetailDelete = async () => {
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
-            Swal.fire({
-                icon: 'error',
-                title: '삭제 실패',
-                text: '잠시 후 다시 시도해주세요.',
-                confirmButtonText: '확인',
-            });
+            alert('삭제 실패');
         }
     } catch (e) {
-        Swal.fire({
-            icon: 'error',
-            title: '삭제 중 오류 발생',
-            text: '문제가 발생했습니다. 다시 시도해주세요.',
-            confirmButtonText: '확인',
-        });
+        alert('삭제 중 오류가 발생했습니다.');
     }
 };
 
