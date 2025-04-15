@@ -253,14 +253,13 @@ const expenseApprovalUpdate = async () => {
             '/api/account/expenseLastUpdate.do',
             param
         );
-        console.log('서버 응답:', res.data);
+
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
             alert('저장 실패');
         }
     } catch (e) {
-        console.error('저장 중 오류:', e);
         alert('저장 중 오류가 발생했습니다.');
     }
 };

@@ -17,7 +17,7 @@ import ExpenseReviewList from '../views/Account/ExpenseReviewList.vue';
 import PlanResult from '../views/Business/PlanResult/PlanResult.vue';
 import Estimate from '../views/Business/Estimate/Estimate.vue';
 import Code from '../views/System/Code.vue';
-import ExpenseReviewListPrint from '../components/page/Account/ExpenseReview/ExpenseReviewListPrint.vue';
+import ExpenseReviewListPrint from '../components/page/Account/ExpenseReviewList/ExpenseReviewListPrint.vue';
 import SalaryManage from '../views/Personnel/Salary/Salary-manage.vue';
 import AttendanceList from '../views/Personnel/Attendance/Attendance-list.vue';
 import ExpenseApproval from '../views/Account/ExpenseApproval.vue';

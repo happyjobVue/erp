@@ -90,7 +90,7 @@ const searchDetail = async () => {
         });
         searchAccount.value = response.data.accountGroupList[0];
     } catch (e) {
-        console.error(e);
+        console.error('상세정보 불러오기 실패:', e);
     }
 };
 
@@ -133,7 +133,7 @@ const manageSave = async () => {
             alert('저장 실패');
         }
     } catch (e) {
-        console.error(e);
+        alert('저장 중 오류가 발생했습니다.');
     }
 };
 
@@ -146,10 +146,10 @@ const manageUpdate = async () => {
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
-            alert('저장 실패');
+            alert('수정 실패');
         }
     } catch (e) {
-        console.error(e);
+        alert('수정 중 오류가 발생했습니다.');
     }
 };
 
@@ -165,7 +165,7 @@ const manageDelete = async () => {
             alert('삭제 실패');
         }
     } catch (e) {
-        console.error(e);
+        alert('삭제 중 오류가 발생했습니다.');
     }
 };
 

@@ -72,7 +72,7 @@ const searchList = async () => {
         );
         groupCodeList.value = response.data;
     } catch (e) {
-        console.error(e);
+        console.error('상세정보 불러오기 실패:', e);
     }
 };
 

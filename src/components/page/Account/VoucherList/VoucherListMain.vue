@@ -87,9 +87,16 @@ const onPostSuccess = () => {
     searchList();
 };
 
-const selectedVoucher = computed(() =>
-    voucherList.value?.voucher.find(v => v.voucher_no === voucherNo.value)
-);
+const selectedVoucher = computed(() => {
+    const v = voucherList.value?.voucher.find(
+        v => v.voucher_no === voucherNo.value
+    );
+    if (!v) return null;
+    return {
+        ...v,
+        type: v.exp_id ? '비용' : '매출',
+    };
+});
 
 onMounted(() => {
     searchList();

@@ -9,7 +9,7 @@
                         <td>
                             <input
                                 type="text"
-                                v-model="voucherDetail.voucher_no"
+                                :value="voucherDetail.voucher_no"
                                 readonly
                             />
                         </td>
@@ -17,7 +17,7 @@
                         <td>
                             <input
                                 type="text"
-                                v-model="voucherDetail.account_type"
+                                :value="voucherDetail.type"
                                 readonly
                             />
                         </td>
@@ -25,7 +25,7 @@
                         <td>
                             <input
                                 type="text"
-                                v-model="voucherDetail.emp_name"
+                                :value="voucherDetail.emp_name"
                                 readonly
                             />
                         </td>
@@ -33,7 +33,7 @@
                         <td>
                             <input
                                 type="date"
-                                v-model="voucherDetail.voucher_date"
+                                :value="voucherDetail.voucher_date"
                                 readonly
                             />
                         </td>
@@ -42,27 +42,31 @@
                         <td class="label">거래처</td>
                         <td>
                             <input
-                                type="date"
-                                v-model="voucherDetail.client_name"
-                                readonly
-                            />
-                        </td>
-                        <td class="label">주문번호</td>
-                        <td>
-                            <input
                                 type="text"
-                                v-model="voucherDetail.order_id"
+                                :value="voucherDetail.client_name"
                                 readonly
                             />
                         </td>
-                        <td class="label">지출번호</td>
-                        <td>
-                            <input
-                                type="text"
-                                v-model="voucherDetail.exp_id"
-                                readonly
-                            />
-                        </td>
+                        <template v-if="voucherDetail.type === '매출'">
+                            <td class="label">주문번호</td>
+                            <td>
+                                <input
+                                    type="text"
+                                    :value="voucherDetail.order_id"
+                                    readonly
+                                />
+                            </td>
+                        </template>
+                        <template v-else-if="voucherDetail.type === '비용'">
+                            <td class="label">지출번호</td>
+                            <td>
+                                <input
+                                    type="text"
+                                    :value="voucherDetail.exp_id"
+                                    readonly
+                                />
+                            </td>
+                        </template>
                     </tr>
                 </table>
                 <table class="content-table">
@@ -78,7 +82,7 @@
                             <td>
                                 <input
                                     type="text"
-                                    v-model="voucherDetail.debit_name"
+                                    :value="voucherDetail.debit_name"
                                     readonly
                                 />
                             </td>
@@ -101,7 +105,7 @@
                             <td>
                                 <input
                                     type="text"
-                                    v-model="voucherDetail.crebit_name"
+                                    :value="voucherDetail.crebit_name"
                                     readonly
                                 />
                             </td>

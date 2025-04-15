@@ -254,7 +254,6 @@ const searchDetail = async () => {
         expenseDetail.value = response.data.expenseDetail;
         clientList.value = response.data.clientList;
         expenseDetailName.value = response.data.expenseDetailName;
-        console.log('clientList:', clientList.value);
     } catch (e) {
         console.error('상세정보 불러오기 실패:', e);
     }
@@ -297,7 +296,6 @@ const fileHandler = e => {
 };
 
 const expenseListSave = async () => {
-    console.log('expenseListSave 함수가 호출되었습니다.');
     try {
         if (!expenseDetail.value.use_date) {
             alert('사용일자를 입력해주세요.');
@@ -358,7 +356,6 @@ const expenseListSave = async () => {
             alert('저장 실패');
         }
     } catch (e) {
-        console.error('axios 요청 중 오류 발생:', e);
         alert('저장 중 오류가 발생했습니다.');
     }
 };
@@ -375,7 +372,7 @@ const expenseListDelete = async () => {
             alert('삭제 실패');
         }
     } catch (e) {
-        console.error('삭제 중 오류 발생:', e);
+        alert('삭제 중 오류 발생:', e);
     }
 };
 

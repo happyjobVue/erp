@@ -198,8 +198,8 @@ import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
 const emit = defineEmits(['modalClose', 'postSuccess']);
 const { setModalState } = useModalStore();
-const expenseDetail = ref({});
-const crebitList = ref({});
+const expenseDetail = ref({ crebit_code: 'AC05101', credit_name: '현금' });
+const crebitList = ref({ detail_name: '현금' });
 const { id } = defineProps(['id']);
 const showRadio = ref(false);
 const showSubmitButton = ref(false);
@@ -220,13 +220,10 @@ const searchDetail = async () => {
                 id,
             }
         );
-        expenseDetail.value = response.data.expenseDetail;
         crebitList.value = response.data.crebitList;
-        if (!crebitList.value.crebit_code) {
-            crebitList.value.crebit_code = 'AC03101';
-        }
+        expenseDetail.value = response.data.expenseDetail;
     } catch (e) {
-        console.error(e);
+        console.error('상세정보 불러오기 실패:', e);
     }
 };
 
@@ -248,15 +245,21 @@ const downloadFileImage = async () => {
         link.click();
         link.remove();
     } catch (e) {
-        console.error(e);
+        console.error('파일 다운로드 실패:', e);
     }
 };
 
 const expenseReviewUpdate = async () => {
+    if (expenseDetail.value.is_approval === 'N') {
+        updateExpense();
+        return;
+    }
+
     if (!['F', 'N'].includes(expenseDetail.value.is_approval)) {
         alert('승인여부를 선택해주세요. (승인대기 또는 반려)');
         return;
     }
+
     if (
         !expenseDetail.value.crebit_code ||
         expenseDetail.value.crebit_code.trim() === ''
@@ -264,6 +267,11 @@ const expenseReviewUpdate = async () => {
         alert('대변과목을 입력해주세요.');
         return;
     }
+
+    updateExpense();
+};
+
+const updateExpense = async () => {
     const param = new URLSearchParams();
     param.append('checkApproval', expenseDetail.value.is_approval);
     param.append('detail_code', expenseDetail.value.crebit_code);
@@ -273,7 +281,6 @@ const expenseReviewUpdate = async () => {
 
     try {
         const res = await axios.post('/api/account/expenseUpdate.do', param);
-        console.log('서버 응답:', res.data);
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
