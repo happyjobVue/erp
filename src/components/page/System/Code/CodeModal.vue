@@ -52,8 +52,8 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue';
-import { useModalStore } from '../../../../stores/modalState';
+rom '../../../../stores/modalState';import { onMounted, onUnmounted } from 'vue';
+import { useModalStore } f
 import axios from 'axios';
 const { setModalState } = useModalStore();
 const { id } = defineProps(['id']);
