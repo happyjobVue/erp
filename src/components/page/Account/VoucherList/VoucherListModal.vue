@@ -90,7 +90,7 @@
                                 <input
                                     type="text"
                                     :value="
-                                        numberWithCommas(
+                                        formattedPayment(
                                             voucherDetail.voucher_amount
                                         )
                                     "
@@ -116,7 +116,7 @@
                                 <input
                                     type="text"
                                     :value="
-                                        numberWithCommas(
+                                        formattedPayment(
                                             voucherDetail.voucher_amount
                                         )
                                     "
@@ -130,9 +130,9 @@
                                 <input
                                     type="text"
                                     :value="
-                                        numberWithCommas(
+                                        formattedPayment(
                                             voucherDetail.voucher_amount
-                                        )
+                                        ) + ' 원'
                                     "
                                     readonly
                                 />
@@ -141,9 +141,9 @@
                                 <input
                                     type="text"
                                     :value="
-                                        numberWithCommas(
+                                        formattedPayment(
                                             voucherDetail.voucher_amount
-                                        )
+                                        ) + ' 원'
                                     "
                                     readonly
                                 />
@@ -177,7 +177,7 @@ const { voucherDetail } = defineProps({
     },
 });
 
-const numberWithCommas = x => {
+const formattedPayment = x => {
     if (typeof x !== 'number') return '';
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };

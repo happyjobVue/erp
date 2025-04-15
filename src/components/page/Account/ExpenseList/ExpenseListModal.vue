@@ -127,7 +127,7 @@
                         <td>
                             <input
                                 type="text"
-                                v-model="expenseDetail.expense_payment"
+                                v-model="formattedPayment"
                                 placeholder="결의금액 입력"
                                 :readonly="isReadOnly"
                             />
@@ -206,6 +206,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 const { setModalState } = useModalStore();
 const isEditMode = computed(() => !!id);
 const expenseDetail = ref({
@@ -228,6 +229,19 @@ const approvalMap = computed(() => ({
     N: '반려',
     C: '취소',
 }));
+
+const formattedPayment = computed({
+    get() {
+        const value =
+            expenseDetail.value.expense_payment?.toString().replace(/,/g, '') ||
+            '';
+        return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' 원';
+    },
+    set(value) {
+        const numberValue = value.replace(/[^0-9]/g, ''); 
+        expenseDetail.value.expense_payment = parseInt(numberValue, 10) || 0;
+    },
+});
 
 const fetchLoginInfo = async () => {
     try {
@@ -298,32 +312,56 @@ const fileHandler = e => {
 const expenseListSave = async () => {
     try {
         if (!expenseDetail.value.use_date) {
-            alert('사용일자를 입력해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                title: '사용일자를 입력해주세요.',
+                confirmButtonText: '확인',
+            });
             return;
         }
 
         if (!expenseDetail.value.group_name) {
-            alert('계정대분류명을 선택해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                title: '계정대분류명을 선택해주세요.',
+                confirmButtonText: '확인',
+            });
             return;
         }
 
         if (!expenseDetail.value.debit_code) {
-            alert('계정과목을 선택해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                title: '계정과목을 선택해주세요.',
+                confirmButtonText: '확인',
+            });
             return;
         }
 
         if (!expenseDetail.value.client_id) {
-            alert('거래처명을 선택해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                title: '거래처명을 선택해주세요.',
+                confirmButtonText: '확인',
+            });
             return;
         }
 
         if (!expenseDetail.value.expense_payment) {
-            alert('결의금액을 입력해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                title: '결의금액을 입력해주세요.',
+                confirmButtonText: '확인',
+            });
             return;
         }
 
         if (!fileData.value) {
-            alert('첨부파일을 선택해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                title: '첨부파일을 선택해주세요.',
+                confirmButtonText: '확인',
+            });
             return;
         }
 
@@ -343,20 +381,31 @@ const expenseListSave = async () => {
 
         Object.entries(textData).forEach(([key, value]) => {
             formData.append(key, value);
-            formData.append('file', fileData.value);
         });
+        formData.append('file', fileData.value);
 
         const res = await axios.post(
             '/api/account/expenseFileSave.do',
             formData
         );
+
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
-            alert('저장 실패');
+            Swal.fire({
+                icon: 'error',
+                title: '저장 실패',
+                text: '잠시 후 다시 시도해주세요.',
+                confirmButtonText: '확인',
+            });
         }
     } catch (e) {
-        alert('저장 중 오류가 발생했습니다.');
+        Swal.fire({
+            icon: 'error',
+            title: '오류 발생',
+            text: '저장 중 문제가 발생했습니다.',
+            confirmButtonText: '확인',
+        });
     }
 };
 
@@ -366,13 +415,24 @@ const expenseListDelete = async () => {
 
     try {
         const res = await axios.post('/api/account/expenseDelete.do', param);
+
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
-            alert('삭제 실패');
+            Swal.fire({
+                icon: 'error',
+                title: '삭제 실패',
+                text: '잠시 후 다시 시도해주세요.',
+                confirmButtonText: '확인',
+            });
         }
     } catch (e) {
-        alert('삭제 중 오류 발생:', e);
+        Swal.fire({
+            icon: 'error',
+            title: '삭제 중 오류 발생',
+            text: '문제가 발생했습니다. 다시 시도해주세요.',
+            confirmButtonText: '확인',
+        });
     }
 };
 

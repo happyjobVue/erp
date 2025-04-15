@@ -157,7 +157,7 @@
                         <td>
                             <input
                                 type="text"
-                                v-model="expenseDetail.expense_payment"
+                                v-model="formattedPayment"
                                 readonly
                             />
                         </td>
@@ -196,6 +196,7 @@
 import { ref, onMounted } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 const emit = defineEmits(['modalClose', 'postSuccess']);
 const { setModalState } = useModalStore();
 const expenseDetail = ref({ crebit_code: 'AC05101', credit_name: '현금' });
@@ -211,6 +212,12 @@ const approvalMap = computed(() => ({
     N: '반려',
     C: '취소',
 }));
+
+const formattedPayment = computed(() => {
+    const value =
+        expenseDetail.value.expense_payment?.toString().replace(/,/g, '') || '';
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' 원';
+});
 
 const searchDetail = async () => {
     try {
@@ -256,7 +263,12 @@ const expenseReviewUpdate = async () => {
     }
 
     if (!['F', 'N'].includes(expenseDetail.value.is_approval)) {
-        alert('승인여부를 선택해주세요. (승인대기 또는 반려)');
+        Swal.fire({
+            icon: 'warning',
+            title: '승인여부를 선택해주세요.',
+            text: '승인대기 또는 반려를 선택해 주세요.',
+            confirmButtonText: '확인',
+        });
         return;
     }
 
@@ -264,7 +276,12 @@ const expenseReviewUpdate = async () => {
         !expenseDetail.value.crebit_code ||
         expenseDetail.value.crebit_code.trim() === ''
     ) {
-        alert('대변과목을 입력해주세요.');
+        Swal.fire({
+            icon: 'warning',
+            title: '대변과목을 입력해주세요.',
+            text: '필수항목입니다.',
+            confirmButtonText: '확인',
+        });
         return;
     }
 
@@ -284,10 +301,20 @@ const updateExpense = async () => {
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
-            alert('저장 실패');
+            Swal.fire({
+                icon: 'error',
+                title: '저장 실패',
+                text: '잠시 후 다시 시도해주세요.',
+                confirmButtonText: '확인',
+            });
         }
     } catch (e) {
-        alert('저장 중 오류가 발생했습니다.', e);
+        Swal.fire({
+            icon: 'error',
+            title: '오류 발생',
+            text: '저장 중 문제가 발생했습니다.',
+            confirmButtonText: '확인',
+        });
     }
 };
 

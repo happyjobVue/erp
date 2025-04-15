@@ -72,6 +72,7 @@
 import { onMounted, onUnmounted } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 const { setModalState } = useModalStore();
 const { id } = defineProps(['id']);
 const emit = defineEmits(['modalClose', 'postSuccess']);
@@ -99,28 +100,44 @@ const manageSave = async () => {
         !searchAccount.value.group_code ||
         searchAccount.value.group_code.trim() === ''
     ) {
-        alert('계정대분류명을 입력해주세요.');
+        Swal.fire({
+            icon: 'warning',
+            title: '계정대분류명을 선택해주세요.',
+            confirmButtonText: '확인',
+        });
         return;
     }
     if (
         !searchAccount.value.detail_name ||
         searchAccount.value.detail_name.trim() === ''
     ) {
-        alert('계정세부명을 입력해주세요.');
+        Swal.fire({
+            icon: 'warning',
+            title: '계정세부명을 입력해주세요.',
+            confirmButtonText: '확인',
+        });
         return;
     }
     if (
         !searchAccount.value.content ||
         searchAccount.value.content.trim() === ''
     ) {
-        alert('상세내용을 입력해주세요.');
+        Swal.fire({
+            icon: 'warning',
+            title: '상세내용을 입력해주세요.',
+            confirmButtonText: '확인',
+        });
         return;
     }
     if (
         !searchAccount.value.code_type ||
         searchAccount.value.code_type.trim() === ''
     ) {
-        alert('수입/지출을 입력해주세요.');
+        Swal.fire({
+            icon: 'warning',
+            title: '수입/지출을 입력해주세요.',
+            confirmButtonText: '확인',
+        });
         return;
     }
     const param = new URLSearchParams(searchAccount.value);
@@ -130,10 +147,20 @@ const manageSave = async () => {
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
-            alert('저장 실패');
+            Swal.fire({
+                icon: 'error',
+                title: '저장 실패',
+                text: '잠시 후 다시 시도해주세요.',
+                confirmButtonText: '확인',
+            });
         }
     } catch (e) {
-        alert('저장 중 오류가 발생했습니다.');
+        Swal.fire({
+            icon: 'error',
+            title: '오류 발생',
+            text: '저장 중 문제가 발생했습니다.',
+            confirmButtonText: '확인',
+        });
     }
 };
 
@@ -146,10 +173,20 @@ const manageUpdate = async () => {
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
-            alert('수정 실패');
+            Swal.fire({
+                icon: 'error',
+                title: '수정 실패',
+                text: '잠시 후 다시 시도해주세요.',
+                confirmButtonText: '확인',
+            });
         }
     } catch (e) {
-        alert('수정 중 오류가 발생했습니다.');
+        Swal.fire({
+            icon: 'error',
+            title: '오류 발생',
+            text: '수정 중 문제가 발생했습니다.',
+            confirmButtonText: '확인',
+        });
     }
 };
 
@@ -162,10 +199,20 @@ const manageDelete = async () => {
         if (res.data.result === 'success') {
             emit('postSuccess');
         } else {
-            alert('삭제 실패');
+            Swal.fire({
+                icon: 'error',
+                title: '삭제 실패',
+                text: '잠시 후 다시 시도해주세요.',
+                confirmButtonText: '확인',
+            });
         }
     } catch (e) {
-        alert('삭제 중 오류가 발생했습니다.');
+        Swal.fire({
+            icon: 'error',
+            title: '삭제 중 오류 발생',
+            text: '문제가 발생했습니다. 다시 시도해주세요.',
+            confirmButtonText: '확인',
+        });
     }
 };
 

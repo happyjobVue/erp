@@ -32,7 +32,7 @@
                         <td>{{ expense.group_name }}</td>
                         <td>{{ expense.detail_name }}</td>
                         <td>{{ expense.use_department }}</td>
-                        <td>{{ expense.expense_payment }}</td>
+                        <td>{{ formatPayment(expense.expense_payment) }}</td>
                         <td>{{ approvalMap[expense.is_approval] }}</td>
                     </tr>
                 </template>
@@ -71,6 +71,14 @@ const approvalMap = computed(() => ({
     N: '반려',
     C: '취소',
 }));
+
+const formatPayment = value => {
+    const formattedValue = (value?.toString().replace(/,/g, '') || '').replace(
+        /\B(?=(\d{3})+(?!\d))/g,
+        ','
+    );
+    return formattedValue + ' 원';
+};
 
 const searchList = async () => {
     const param = new URLSearchParams({
