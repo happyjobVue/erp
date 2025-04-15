@@ -69,6 +69,36 @@ function handleProductChange() {
 }
 
 const saveSalesPlan = () => {
+    // ✅ 유효성 검사
+    if (!userId.user.empId) {
+        alert('사원 정보가 없습니다.');
+        return;
+    }
+
+    if (!SelectedClient.value) {
+        alert('거래처를 선택해주세요.');
+        return;
+    }
+
+    if (!selectedManufactureId.value || !selectedIndutryCode.value) {
+        alert('제조사를 선택해주세요.');
+        return;
+    }
+
+    if (!selectedProductCode.value || !selectedProductName.value) {
+        alert('제품을 선택해주세요.');
+        return;
+    }
+
+    if (!targetDate.value) {
+        alert('목표 일자를 입력해주세요.');
+        return;
+    }
+
+    if (!goalQuanti.value || isNaN(goalQuanti.value) || goalQuanti.value <= 0) {
+        alert('목표 수량은 1 이상의 숫자로 입력해주세요.');
+        return;
+    }
     const salesPlan = {
         emp_id: userId.user.empId,
         client_id: SelectedClient.value,

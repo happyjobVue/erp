@@ -1,12 +1,11 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, onUnmounted } from 'vue';
 import {
     fetchClient,
     fetchManufacturers,
 } from '../../../../common/selectBoxApi';
 import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
-import { onUnmounted } from 'vue';
 const modalState = useModalStore();
 const clients = ref(''); // 고객 목록
 const manufacturers = ref(''); //제조사 목록
@@ -70,9 +69,11 @@ async function orderEstiDetailList(estiId) {
 }
 
 // 수주 저장
-// estimateId , clientId , orderDeliveryDate, orderSalesArea
-// orderList => {productId, unipPrice , quantity , supplyPrice }
+
 async function saveOrder() {
+    if (!orderDeliveryDate.value) {
+        alert('납기일을 선택해주세요.');
+    }
     orderEstiId.value = orderEstiProductList.value[0]?.estimateId;
     orderSalesArea.value = orderEstiProductList.value[0]?.salesArea;
     selectedClient.value = orderEstiProductList.value[0]?.clientId;
@@ -98,16 +99,9 @@ const closeModal = () => {
     modalState.setModalState();
 };
 
-//  총액 = 제품 단가 * 수량
-const updateSupplyPrice = item => {
-    item.supplyPrice = item.unitPrice * item.quantity;
-};
-
 onUnmounted(() => {
     emit('modalClose', 0);
 });
-
-// {"estimateId":"58","clientId":"37","orderDeliveryDate":"2025-04-10","orderSalesArea":"SCM","orderList":[{"productId":1,"unitPrice":"80000","quantity":"10","supplyPrice":"800000"},{"productId":1,"unitPrice":"80000","quantity":"10","supplyPrice":"800000"}]}
 </script>
 
 <template>

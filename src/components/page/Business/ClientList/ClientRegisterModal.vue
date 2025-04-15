@@ -69,6 +69,39 @@ const emit = defineEmits(['modalClose', 'postSuccess']);
 
 // 저장 함수
 const saveClient = () => {
+    // ✅ 유효성 검사
+    if (
+        !saveData.value.client_name ||
+        saveData.value.client_name.trim() === ''
+    ) {
+        alert('거래처명을 입력해주세요.');
+        return;
+    }
+
+    if (!saveData.value.biz_num || saveData.value.biz_num.trim() === '') {
+        alert('사업자등록번호를 입력해주세요.');
+        return;
+    }
+
+    if (!saveData.value.person || saveData.value.person.trim() === '') {
+        alert('담당자명을 입력해주세요.');
+        return;
+    }
+
+    if (!saveData.value.person_ph || saveData.value.person_ph.trim() === '') {
+        alert('담당자 연락처를 입력해주세요.');
+        return;
+    }
+
+    if (!saveData.value.ph || saveData.value.ph.trim() === '') {
+        alert('회사 전화번호를 입력해주세요.');
+        return;
+    }
+
+    if (!roadAddress.value || !postcode.value) {
+        alert('주소 검색을 완료해주세요.');
+        return;
+    }
     const param = {
         ISBN: '',
         addr: roadAddress.value,
