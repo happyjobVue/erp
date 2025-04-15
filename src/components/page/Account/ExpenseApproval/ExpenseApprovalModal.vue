@@ -160,7 +160,7 @@
                 <div class="button-box">
                     <button
                         v-if="showSubmitButton"
-                        @click="expenseReviewUpdate()"
+                        @click="expenseApprovalUpdate()"
                     >
                         승인완료
                     </button>
@@ -231,8 +231,8 @@ const downloadFileImage = async () => {
     }
 };
 
-const expenseReviewUpdate = async () => {
-    if (!['S'].includes(expenseDetail.value.is_approval)) {
+const expenseApprovalUpdate = async () => {
+    if (!['S', 'N'].includes(expenseDetail.value.is_approval)) {
         alert('승인여부를 선택해주세요. (승인대기 또는 반려)');
         return;
     }
