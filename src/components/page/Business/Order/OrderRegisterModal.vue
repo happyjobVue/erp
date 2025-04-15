@@ -3,10 +3,10 @@ import { onMounted, ref } from 'vue';
 import {
     fetchClient,
     fetchManufacturers,
-    fetchProductsByManufacturer,
 } from '../../../../common/selectBoxApi';
 import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
+import { onUnmounted } from 'vue';
 const modalState = useModalStore();
 const clients = ref(''); // 고객 목록
 const manufacturers = ref(''); //제조사 목록
@@ -102,6 +102,10 @@ const closeModal = () => {
 const updateSupplyPrice = item => {
     item.supplyPrice = item.unitPrice * item.quantity;
 };
+
+onUnmounted(() => {
+    emit('modalClose', 0);
+});
 
 // {"estimateId":"58","clientId":"37","orderDeliveryDate":"2025-04-10","orderSalesArea":"SCM","orderList":[{"productId":1,"unitPrice":"80000","quantity":"10","supplyPrice":"800000"},{"productId":1,"unitPrice":"80000","quantity":"10","supplyPrice":"800000"}]}
 </script>

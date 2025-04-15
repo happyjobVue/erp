@@ -52,6 +52,7 @@ async function updateSalesPlan() {
     const param = {
         planNum: id,
         goalQuanti: detailData.value.goal_quanti, // goal_quanti 값을 반드시 숫자 형태로 설정
+        planMemo: detailData.value.plan_memo,
     };
 
     try {

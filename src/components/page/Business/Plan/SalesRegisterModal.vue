@@ -40,7 +40,7 @@ const goalQuanti = ref(0); // 목표 수량
 //메모
 const memo = ref('');
 
-const emit = defineEmits(['postSuccess']);
+const emit = defineEmits(['modalClose', 'postSuccess']);
 
 onMounted(async () => {
     manufacturers.value = await fetchManufacturers();
@@ -85,7 +85,12 @@ const saveSalesPlan = () => {
     axios.post('/api/business/sales-plan/insertPlan.do', salesPlan).then(() => {
         alert('저장 완료되었습니다.');
         emit('postSuccess');
+        closeModal();
     });
+};
+
+const closeModal = () => {
+    modalState.setModalState();
 };
 </script>
 

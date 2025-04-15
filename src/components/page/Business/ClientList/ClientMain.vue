@@ -1,10 +1,10 @@
 <script setup>
 import axios from 'axios';
-
-import { ref, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import ClientDetailModal from './ClientDetailModal.vue';
 import ClientRegisterModal from './ClientRegisterModal.vue';
+
 const modalType = ref('');
 const modalState = useModalStore();
 const cPage = ref(1);
@@ -13,65 +13,51 @@ const clientListCnt = ref();
 const selectedClient = ref();
 const route = useRoute();
 
+// 공통 데이터 로드 함수 (clientList 및 searchClientList 통합)
+const loadClientList = () => {
+    const param = {
+        currentPage: cPage.value,
+        pageSize: 5,
+        ...route.query, // route.query를 통해 검색 조건 추가
+    };
+
+    axios
+        .post('/api/business/client-list/searchClientListBody.do', param)
+        .then(res => {
+            clients.value = res.data.clientList;
+            clientListCnt.value = res.data.clientListCnt;
+        })
+        .catch(err => {
+            console.error('Error loading client list:', err);
+        });
+};
+
 onMounted(() => {
-    clientList();
+    loadClientList(); // 페이지 로드 시 기본 클라이언트 목록 로드
 });
 
-//등록 모달 열기
+// 등록 모달 열기
 const registerClientModal = () => {
-    console.log('등록');
     modalType.value = 'register';
     modalState.setModalState(true);
 };
+
 // 모달이 성공적으로 닫힌 후 실행될 함수
 const onPostSuccess = () => {
-    modalState.setModalState(); // 모달 열기
+    modalState.setModalState(); // 모달 닫기
     modalType.value = ''; // 모달 타입 초기화
-    getAllEstimate(); // 목록 새로고침
+    loadClientList(); // 클라이언트 목록 새로고침
 };
 
-const onModalClose = () => {
-    console.log('모달 close');
-};
-
-//상세 보기 모달
+// 상세 보기 모달
 const detailClient = client => {
-    console.log('상세' + client);
     modalType.value = 'view';
     modalState.setModalState(true);
     selectedClient.value = client;
 };
 
-const clientList = () => {
-    const param = {
-        currentPage: cPage.value,
-        pageSize: 5,
-    };
-    axios
-        .post('/api/business/client-list/searchClientListBody.do', param)
-        .then(res => {
-            clients.value = res.data.clientList;
-            clientListCnt.value = res.data.clientListCnt;
-        });
-};
-
-// 검색된 견적서 목록 불러오는 함수
-const searchClientList = () => {
-    console.log('검색 로직 ');
-    const param = {
-        ...route.query,
-        currentPage: cPage.value,
-        pageSize: 5,
-    };
-    axios
-        .post('/api/business/client-list/searchClientListBody.do', param)
-        .then(res => {
-            clients.value = res.data.clientList;
-            clientListCnt.value = res.data.clientListCnt;
-        });
-};
-
-watch(() => route.query, searchClientList);
+// 검색된 클라이언트 목록 불러오기 (검색 조건이 변경될 때마다 실행)
+watch(() => route.query, loadClientList);
 </script>
 
 <template>
@@ -84,15 +70,17 @@ watch(() => route.query, searchClientList);
             @postSuccess="onPostSuccess"
         />
 
-        <!-- 등록 모달  -->
+        <!-- 등록 모달 -->
         <ClientRegisterModal
             v-if="modalState.modalState && modalType === 'register'"
-            @postSucess="onPostSuccess"
+            @postSuccess="onPostSuccess"
             @modalClose="onModalClose"
         />
+
         <div class="button-container">
             <button @click="registerClientModal()">거래처 등록</button>
         </div>
+
         <table>
             <thead>
                 <tr>
@@ -128,26 +116,27 @@ watch(() => route.query, searchClientList);
                     </template>
                     <template v-else>
                         <tr>
-                            <td colspan="7">일치하는 검색 결과가 없습니다</td>
+                            <td colspan="9">일치하는 검색 결과가 없습니다</td>
                         </tr>
                     </template>
                 </template>
             </tbody>
         </table>
+
         <!-- 페이징 -->
         <Pagination
             :totalItems="clientListCnt"
             :items-per-page="5"
             :max-pages-shown="5"
-            :onClick="clientList"
+            :onClick="loadClientList"
             v-model="cPage"
         />
     </div>
 </template>
+
 <style lang="scss" scoped>
 table {
     width: 100%;
-
     margin: 20px 0px 0px 0px;
     font-size: 18px;
     text-align: left;
@@ -165,7 +154,6 @@ table {
         color: #ddd;
     }
 
-    /* 테이블 올렸을 때 */
     tbody tr:hover {
         background-color: #d3d3d3;
         opacity: 0.9;

@@ -5,7 +5,6 @@ import { useModalStore } from '../../../../stores/modalState';
 import { deprecations } from 'sass';
 const estimate = ref('');
 const estimateDetailData = ref([]);
-const productDeposit = ref();
 
 const client = ref('');
 const modalState = useModalStore();
@@ -37,7 +36,6 @@ async function estimateDetail() {
         estimate.value = response.data.estimate;
         estimateDetailData.value = response.data.estimateDetail;
         client.value = response.data.client;
-        console.log(estimateDetailData);
     } catch (error) {
         console.error('Error fetching estimate details:', error);
     }

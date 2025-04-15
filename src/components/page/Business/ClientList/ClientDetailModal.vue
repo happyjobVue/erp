@@ -70,10 +70,17 @@ const editClient = () => {
 };
 
 onMounted(() => {
-    console.log('디테일 컴포넌트 마운트 됨 ');
     if (props.client) {
         console.log('props' + props.client.client_name);
     }
+});
+
+const closeModal = () => {
+    modalState.setModalState();
+};
+
+onUnmounted(() => {
+    emit('modalClose', 0);
 });
 </script>
 
@@ -168,10 +175,6 @@ onMounted(() => {
                             <tr>
                                 <th class="table-header">은행</th>
                                 <td>
-                                    <!-- <input
-                                        type="text"
-                                        v-model="props.client.bank"
-                                    /> -->
                                     <select v-model="props.client.bank">
                                         <option value="" disabled>전체</option>
                                         <option value="신한은행">

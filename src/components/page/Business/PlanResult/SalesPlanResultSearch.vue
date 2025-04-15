@@ -63,7 +63,7 @@ async function handleManufacturerChange() {
                 <option
                     v-for="manufacturer in manufacturer"
                     :key="manufacturer.manufacturer_id"
-                    :value="manufacturer.industryCode"
+                    :value="manufacturer.manufacturer_id"
                 >
                     {{ manufacturer.industryName }}
                 </option>
