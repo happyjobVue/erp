@@ -222,6 +222,9 @@ const searchDetail = async () => {
         );
         expenseDetail.value = response.data.expenseDetail;
         crebitList.value = response.data.crebitList;
+        if (!crebitList.value.crebit_code) {
+            crebitList.value.crebit_code = 'AC03101';
+        }
     } catch (e) {
         console.error(e);
     }
