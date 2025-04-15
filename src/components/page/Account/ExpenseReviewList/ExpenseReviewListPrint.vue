@@ -37,8 +37,10 @@
                             convertToKoreanNumber(
                                 expenseDetail.expense_payment
                             )
-                        }}원정 (₩{{
-                            numberWithCommas(expenseDetail.expense_payment)
+                        }}원정 ( ₩
+                        {{
+                            formattedPayment(expenseDetail.expense_payment) +
+                            ' 원 '
                         }})
                     </td>
                 </tr>
@@ -56,7 +58,7 @@
                     <tr v-for="(item, index) in detailList" :key="index">
                         <td>{{ item.date }}</td>
                         <td>{{ item.description }}</td>
-                        <td>{{ numberWithCommas(item.amount) }}</td>
+                        <td>{{ formattedPayment(item.amount) }}</td>
                         <td>{{ item.note }}</td>
                     </tr>
                     <tr v-for="n in 7 - detailList.length" :key="'empty-' + n">
@@ -67,7 +69,7 @@
                     </tr>
                     <tr class="total-row">
                         <td colspan="2">합계</td>
-                        <td>{{ numberWithCommas(totalAmount) }}</td>
+                        <td>{{ formattedPayment(totalAmount) + ' 원' }}</td>
                         <td></td>
                     </tr>
                 </tbody>
@@ -104,7 +106,7 @@ const totalAmount = computed(() =>
     detailList.value.reduce((sum, item) => sum + item.amount, 0)
 );
 
-const numberWithCommas = num => {
+const formattedPayment = num => {
     if (!num && num !== 0) return '';
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };

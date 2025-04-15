@@ -32,7 +32,7 @@
                         <td>{{ voucher.client_name }}</td>
                         <td>{{ voucher.debit_name }}</td>
                         <td>{{ voucher.crebit_name }}</td>
-                        <td>{{ voucher.voucher_amount }}</td>
+                        <td>{{ formatPayment(voucher.voucher_amount) }}</td>
                     </tr>
                 </template>
                 <template v-else>
@@ -61,6 +61,14 @@ const cPage = ref(1);
 const route = useRoute();
 const voucherList = ref();
 const voucherNo = ref(0);
+
+const formatPayment = value => {
+    const formattedValue = (value?.toString().replace(/,/g, '') || '').replace(
+        /\B(?=(\d{3})+(?!\d))/g,
+        ','
+    );
+    return formattedValue + ' 원';
+};
 
 const searchList = async () => {
     const param = new URLSearchParams({
