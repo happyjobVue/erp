@@ -6,9 +6,12 @@ import EmployeeYearModal from './EmployeeYearModal.vue';
 
 const address = ref('');
 const addressCode = ref('');
-const emit = defineEmits(['closeModal','OpenRetireModal']);
+const emit = defineEmits(['closeModal','OpenRetireModal','closeCommonModal']);
 const props = defineProps(['modalType', 'UserDetail','employeeDetail','imgUrl']);
 const userInfo = useUserInfo();
+
+// 모달창 동시에 띄우기 위한 새로운 타입 변수 
+const CommonModal = ref(false);
 
 //사원 등록 및 파일업로드
 const employeeForm = ref({
@@ -114,7 +117,7 @@ const OnRetire = () => {
         return;
     }
 
-
+    CommonModal.value = false;
     emit('update-retire-info', {
         resignationReason: resignationReason.value,
         resignationDate: resignationDate.value,
@@ -253,6 +256,7 @@ const closeModal = () => {
     emit('closeModal', isModalOpen.value);
 };
 
+
 const handleImgError = () => {
   imgUrl.value = '/images/default-profile.png';
 }
@@ -267,7 +271,10 @@ const onJobGradeChange = () => {
 
 const onemplStatus = () => {
     if(employeeForm.value.emplStatus == 'F'){
-        emit('OpenRetireModal', employeeForm.value);
+        CommonModal.value = true;
+        emit('OpenRetireModal',
+            employeeForm.value
+        );
     }
 }
 
@@ -687,7 +694,9 @@ onMounted(() => {
                                             name="emplStatus"
                                             value="W"
                                             v-model="employeeForm.emplStatus"
-                                            :disabled="modalType == 'register'"
+                                            :disabled="modalType == 'register' ||
+                                            employeeForm.emplStatus == 'F'
+                                            "
                                             @change="onemplStatus"
 
                                         />
@@ -699,7 +708,9 @@ onMounted(() => {
                                             name="emplStatus"
                                             value="F"
                                             v-model="employeeForm.emplStatus"
-                                            :disabled="modalType == 'register'"
+                                            :disabled="modalType == 'register'||
+                                            employeeForm.emplStatus == 'F'
+                                            "
                                             @change="onemplStatus"
                                         />
                                         퇴직</label
@@ -710,7 +721,9 @@ onMounted(() => {
                                             name="emplStatus"
                                             value="O"
                                             v-model="employeeForm.emplStatus"
-                                            :disabled="modalType == 'register'"
+                                            :disabled="modalType == 'register'||
+                                            employeeForm.emplStatus == 'F'
+                                            "
                                             @change="onemplStatus"
                                         />
                                         휴직</label

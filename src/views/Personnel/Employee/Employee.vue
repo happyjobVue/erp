@@ -21,6 +21,7 @@ const chEmplStatus = ref('');
 
 //modal type별 정의 
 const modalType = ref('');
+const CommonModal = ref(false);
 
 const imgUrl = ref('');
 
@@ -175,12 +176,11 @@ const Onretire = (personnel) => {
 }
 
 //모달창에서 상위컴포넌트에서 모달창 열리게하기
-const OpenRetireModal = (val) => {
-    modalType.value = 'retire'
+const OpenRetireModal = (val, ComModal) => {
+     modalType.value = 'retire'
 
     /*     AxiosRequest('employeeDetailBody', param, UserDetail);
     */
-
     const param = {
         employeeId: val.employeeId,
         jobGradeCode: val.jobGradeCode
@@ -279,6 +279,11 @@ const closeModal = (val) => {
   personnelSearchList();
 };
 
+const closeCommonModal = (val) => {
+    CommonModal.value = val;
+    personnelSearchList();
+}
+
 
 onMounted(() => {
     console.log('쿼리 값:', route.query);
@@ -310,6 +315,7 @@ computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
         <EmployeeModal 
 
         :modalType="modalType"
+        :CommonModal="CommonModal"
         :UserDetail="UserDetail"
         :employeeDetail="employeeDetail"
         :imgUrl="imgUrl"
@@ -317,6 +323,7 @@ computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
         @closeModal="closeModal"
         @update-retire-info="handleRetireInfo"
         @OpenRetireModal="OpenRetireModal"
+        @closeCommonModal="closeCommonModal"
 
         />
     </div> 
