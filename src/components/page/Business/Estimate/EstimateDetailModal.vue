@@ -186,21 +186,36 @@ onUnmounted(() => {
                                         min="1"
                                     />
                                 </td>
-                                <td>{{ detail.unitPrice }}</td>
-                                <td>{{ detail.supplyPrice }}</td>
-                                <td>{{ detail.supplyPrice * 0.1 }}</td>
+                                <td>{{ detail.unitPrice.toLocaleString() }}</td>
                                 <td>
-                                    {{ (detail.supplyPrice * 1.1).toFixed(0) }}
+                                    {{ detail.supplyPrice.toLocaleString() }}
+                                </td>
+                                <td>
+                                    {{
+                                        (
+                                            detail.supplyPrice * 0.1
+                                        ).toLocaleString()
+                                    }}
+                                </td>
+
+                                <td>
+                                    {{
+                                        (
+                                            detail.supplyPrice * 1.1
+                                        ).toLocaleString()
+                                    }}
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                     <table>
                         <th class="table-header">견적서 총 금액</th>
-                        <td>{{ estimate.depositAmount }}</td>
+                        <td>
+                            {{ estimate.depositAmount?.toLocaleString() }}
+                        </td>
                     </table>
 
-                    <div class="button-box">
+                    <div class="button-container">
                         <button type="button" @click="closeModal()">
                             취소
                         </button>
@@ -286,12 +301,12 @@ button {
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    margin: 10px 0;
+    margin: 10px 10px;
     cursor: pointer;
     border-radius: 12px;
     box-shadow: 0 4px #999;
     transition: 0.3s;
-    width: 30px;
+    width: 120px;
 }
 
 button:hover {
@@ -302,14 +317,6 @@ button:active {
     background-color: #3e8e41;
     box-shadow: 0 2px #666;
     transform: translateY(2px);
-}
-
-.button-box {
-    display: flex;
-    text-align: center;
-    justify-content: space-between;
-    margin-top: 20px;
-    width: 300px;
 }
 
 .button-box button {
@@ -329,5 +336,12 @@ input {
     margin-right: 5px;
     border-radius: 4px;
     border: 1px solid #ccc;
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin-bottom: 20px;
+    margin: 15px 15px;
 }
 </style>

@@ -155,13 +155,25 @@ onUnmounted(() => {
                             >
                                 <td>{{ detail.productName }}</td>
                                 <td>{{ detail.quantity }}</td>
-                                <td>{{ detail.unitPrice }}</td>
-                                <td>{{ detail.supplyPrice }}</td>
-                                <td>{{ detail.supplyPrice * 0.1 }}</td>
+                                <td>
+                                    {{ detail.unitPrice?.toLocaleString() }}
+                                </td>
+                                <td>
+                                    {{ detail.supplyPrice?.toLocaleString() }}
+                                </td>
                                 <td>
                                     {{
-                                        detail.supplyPrice +
-                                        detail.supplyPrice * 0.1
+                                        (
+                                            detail.supplyPrice * 0.1
+                                        )?.toLocaleString()
+                                    }}
+                                </td>
+                                <td>
+                                    {{
+                                        (
+                                            detail.supplyPrice +
+                                            detail.supplyPrice * 0.1
+                                        ).toLocaleString()
                                     }}
                                 </td>
                             </tr>
@@ -172,7 +184,7 @@ onUnmounted(() => {
                         <td>{{ totalOrderAmount.toLocaleString() }}</td>
                     </table>
 
-                    <div class="button-box">
+                    <div class="button-container">
                         <button type="button" @click="closeModal()">
                             취소
                         </button>
@@ -260,7 +272,7 @@ button {
     border-radius: 12px;
     box-shadow: 0 4px #999;
     transition: 0.3s;
-    width: 30px;
+    width: 120px;
 }
 
 button:hover {
@@ -290,5 +302,11 @@ input[type='date']:focus,
 select:focus {
     border-color: #3bb2ea;
     outline: none;
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin-bottom: 20px;
 }
 </style>

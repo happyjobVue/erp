@@ -73,7 +73,7 @@ watch(() => route.query, getOrder);
         />
         <OrderRegisterModal
             v-if="modalState.modalState && modalType === 'register'"
-            @postSucess="onPostSuccess"
+            @postSuccess="onPostSuccess"
             @modalClose="onModalClose"
         />
         <!-- 신규 등록 버튼 -->
@@ -105,8 +105,10 @@ watch(() => route.query, getOrder);
                             <td>{{ order.productName }}</td>
                             <td>{{ order.deliveryDate }}</td>
                             <td>{{ order.totalDeliveryCount }}</td>
-                            <td>{{ order.totalSupplyPrice }}</td>
-                            <td>{{ order.totalTax }}</td>
+                            <td>
+                                {{ order.totalSupplyPrice?.toLocaleString() }}
+                            </td>
+                            <td>{{ order.totalTax?.toLocaleString() }}</td>
                             <td>{{ order.salesArea }}</td>
                             <td>
                                 <button

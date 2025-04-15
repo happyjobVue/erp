@@ -108,9 +108,9 @@ const detailEst = (clientId, id) => {
                             <td>{{ est.productName }}</td>
                             <td>{{ est.deliveryDate }}</td>
                             <td>{{ est.totalDeliveryCount }}</td>
-                            <td>{{ est.totalSupplyPrice }}</td>
-                            <td>{{ est.totalTax }}</td>
-                            <td>{{ est.depositAmount }}</td>
+                            <td>{{ est.totalSupplyPrice.toLocaleString() }}</td>
+                            <td>{{ est.totalTax.toLocaleString() }}</td>
+                            <td>{{ est.depositAmount.toLocaleString() }}</td>
                             <td>{{ est.salesArea }}</td>
                             <td>
                                 <button
