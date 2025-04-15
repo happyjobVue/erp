@@ -151,25 +151,44 @@ const saveEmployee = () => {
 
 
     //유효성 검사 
-    if (
-    !employeeForm.value.employeeName ||
-    !employeeForm.value.registrationNumber ||
-    !employeeForm.value.sex ||
-    !employeeForm.value.birthday ||
-    !employeeForm.value.email ||
-    !employeeForm.value.finalEducation ||
-    !address.value ||
-    !employeeForm.value.addressDetail ||
-    !employeeForm.value.hp ||
-    !employeeForm.value.bank ||
-    !employeeForm.value.bankAccount ||
-    !employeeForm.value.departmentDetailName ||
-    !employeeForm.value.jobGradeDetailName ||
-    !employeeForm.value.regDate ||
-    !salary.value
-    ) {
-    alert('모든 항목을 기입해야 저장 가능합니다.');
+        const requiredFields = [
+    { key: 'employeeName', label: '이름' },
+    { key: 'registrationNumber', label: '주민등록번호' },
+    { key: 'sex', label: '성별' },
+    { key: 'birthday', label: '생년월일' },
+    { key: 'email', label: '이메일' },
+    { key: 'finalEducation', label: '최종학력' },
+    { key: 'addressDetail', label: '상세주소' },
+    { key: 'hp', label: '휴대폰 번호' },
+    { key: 'bank', label: '은행명' },
+    { key: 'bankAccount', label: '계좌번호' },
+    { key: 'departmentDetailName', label: '부서' },
+    { key: 'jobGradeDetailName', label: '직급' },
+    { key: 'regDate', label: '입사일' }
+    ];
+
+    // employeeForm 내부 필드 검사
+    for (const field of requiredFields) {
+    const value = employeeForm.value[field.key];
+    if (!value || value === '') {
+        alert(`${field.label}을(를) 입력해주세요.`);
+        return;
+    }
+    }
+
+    // ref로 선언된 외부 값 검사
+    if (!address.value) {
+    alert('주소를 입력해주세요.');
     return;
+    }
+    if (!salary.value) {
+    alert('연봉을 입력해주세요.');
+    return;
+    }
+
+    //연봉 제한 
+    if(salary.value == 100000000){
+        alert('연봉 금액이 너무 큽니다.')
     }
 
     //생년월일 yyyy-mm-dd 형시기 아닐경우 리턴 
@@ -820,7 +839,7 @@ onMounted(() => {
                                     id="salary"
                                     :value="formattedSalary"
                                     @input="onSalaryInput"
-                                    placeholder="자동 입력됨"
+                                    placeholder="1억 미만으로 입력"
                                     :readonly="modalType === 'update'"
                                     />
                                 </td>
