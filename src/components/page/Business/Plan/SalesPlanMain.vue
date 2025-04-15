@@ -7,8 +7,8 @@ import { onMounted, ref, watch } from 'vue';
 import SalesRegisterModal from './SalesRegisterModal.vue';
 import SalesDetailModal from './SalesDetailModal.vue';
 
-const salesPlanListData = ref();
-const salesPlanListCnt = ref();
+const salesPlanListData = ref([]);
+const salesPlanListCnt = ref(0);
 const userId = useUserInfo();
 const modalState = useModalStore();
 const planNum = ref(0);
@@ -16,7 +16,6 @@ const cPage = ref(1);
 const route = useRoute();
 const modalType = ref('');
 
-// 판매 계획 목록을 불러오는 함수
 const salesPlanDefaultList = () => {
     const param = {
         empId: userId.user.empId,
@@ -24,12 +23,11 @@ const salesPlanDefaultList = () => {
         currentPage: cPage.value,
     };
     axios.post('/api/business/sales-plan/getAllSalesPlan', param).then(res => {
-        salesPlanListData.value = res.data.searchPlanList;
-        salesPlanListCnt.value = res.data.salesPlanCnt;
+        salesPlanListData.value = res.data.searchPlanList || []; // 빈 배열로 초기화
+        salesPlanListCnt.value = res.data.salesPlanCnt || 0; // 기본값 0으로 설정
     });
 };
 
-// 검색된 판매 계획 목록을 불러오는 함수
 const searchList = () => {
     const param = new URLSearchParams({
         ...route.query,
@@ -40,11 +38,10 @@ const searchList = () => {
     axios
         .post('/api/business/sales-plan/getSearchSalesPlan', param)
         .then(res => {
-            salesPlanListData.value = res.data.searchPlanList;
-            salesPlanListCnt.value = res.data.salesPlanCnt;
+            salesPlanListData.value = res.data.searchPlanList || [];
+            salesPlanListCnt.value = res.data.salesPlanCnt || 0;
         });
 };
-
 // 페이지 로드 시 기본 판매 계획 목록 불러오기
 onMounted(() => {
     salesPlanDefaultList();
@@ -88,6 +85,7 @@ watch(() => route.query, searchList);
         <SalesRegisterModal
             v-if="modalState.modalState && modalType === 'register'"
             @postSuccess="onPostSuccess"
+            @modalClose="onModalClose"
         />
 
         <!-- 신규 등록 버튼 -->
@@ -107,7 +105,7 @@ watch(() => route.query, searchList);
                 </tr>
             </thead>
             <tbody>
-                <template v-if="salesPlanListData">
+                <template v-if="salesPlanListData.length > 0">
                     <template v-if="salesPlanListCnt > 0">
                         <tr
                             v-for="plan in salesPlanListData"
@@ -122,11 +120,11 @@ watch(() => route.query, searchList);
                             <td>{{ plan.goal_quanti }}</td>
                         </tr>
                     </template>
-                    <template v-else>
-                        <tr>
-                            <td colspan="7">일치하는 검색 결과가 없습니다</td>
-                        </tr>
-                    </template>
+                </template>
+                <template v-else>
+                    <tr>
+                        <td colspan="6">일치하는 검색 결과가 없습니다</td>
+                    </tr>
                 </template>
             </tbody>
         </table>

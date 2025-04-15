@@ -1,12 +1,13 @@
 <script setup>
 import axios from 'axios';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 
 // 우편번호
 const postcode = ref('');
 const modalState = useModalStore();
 const roadAddress = ref('');
+
 const isScriptLoaded = ref(false); // 스크립트 로딩 상태를 추적하는 변수
 const saveData = ref({
     bank: '',
@@ -30,10 +31,6 @@ const loadDaumPostcodeScript = () => {
         isScriptLoaded.value = true; // 스크립트가 로드되면 isScriptLoaded를 true로 설정
     };
     document.head.appendChild(script);
-};
-
-const closeModal = () => {
-    modalState.setModalState();
 };
 
 onMounted(() => {
@@ -87,14 +84,25 @@ const saveClient = () => {
         ph: saveData.value.ph,
         zip: postcode.value,
     };
+    try {
+        axios
+            .post('/api/business/client-list/insertClientListBody.do', param)
+            .then(() => {
+                alert('거래처가 등록되었습니다.');
+                emit('postSuccess');
+                closeModal();
+            });
+    } catch (error) {
+        alert('거래처 등록을 다시 시도해주세요.');
+    }
+};
 
-    axios
-        .post('/api/business/client-list/insertClientListBody.do', param)
-        .then(() => {
-            alert('거래처가 등록되었습니다.');
-            emit('postSuccess');
-            closeModal();
-        });
+onUnmounted(() => {
+    emit('modalClose', 0);
+});
+
+const closeModal = () => {
+    modalState.setModalState();
 };
 </script>
 

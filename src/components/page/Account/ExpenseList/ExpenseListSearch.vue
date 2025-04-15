@@ -43,7 +43,7 @@
         </div>
 
         <div class="register-box">
-            <button @click="setModalState">등록</button>
+            <button @click="setModalState">신청</button>
         </div>
     </div>
 </template>
