@@ -5,10 +5,13 @@ import axios from 'axios';
 
 const visible = ref(true);
 const emit = defineEmits(['visibleval']);
-const props = defineProps(['summary']);
+const props = defineProps(['summary','DetailAttendace']);
 
 const userInfo = useUserInfo();
 const attendanceDetail = ref({});
+
+const attendanceList = ref('');
+const modalType = ref('');
 
 const form = ref({
     id: '',
@@ -22,12 +25,13 @@ const form = ref({
     reqReason: '',
     reqTel: '',
     reqdate: '',
+    reqStatus: '',
 });
 
 
 //기초 정보 불러오기 
 const UserDetail = () => {
-
+    
     axios
         .post(`/api/personnel/attendanceCntBody.do`,{
             headers: {
@@ -39,7 +43,10 @@ const UserDetail = () => {
             form.value.deptName = res.data.loginInfo.detail_name;
             form.value.name = res.data.loginInfo.usr_nm;
             form.value.number = res.data.loginInfo.usr_idx ;
-            form.value.reqdate = new Date().toISOString().split('T')[0];
+            if(!form.value.reqdate){
+                form.value.reqdate = new Date().toISOString().split('T')[0];
+            }
+
 
         })
         .catch(err => {
@@ -47,12 +54,48 @@ const UserDetail = () => {
         });
 };
 
+//리스트 데이터 불러오기 
+const search = () => {
+
+const form = new URLSearchParams();
+
+form.append('searchStDate', '');
+form.append('searchEdDate', '');
+form.append('searchReqType', '');
+form.append('searchReqStatus', '');
+
+form.append('pageSize', 20);
+form.append('currentPage', 1);
+
+axios
+    .post(`/api/personnel/attendanceList.do`, form)
+    .then(res => {
+        console.log(res.data.attendanceList);
+        attendanceList.value = res.data.attendanceList;
+    })
+    .catch(err => {
+        console.error('에러 발생:', err);
+    });
+
+}
+
 // 연차 신청
 const submitForm = () => {
-    if (form.value.reqReason === '') {
-        alert('신청 사유를 입력해주세요 .');
+    if (form.value.reqReason === '' || form.value.reqSt === '' 
+    || form.value.reqEd === '' || form.value.reqTel === '') {
+        alert('기간 및 신청 사유, 비상 연락망을 입력해주세요.');
         return;
     } 
+
+    const startDate = form.value.reqSt; // 사용자 선택 시작일
+    const endDate = form.value.reqEd;   // 사용자 선택 종료일
+    const selectedName = form.value.name;
+
+    if (isOverlappingRange(startDate, endDate, selectedName)) {
+        alert('이미 겹치는 휴가 신청이 존재합니다.');
+        return;
+    }
+
 
     const params = new URLSearchParams();
 
@@ -65,15 +108,18 @@ const submitForm = () => {
 
 
     if (form.value.reqType == '연차' && (edDate - StDate) == 0) {
-        alert('기간이 같은 경우 반차를 사용하여 주세요.');
-        return;
+        if(confirm('반차를 사용하는지 알려주세요')){
+            form.value.reqType = '반차';
+        }else {
+            form.value.reqType = '연차';
+        }
     }
 
     if (leftAtt > 0 && (edDate - StDate) >= 0) {
-        if((edDate - edDate) != 0){
-        reqDay.value = (edDate - edDate).toString;
+        if((edDate - StDate) > 0){
+        reqDay.value = (edDate - StDate) + 1;
         }else {
-            reqDay.value = '0.5';
+            reqDay.value = 0.5;
         }
         console.log(reqDay);
     } 
@@ -91,6 +137,8 @@ const submitForm = () => {
     params.append('reqReason', form.value.reqReason);
     params.append('reqTel', form.value.reqTel);
     params.append('reqDay', reqDay.value);
+    params.append('reqdate', form.value.reqdate);
+
 
     //총연차 구할때 얻어오는 id값 = attid랑 같다.
     params.append('attId', props.summary.id);
@@ -108,6 +156,50 @@ const submitForm = () => {
         });
 };
 
+//겹치는 날짜 거르기 시작 날자, 끝날짜 , 이름으로 
+const isOverlappingRange = (selectedStartDate, selectedEndDate, selectedName) => {
+  const selectedStart = new Date(selectedStartDate);
+  const selectedEnd = new Date(selectedEndDate);
+
+  return attendanceList.value.some(item => {
+    if (!item.reqSt || !item.reqEd || !item.name) return false;
+
+    const existingStart = new Date(item.reqSt);
+    const existingEnd = new Date(item.reqEd);
+
+    // 💥 이름도 같고 날짜도 겹치는 경우
+    return (
+      item.name === selectedName &&
+      selectedStart <= existingEnd &&
+      selectedEnd >= existingStart
+    );
+  });
+};
+
+//수정할때 거르기  
+const UpdateOverlappingRange = (selectedStartDate, selectedEndDate, selectedName, editingId = null) => {
+  const selectedStart = new Date(selectedStartDate);
+  const selectedEnd = new Date(selectedEndDate);
+
+  return attendanceList.value.some(item => {
+    // 수정 중인 항목이면 제외
+    if (item.id === editingId) return false;
+
+    if (!item.reqSt || !item.reqEd || !item.name) return false;
+
+    const existingStart = new Date(item.reqSt);
+    const existingEnd = new Date(item.reqEd);
+
+    return (
+      item.name === selectedName &&
+      selectedStart <= existingEnd &&
+      selectedEnd >= existingStart
+    );
+  });
+};
+
+
+
 const closeModal = () => {
     visible.value = false;
     emit('visibleval', visible.value);
@@ -118,8 +210,129 @@ const reLoadCloseModal = () => {
     emit('reLoadCloseModal', visible.value);
 };
 
+function StatusAttendance(item) {
+    DetailAttendance(item);
+}
+
+const DetailAttendance = (item) => {
+    const params = new URLSearchParams();
+
+    modalType.value = '수정'
+
+    console.log(item);
+
+    params.append('id', item);
+
+    axios
+        .post(`/api/personnel/attendanceDetail.do`, params)
+        .then(res => {
+            console.log(res.data);
+            form.value.reqdate = res.data.detail.reqdate;
+            form.value.reqSt = res.data.detail.reqSt;
+            form.value.reqEd = res.data.detail.reqEd;
+            form.value.reqTel = res.data.detail.reqTel;
+            form.value.reqReason = res.data.detail.reqReason;
+            form.value.reqType =res.data.detail.reqType;
+            form.value.reqStatus = res.data.detail.reqStatus;
+            form.value.id = res.data.detail.id;
+            
+            const start = new Date(form.value.reqSt)
+            const end = new Date(form.value.reqEd)
+
+            const diffInTime = end - start  // 밀리초 차이
+            const diffInDays = diffInTime / (1000 * 60 * 60 * 24)  // 일수 변환
+
+            form.value.reqDay = diffInDays + 1;
+
+            console.log(form.value.reqDay)
+
+            attendanceDetail.value = res.data.detail;
+            
+        })
+        .catch(err => {
+            console.error('에러 발생:', err);
+        });
+
+
+
+}
+
+//수정
+const UpdateForm = () => {
+
+    const params = new URLSearchParams();
+
+    params.append('reqSt', form.value.reqSt);
+    params.append('reqEd', form.value.reqEd);
+    params.append('reqReason', form.value.reqReason);
+    params.append('reqTel', form.value.reqTel);
+
+    const start = new Date(form.value.reqSt)
+    const end = new Date(form.value.reqEd)
+
+    const diffInTime = end - start  // 밀리초 차이
+    const diffInDays = diffInTime / (1000 * 60 * 60 * 24)  // 일수 변환
+
+    form.value.reqDay = diffInDays + 1;
+
+    params.append('reqDay', form.value.reqDay);
+    params.append('reqId', form.value.id);
+
+    console.log(form.value.id);
+
+    const startDate = form.value.reqSt; // 사용자 선택 시작일
+    const endDate = form.value.reqEd;   // 사용자 선택 종료일
+    const selectedName = form.value.name;
+
+    if (UpdateOverlappingRange(startDate, endDate, selectedName, form.value.id)) {
+        alert('겹치는 휴가가 존재하거나 동일한 날짜를 입력하셨습니다.');
+        return;
+    }
+
+
+    axios
+        .post(`/api/personnel/attendanceUpdate.do`, params)
+        .then(res => {
+            console.log(res.data);
+            alert('수정 완료');
+            reLoadCloseModal();
+        })
+        .catch(err => {
+            console.error('에러 발생:', err);
+        });
+}
+
+
+//취소 
+const CancleForm = () => {
+
+    const params = new URLSearchParams();
+
+    params.append('reqId', form.value.id);
+
+    console.log(form.value.id);
+
+    axios
+        .post(`/api/personnel/attendanceCancle.do`, params)
+        .then(res => {
+            console.log(res.data);
+            alert('취소 완료');
+            reLoadCloseModal();
+        })
+        .catch(err => {
+            console.error('에러 발생:', err);
+        });
+    
+}
+
+
+defineExpose({
+  StatusAttendance
+})
+
 onMounted(() => {
     UserDetail();
+    search();
 });
 </script>
 
@@ -132,7 +345,8 @@ onMounted(() => {
         >
             <dl style="margin-top: 0;">
                 <dt>
-                    <strong>연차 신청</strong>
+                    <strong v-if="modalType === '수정'">연차 상세</strong>
+                    <strong v-else>연차 신청</strong>
                 </dt>
                 <dd class="content">
                     <table class="row" style="margin-left: -20px;">
@@ -239,10 +453,30 @@ onMounted(() => {
 
                     <div class="btn_areaC mt30">
                         <a
+                            v-if="modalType !== '수정'"
                             href="#"
                             class="btnType blue"
                             @click.prevent="submitForm"
                             ><span>연차 신청</span></a
+                        >
+                        <a
+                        v-show="form.reqStatus"
+                        v-if="modalType === '수정' && form.reqStatus === '검토 대기'"
+                        href="#"
+                        class="btnType blue"
+                        @click.prevent="UpdateForm"
+                        ><span>수정</span></a
+                        >
+                        <a
+                            v-show="form.reqStatus"
+                            v-if="modalType === '수정'
+                            && form.reqStatus !== '반려'
+                            && form.reqStatus !== '취소'
+                            "
+                            href="#"
+                            class="btnType blue"
+                            @click.prevent="CancleForm"
+                            ><span>신청취소</span></a
                         >
                         <a
                             href="#"

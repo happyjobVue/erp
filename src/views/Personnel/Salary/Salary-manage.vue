@@ -25,7 +25,7 @@ const SalarySearchList = () => {
         pageSize: 5,
         currentPage: cPage.value,
     };
-
+     showDetail.value = false;
      AxiosRequest('salaryListBody',param ,SalaryList);
 
 };
@@ -111,8 +111,11 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
   
 //일괄 지급 
   const allPaymentStatusUpdate = (searchMonth) => {
+
+    console.log(searchMonth)
+    console.log(route.query.searchPaymentMonth)
     if (confirm("일괄 지급 하시겟습니까?")) {
-        if(SalaryList.value.length > 0 && route.query.searchPaymentMonth === searchMonth){
+        if(SalaryList.value.salaryList.length > 0 && route.query.searchPaymentMonth === searchMonth){
             const params = new URLSearchParams();
 
             params.append('paymentDate', route.query.searchPaymentMonth);
@@ -127,7 +130,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
                     console.error('에러 발생:', err);
                 });
         }else {
-            alert("급여 연원을 검색후 진행주세요.");
+            alert("급여 연월을 검색후 진행주세요.");
         }
     console.log("지급 완료");
     SalarySearchList();

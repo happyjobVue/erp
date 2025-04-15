@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import {
     fetchClient,
     fetchManufacturers,
@@ -57,15 +57,13 @@ const saveEstimate = async () => {
     };
 
     try {
-        const response = await axios
-            .post('/api/business/saveEstimate', param)
-            .then(() => {
-                alert('저장 완료되었습니다.');
-                emit('postSuccess');
-                closeModal();
-            });
+        await axios.post('/api/business/saveEstimate', param).then(() => {
+            alert('저장 완료되었습니다.');
+            emit('postSuccess');
+            closeModal();
+        });
     } catch (error) {
-        console.error('저장 실패:', error);
+        alert('거래처 등록을 다시 시도해주세요.');
     }
 };
 
@@ -78,6 +76,9 @@ onMounted(async () => {
     clients.value = await fetchClient();
 });
 
+onUnmounted(() => {
+    emit('modalClose', 0);
+});
 // 제품 선택 이벤트 핸들러
 
 async function handleManufacturerChange() {

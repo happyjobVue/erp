@@ -14,68 +14,49 @@ const modalState = useModalStore();
 const selectedEstimateId = ref(null);
 const selectedClientId = ref(null);
 const route = useRoute();
+
 onMounted(() => {
-    getAllEstimate();
+    loadEstimateList(); // 페이지 로드 시 데이터 불러오기
 });
 
-//거래거 목록 조회
-const getAllEstimate = () => {
+// 견적서 목록 불러오기 (검색 조건 포함)
+const loadEstimateList = () => {
     const param = {
         currentPage: cPage.value,
         pageSize: 5,
+        ...route.query, // 검색 조건이 있을 경우 함께 전달
     };
+
     axios
         .post('/api/business/estimate-list/estimateListBody.do', param)
         .then(res => {
             estimateList.value = res.data.estimateList;
             estimateCnt.value = res.data.estimateCnt;
+        })
+        .catch(err => {
+            console.error('Error loading estimate list:', err);
         });
 };
 
-// 검색된 견적서 목록 불러오는 함수
-const searchEstimateList = () => {
-    console.log('검색 로직 ');
-    const param = {
-        ...route.query,
-        currentPage: cPage.value,
-        pageSize: 5,
-    };
-    axios
-        .post('/api/business/estimate-list/estimateListBody.do', param)
-        .then(res => {
-            estimateList.value = res.data.estimateList;
-            estimateCnt.value = res.data.estimateCnt;
-        });
-};
-
-watch(() => route.query, searchEstimateList);
-
-// 모달이 성공적으로 닫힌 후 실행될 함수
+// 모달 성공 처리
 const onPostSuccess = () => {
-    modalState.setModalState(); // 모달 열기
+    modalState.setModalState(); // 모달 닫기
     modalType.value = ''; // 모달 타입 초기화
-    getAllEstimate(); // 목록 새로고침
+    loadEstimateList(); // 데이터 새로고침
 };
 
-//등록 모달 열기
+// 등록 모달 열기
 const registerEstiModal = () => {
-    console.log('등록');
     modalType.value = 'register';
     modalState.setModalState(true);
 };
 
-//상세 보기 모달
+// 상세 보기 모달
 const detailEst = (clientId, id) => {
     modalType.value = 'view';
     modalState.setModalState(true);
-
-    // 전달받은 clientId와 estimateId를 모달에 넘겨주기
     selectedEstimateId.value = id;
     selectedClientId.value = clientId;
-};
-
-const onModalClose = () => {
-    console.log('모달 close');
 };
 </script>
 
@@ -90,12 +71,13 @@ const onModalClose = () => {
             @postSuccess="onPostSuccess"
         />
 
-        <!-- 등록 모달  -->
+        <!-- 등록 모달 -->
         <EstimateRegisModal
             v-if="modalState.modalState && modalType === 'register'"
-            @postSucess="onPostSuccess"
+            @postSuccess="onPostSuccess"
             @modalClose="onModalClose"
         />
+
         <!-- 신규 등록 버튼 -->
         <div class="button-container">
             <button @click="registerEstiModal()">견적서 등록</button>
@@ -128,9 +110,7 @@ const onModalClose = () => {
                             <td>{{ est.totalDeliveryCount }}</td>
                             <td>{{ est.totalSupplyPrice }}</td>
                             <td>{{ est.totalTax }}</td>
-                            <td>
-                                {{ est.depositAmount }}
-                            </td>
+                            <td>{{ est.depositAmount }}</td>
                             <td>{{ est.salesArea }}</td>
                             <td>
                                 <button
@@ -143,22 +123,24 @@ const onModalClose = () => {
                     </template>
                     <template v-else>
                         <tr>
-                            <td colspan="7">일치하는 검색 결과가 없습니다</td>
+                            <td colspan="10">일치하는 검색 결과가 없습니다</td>
                         </tr>
                     </template>
                 </template>
             </tbody>
         </table>
+
         <!-- 페이징 -->
         <Pagination
             :totalItems="estimateCnt"
             :items-per-page="5"
             :max-pages-shown="5"
-            :onClick="getAllEstimate"
+            :onClick="loadEstimateList"
             v-model="cPage"
         />
     </div>
 </template>
+
 <style lang="scss" scoped>
 table {
     width: 100%;

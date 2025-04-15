@@ -2,12 +2,16 @@
 import axios from 'axios';
 import { ref, onMounted, watch, readonly } from 'vue';
 import { useUserInfo } from '../../../../stores/userInfo';
+import EmployeeYearModal from './EmployeeYearModal.vue';
 
 const address = ref('');
 const addressCode = ref('');
-const emit = defineEmits(['closeModal']);
+const emit = defineEmits(['closeModal','OpenRetireModal','closeCommonModal']);
 const props = defineProps(['modalType', 'UserDetail','employeeDetail','imgUrl']);
 const userInfo = useUserInfo();
+
+// 모달창 동시에 띄우기 위한 새로운 타입 변수 
+const CommonModal = ref(false);
 
 //사원 등록 및 파일업로드
 const employeeForm = ref({
@@ -47,6 +51,15 @@ const years = ref('');
 
 //연봉 정보 리스트
 const totalSalary = ref({});
+
+const oldJobGrade = ref('');
+
+
+const showModal = ref(false);
+
+const OpenHobong = () => {
+    showModal.value = true;
+}
 
 //연봉 계산기 계산하기
 const Onsalary = (joinDate) => {
@@ -99,6 +112,12 @@ const getFullYearDiff = (startDate, endDate) => {
 //퇴직 
 const OnRetire = () => {
 
+    if(severancePay.value == 0 && resignationReason.value == '' && resignationDate.value == '' ){
+        alert('필수 항목을 입력해주세요');
+        return;
+    }
+
+    CommonModal.value = false;
     emit('update-retire-info', {
         resignationReason: resignationReason.value,
         resignationDate: resignationDate.value,
@@ -129,11 +148,33 @@ const handlerFile = e => {
 
 //파일 저장
 const saveEmployee = () => {
+
+    if (
+    !employeeForm.value.employeeName ||
+    !employeeForm.value.registrationNumber ||
+    !employeeForm.value.sex ||
+    !employeeForm.value.birthday ||
+    !employeeForm.value.email ||
+    !employeeForm.value.finalEducation ||
+    !address.value ||
+    !employeeForm.value.addressDetail ||
+    !employeeForm.value.hp ||
+    !employeeForm.value.bank ||
+    !employeeForm.value.bankAccount ||
+    !employeeForm.value.departmentDetailName ||
+    !employeeForm.value.jobGradeDetailName ||
+    !employeeForm.value.regDate ||
+    !salary.value
+    ) {
+    alert('모든 항목을 기입해야 저장 가능합니다.');
+    return;
+    }
     
     const formData = new FormData();
     if (fileData.value) formData.append('file', fileData.value);
 
     // Onsalary(employeeForm.value.regDate);
+    employeeForm.value.emplStatus = 'W';
 
     formData.append('employeeName', employeeForm.value.employeeName);
     formData.append('registrationNumber', employeeForm.value.registrationNumber );
@@ -152,7 +193,7 @@ const saveEmployee = () => {
     formData.append('regDate', employeeForm.value.regDate  );
     formData.append('emplStatus', employeeForm.value.emplStatus  );
     formData.append('salary', salary.value);
-    formData.append('paymentDate', employeeForm.value.regDate.slice(0, 7));
+    formData.append('paymentDate', employeeForm.value?.regDate.slice(0, 7));
 
     axios.post('/api/personnel/employeeSave.do', formData).then(res => {
         if (res.data.result === 'success') {
@@ -215,9 +256,38 @@ const closeModal = () => {
     emit('closeModal', isModalOpen.value);
 };
 
+
 const handleImgError = () => {
   imgUrl.value = '/images/default-profile.png';
 }
+
+const onJobGradeChange = () => {
+  if (!confirm('직급을 변경하시겠습니까?')) {
+    employeeForm.value.jobGradeDetailName = oldJobGrade.value;
+  } else {
+    oldJobGrade.value = employeeForm.value.jobGradeDetailName;
+  }
+};
+
+const onemplStatus = () => {
+    if(employeeForm.value.emplStatus == 'F'){
+        CommonModal.value = true;
+        emit('OpenRetireModal',
+            employeeForm.value
+        );
+    }
+}
+
+
+//주민등록 번호 
+const formatResidentNumber = (e) => {
+  let value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만
+  if (value.length > 6) {
+    value = value.slice(0, 6) + '-' + value.slice(6, 13);
+  }
+  employeeForm.value.registrationNumber= value;
+};
+
 
 //퇴직 값이 들어오면 즉각 적용 
 watch(
@@ -230,6 +300,7 @@ watch(
     },
     { immediate: true } // 필요에 따라 사용, 없으면 값 바뀔 때만 감지
 );
+
 
 //유저 정보 들어오면 모달창에 적용 
 // props.UserDetail이 바뀔 때 employeeForm에 복사
@@ -264,6 +335,8 @@ watch(
   { immediate: true }
 );
 
+
+//타입 감지 
 watch(
     () => props.modalType ,
     (Type) => {
@@ -303,6 +376,11 @@ onMounted(() => {
                     <h2>사원 상세 정보</h2>
                     <button class="modal-close" @click="closeModal">×</button>
                 </div>
+
+                <EmployeeYearModal 
+                :show ="showModal"
+                @close="showModal = false"
+                />
 
                 <div class="modal-body">
                     <!-- 1. 기본 정보 -->
@@ -349,8 +427,9 @@ onMounted(() => {
                                         class="inputTxt"
                                         id="registrationNumber"
                                         placeholder="숫자만 입력"
-                                        @input="formatRegistrationNumber"
+                                        @input="formatResidentNumber"
                                         v-model="employeeForm.registrationNumber"
+                                        maxlength="14"
                                     />
                                 </td>
                                 <th>성별 <span class="required">*</span></th>
@@ -583,7 +662,9 @@ onMounted(() => {
                                     <select
                                         class="inputSelect"
                                         id="jobGradeGroup"
-                                        v-model="employeeForm.jobGradeDetailName">
+                                        v-model="employeeForm.jobGradeDetailName"
+                                        @change="onJobGradeChange"
+                                        >
                                         <option value="">전체</option>
                                         <option value="대리">대리</option>
                                         <option value="부장">부장</option>
@@ -613,6 +694,11 @@ onMounted(() => {
                                             name="emplStatus"
                                             value="W"
                                             v-model="employeeForm.emplStatus"
+                                            :disabled="modalType == 'register' ||
+                                            employeeForm.emplStatus == 'F'
+                                            "
+                                            @change="onemplStatus"
+
                                         />
                                         재직</label
                                     >
@@ -622,6 +708,10 @@ onMounted(() => {
                                             name="emplStatus"
                                             value="F"
                                             v-model="employeeForm.emplStatus"
+                                            :disabled="modalType == 'register'||
+                                            employeeForm.emplStatus == 'F'
+                                            "
+                                            @change="onemplStatus"
                                         />
                                         퇴직</label
                                     >
@@ -631,6 +721,10 @@ onMounted(() => {
                                             name="emplStatus"
                                             value="O"
                                             v-model="employeeForm.emplStatus"
+                                            :disabled="modalType == 'register'||
+                                            employeeForm.emplStatus == 'F'
+                                            "
+                                            @change="onemplStatus"
                                         />
                                         휴직</label
                                     >
@@ -675,7 +769,7 @@ onMounted(() => {
                                         type="text"
                                         class="inputTxt"
                                         id="salary"
-                                        @input="formatSalary"
+                                        @input="onlyNumber"
                                         placeholder="자동 입력됨"
                                         v-model="salary"
                                         :readonly="modalType === 'update'"
@@ -701,6 +795,12 @@ onMounted(() => {
                                     />
                                 </td>
                             </tr>
+                            <button @click="OpenHobong" 
+                            style="background-color: #3e4566; color: aliceblue;
+                            width: 50px; height: 30px;
+                            ">
+                                호봉
+                            </button>
                         </tbody>
                     </table>
 
@@ -716,7 +816,7 @@ onMounted(() => {
                         <button
                             class="btnType blue"
                             @click="updateEmployee"
-                            v-else
+                            v-if="modalType !== 'register' && employeeForm.emplStatus !== 'F'"
                         >
                             수정
                         </button>

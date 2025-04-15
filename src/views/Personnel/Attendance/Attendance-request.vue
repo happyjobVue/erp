@@ -27,6 +27,9 @@ const userInfo = useUserInfo();
 
 const cPage = ref(1);
 
+const DetailAttendace = ref(null);
+const detailModalRef = ref(null)
+
 //리스트 데이터 불러오기 
 const search = () => {
 
@@ -50,8 +53,8 @@ const search = () => {
     axios
         .post(`/api/personnel/attendanceList.do`, form)
         .then(res => {
-            console.log(res.data.attendanceList);
-            attendanceList.value = res.data.attendanceList;
+            console.log(res.data);
+            attendanceList.value = res.data;
         })
         .catch(err => {
             console.error('에러 발생:', err);
@@ -64,8 +67,8 @@ const anualLeave = () => {
 
     const form = new URLSearchParams();
 
-    // form.append('userIdx', userInfo.user.empId);
-    // console.log(userInfo.user.empId);
+    form.append('userIdx', userInfo.user.empId);
+    console.log(userInfo.user.empId);
 
     axios
         .post(`/api/personnel/attendanceCnt.do`,form)
@@ -94,6 +97,14 @@ const reLoadCloseModal = (val) => {
     search();
     anualLeave();
 
+}
+
+const AttendanceStatus = async (item) => {
+  DetailAttendace.value = item.id;
+  console.log(DetailAttendace);
+  visible.value = true;
+  await nextTick() // 하위 컴포넌트가 렌더링된 다음 실행
+  detailModalRef.value?.StatusAttendance(item.id);
 }
 
 const CompanionReason = (attid) => {
@@ -168,9 +179,11 @@ onMounted(() => {
 
         <!-- 등록 모달 -->
         <AttendanceRequestModal v-if="visible && summary.leftAttCnt !== undefined"
+            ref="detailModalRef"
             @visibleval="visibleval"
             @reLoadCloseModal="reLoadCloseModal"
             :summary="summary"
+            :DetailAttendace="DetailAttendace"
         /> 
 
 
@@ -221,7 +234,9 @@ onMounted(() => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in attendanceList" :key="item.id">
+              <tr v-for="(item, index) in attendanceList.attendanceList" :key="item.id" @click="() => AttendanceStatus(item)"
+                style="hover:"
+                >
                 <td>{{ item.id }}</td>
                 <td>{{ item.reqType }}</td>
                 <td>{{ item.number }}</td>
@@ -231,7 +246,7 @@ onMounted(() => {
                 <td>{{ item.appType }}</td>
                 <td>{{ item.reqStatus }}</td>
                 <td v-if="item.reqStatus === '반려'" style="width: 100px;">
-                    <button @click="() =>CompanionReason(item.id)">반려사유</button>
+                    <button @click.stop="() =>CompanionReason(item.id)">반려사유</button>
                 </td>
                 <td v-else style="width: 100px;">
                     -
@@ -243,7 +258,7 @@ onMounted(() => {
                 <!-- 페이징 영역 -->
       <div class="paging_area">
         <Pagination
-            :totalItems="attendanceList?.attendanceCnt"
+            :totalItems="attendanceList?.attendanceRequestCnt"
             :items-per-page="5"
             :max-pages-shown="5"
             :onClick="search"
@@ -392,6 +407,11 @@ td {
     text-align: center;
     white-space: nowrap;
 }
+
+tr:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+  }
  
   </style>
   
