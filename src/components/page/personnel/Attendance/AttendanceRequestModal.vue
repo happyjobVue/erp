@@ -236,6 +236,7 @@ const DetailAttendance = (item) => {
             form.value.reqStatus = res.data.detail.reqStatus;
             form.value.id = res.data.detail.id;
             
+            
             const start = new Date(form.value.reqSt)
             const end = new Date(form.value.reqEd)
 
@@ -324,6 +325,23 @@ const CancleForm = () => {
         });
     
 }
+
+//번호 숫자 형식 바꾸기 
+const formatPhone = () => {
+  // 숫자만 남기기
+  let digits = form.value.reqTel.replace(/\D/g, '');
+
+  // 010-1234-5678 형식으로 만들기
+  if (digits.length <= 3) {
+    form.value.reqTel = digits;
+  } else if (digits.length <= 7) {
+    form.value.reqTel = `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  } else if (digits.length <= 11) {
+    form.value.reqTel = `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+  } else {
+    form.value.reqTel = `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+  }
+};
 
 
 defineExpose({
@@ -430,9 +448,11 @@ onMounted(() => {
                                 </th>
                                 <td colspan="3">
                                     <input
-                                        type="tel"
+                                        type="text"
                                         class="inputTxt p100"
                                         v-model="form.reqTel"
+                                        @input="formatPhone"
+                                        maxlength="13"
                                         placeholder="010-0000-0000"
                                     />
                                 </td>

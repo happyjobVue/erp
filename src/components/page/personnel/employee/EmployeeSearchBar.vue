@@ -87,7 +87,7 @@ onMounted(() => {
 <template>
     <div class="breadcrumb-container" style="width: 1210px; margin: 0 auto;">
         <!-- 홈 아이콘 -->
-        <i class="ph ph-house"></i>
+        <i class="ph ph-house">🏠</i>
 
         <!-- 경로 텍스트 -->
         <span class="breadcrumb">인사/급여</span>

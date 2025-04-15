@@ -136,9 +136,9 @@ onMounted(() => {
           <p class="Location">
             <i class="icon-home" /> 
             /
-            <a href="#" class="btn_nav bold">시스템 관리</a>
+            <a href="#" class="btn_nav bold">인사/급여</a>
             /
-            <span class="btn_nav bold">공지 사항</span>
+            <span class="btn_nav bold">근태 신청</span>
             <a href="#" class="btn_set refresh">
                 <i class="icon-refresh" />
             </a>
@@ -235,7 +235,6 @@ onMounted(() => {
             </thead>
             <tbody>
               <tr v-for="(item, index) in attendanceList.attendanceList" :key="item.id" @click="() => AttendanceStatus(item)"
-                style="hover:"
                 >
                 <td>{{ item.id }}</td>
                 <td>{{ item.reqType }}</td>
@@ -408,7 +407,7 @@ td {
     white-space: nowrap;
 }
 
-tr:hover {
+.att-table tr:hover {
     background-color: #f0f0f0;
     cursor: pointer;
   }

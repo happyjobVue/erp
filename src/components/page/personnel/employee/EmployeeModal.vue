@@ -149,6 +149,8 @@ const handlerFile = e => {
 //파일 저장
 const saveEmployee = () => {
 
+
+    //유효성 검사 
     if (
     !employeeForm.value.employeeName ||
     !employeeForm.value.registrationNumber ||
@@ -169,7 +171,20 @@ const saveEmployee = () => {
     alert('모든 항목을 기입해야 저장 가능합니다.');
     return;
     }
-    
+
+    //생년월일 yyyy-mm-dd 형시기 아닐경우 리턴 
+
+    const birthday = employeeForm.value.birthday;
+
+    // YYYY-MM-DD 형식인지 확인
+    const isValidDate = /^\d{4}-\d{2}-\d{2}$/.test(birthday);
+
+    if (!isValidDate) {
+    alert('생년월일 형식은 YYYY-MM-DD로 입력해주세요.');
+    return;
+    }
+
+
     const formData = new FormData();
     if (fileData.value) formData.append('file', fileData.value);
 
@@ -286,6 +301,40 @@ const formatResidentNumber = (e) => {
     value = value.slice(0, 6) + '-' + value.slice(6, 13);
   }
   employeeForm.value.registrationNumber= value;
+};
+
+//핸드폰 번호 
+//번호 숫자 형식 바꾸기 
+const formatPhone = () => {
+  // 숫자만 남기기
+  let digits = employeeForm.value.hp.replace(/\D/g, '');
+
+  // 010-1234-5678 형식으로 만들기
+  if (digits.length <= 3) {
+    employeeForm.value.hp = digits;
+  } else if (digits.length <= 7) {
+    employeeForm.value.hp = `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  } else if (digits.length <= 11) {
+    employeeForm.value.hp = `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+  } else {
+    employeeForm.value.hp = `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+  }
+};
+
+//연봉 수샂 형식 변경 하기 
+// 표시용: 천 단위 콤마 붙여서 보여주기
+const formattedSalary = computed(() => {
+  if (!salary.value) return '';
+  return Number(salary.value).toLocaleString();
+});
+
+const onSalaryInput = (event) => {
+  const input = event.target.value;
+  const onlyNumber = input.replace(/[^0-9]/g, ''); // 숫자만 남기기
+  salary.value = onlyNumber;
+
+  // 직접 input에 포맷된 값 넣어주기
+  event.target.value = Number(onlyNumber).toLocaleString();
 };
 
 
@@ -516,7 +565,7 @@ onMounted(() => {
                                         class="inputTxt"
                                         id="hp"
                                         placeholder="숫자만 입력"
-                                        @input="formatPhoneNumber"
+                                        @input="formatPhone"
                                         v-model="employeeForm.hp"
                                     />
                                 </td>
@@ -766,13 +815,13 @@ onMounted(() => {
                                 <th>연봉</th>
                                 <td colspan="3">
                                     <input
-                                        type="text"
-                                        class="inputTxt"
-                                        id="salary"
-                                        @input="onlyNumber"
-                                        placeholder="자동 입력됨"
-                                        v-model="salary"
-                                        :readonly="modalType === 'update'"
+                                    type="text"
+                                    class="inputTxt"
+                                    id="salary"
+                                    :value="formattedSalary"
+                                    @input="onSalaryInput"
+                                    placeholder="자동 입력됨"
+                                    :readonly="modalType === 'update'"
                                     />
                                 </td>
                                 <th>퇴직금</th>

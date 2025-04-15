@@ -81,7 +81,7 @@ onMounted(() => {
                                 <span class="divider">/</span>
                                 <span>인사/급여</span>
                                 <span class="divider">/</span>
-                                <span class="current">급여 관리</span>
+                                <span class="current">근태 조회 및 승인</span>
                             </div>
                             <button class="refresh-btn" @click="refresh">
                                 <i class="icon-refresh" />
