@@ -153,15 +153,49 @@ const getFullYearDiff = (startDate, endDate) => {
 
 //퇴직
 const OnRetire = () => {
+
+
+    //유효성 검사 
     if (
-        severancePay.value == 0 &&
-        resignationReason.value == '' &&
-        resignationDate.value == ''
+        severancePay.value == 0 
     ) {
-        alert('필수 항목을 입력해주세요');
+        alert('퇴직금을 입력해주세요');
         return;
     }
 
+    if (
+        resignationReason.value == '' 
+    ) {
+        alert('퇴직사유를 입력해주세요');
+        return;
+    }
+
+
+    if (
+        resignationDate.value == ''
+    ) {
+        alert('퇴직날짜를 입력해주세요');
+        return;
+    }
+
+
+    const regDate = new Date(props.UserDetail.detail.regDate);
+    const resigDate = new Date(resignationDate.value);
+
+    if(regDate > resigDate){
+        alert('퇴사일이 입사일자보다 앞입니다.');
+        return;
+    }
+
+    console.log(severancePay.value);
+
+    if(severancePay.value <= 0){
+        alert('퇴직금을 확인해주십쇼');
+        return;
+    }
+
+
+    //부모 컴포넌트로 올리기 
     CommonModal.value = false;
     emit('update-retire-info', {
         resignationReason: resignationReason.value,
@@ -343,7 +377,7 @@ const updateEmployee = () => {
     formData.append('employeeId', employeeForm.value.employeeId);
 
     axios.post('/api/personnel/employeeUpdate.do', formData).then(res => {
-        alert('사원정보 수장 완료');
+        alert('사원정보 수정 완료');
         closeModal();
     });
 };
@@ -352,6 +386,7 @@ const updateEmployee = () => {
 const openDaumPostcode = () => {
     new window.daum.Postcode({
         oncomplete: function (data) {
+            console.log(data);
             address.value = data.address; // 선택한 주소를 input에 적용
             addressCode.value = data.sigunguCode;
         },
@@ -459,7 +494,7 @@ watch(
         if (newDetail) {
             employeeForm.value = { ...employeeForm.value, ...newDetail };
             address.value = newDetail.address;
-            addressCode.value = newDetail.addressCode;
+            addressCode.value = newDetail.zipCode;
             employeeForm.value.employeeId = newDetail.employeeId;
             salary.value = employeeForm.value.salary;
             console.log(salary.value);

@@ -35,7 +35,7 @@ const SetEmplStatus = (val) => {
         emit('EmplStatus', emplStatus.value );
         emit('OnEmplStatus');
 
-    } else {
+    } else if(val === 'F') {
         emplStatus.value = 'F'
         emit('EmplStatus', emplStatus.value);
         emit('OnEmplStatus');

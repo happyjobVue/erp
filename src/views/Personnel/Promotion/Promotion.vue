@@ -177,7 +177,4 @@ select {
     text-align: center;
 }
 
-.promotion-table tbody tr:hover {
-    background-color: #f9f9f9;
-}
 </style>
