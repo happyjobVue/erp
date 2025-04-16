@@ -23,7 +23,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">사용일자</td>
+                        <td class="label">
+                            사용일자<span class="font_red">*</span>
+                        </td>
                         <td>
                             <input
                                 type="date"
@@ -59,7 +61,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">계정대분류명</td>
+                        <td class="label">
+                            계정대분류명<span class="font_red">*</span>
+                        </td>
                         <td>
                             <template v-if="isEditMode">
                                 <input
@@ -79,7 +83,9 @@
                             </template>
                         </td>
 
-                        <td class="label">계정과목</td>
+                        <td class="label">
+                            계정과목<span class="font_red">*</span>
+                        </td>
                         <td>
                             <template v-if="isEditMode">
                                 <input
@@ -102,7 +108,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">거래처명</td>
+                        <td class="label">
+                            거래처명<span class="font_red">*</span>
+                        </td>
                         <td>
                             <template v-if="isEditMode">
                                 <input
@@ -123,7 +131,9 @@
                                 </select>
                             </template>
                         </td>
-                        <td class="label">결의금액</td>
+                        <td class="label">
+                            결의금액<span class="font_red">*</span>
+                        </td>
                         <td>
                             <input
                                 type="text"
@@ -152,7 +162,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">첨부파일</td>
+                        <td class="label">
+                            첨부파일<span class="font_red">*</span>
+                        </td>
                         <td>
                             <template v-if="isReadOnly">
                                 <button
@@ -238,7 +250,7 @@ const formattedPayment = computed({
         return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' 원';
     },
     set(value) {
-        const numberValue = value.replace(/[^0-9]/g, ''); 
+        const numberValue = value.replace(/[^0-9]/g, '');
         expenseDetail.value.expense_payment = parseInt(numberValue, 10) || 0;
     },
 });
@@ -540,5 +552,8 @@ button:active {
     background-color: #3e8e41;
     box-shadow: 0 2px #666;
     transform: translateY(2px);
+}
+.font_red {
+    color: #fe1414;
 }
 </style>
