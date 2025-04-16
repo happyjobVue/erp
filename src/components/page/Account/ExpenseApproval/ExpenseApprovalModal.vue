@@ -89,12 +89,20 @@
                             <input
                                 type="text"
                                 v-model="expenseDetail.credit_name"
-                                readonly
+                                :readonly="expenseDetail.is_approval === 'W'"
+                                :class="{
+                                    'readonly-input':
+                                        expenseDetail.is_approval === 'W',
+                                }"
                             />
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">승인여부</td>
+                        <td class="label">
+                            승인여부<span v-if="showRadio" class="font_red"
+                                >*</span
+                            >
+                        </td>
                         <td>
                             <div v-if="showRadio" class="radio-group">
                                 <label style="margin-right: 10px">
@@ -165,7 +173,7 @@
                         승인완료
                     </button>
                     <button
-                        v-if="originalApproval !== 'F'"
+                        v-if="originalApproval === 'S'"
                         @click="goToPrintPage"
                     >
                         지출결의서 출력
@@ -345,8 +353,15 @@ onUnmounted(() => {
 }
 .radio-group {
     display: flex;
-    gap: 20px;
+    gap: 10px;
     align-items: center;
+    flex-wrap: nowrap;
+}
+.radio-group label {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 .radio-group input[type='radio'] {
     display: inline-block;
@@ -357,6 +372,7 @@ onUnmounted(() => {
     font-weight: bold;
     text-align: left;
     width: 150px;
+    white-space: nowrap;
 }
 input:not([type='radio']),
 select,
@@ -402,5 +418,12 @@ button:active {
     background-color: #3e8e41;
     box-shadow: 0 2px #666;
     transform: translateY(2px);
+}
+.font_red {
+    color: #fe1414;
+}
+.readonly-input {
+    background-color: #f5f5f5;
+    pointer-events: none;
 }
 </style>

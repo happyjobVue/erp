@@ -3,8 +3,6 @@ import { defineProps, onMounted, onUnmounted, ref } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
 const modalState = useModalStore();
-const postcode = ref('');
-const roadAddress = ref('');
 const isScriptLoaded = ref(false); // 스크립트 로딩 상태를 추적하는 변수
 const emit = defineEmits(['modalClose', 'postSuccess']);
 const props = defineProps({
@@ -69,15 +67,15 @@ const editClient = () => {
         });
 };
 
+const closeModal = () => {
+    modalState.setModalState();
+};
+
 onMounted(() => {
     if (props.client) {
         console.log('props' + props.client.client_name);
     }
 });
-
-const closeModal = () => {
-    modalState.setModalState();
-};
 
 onUnmounted(() => {
     emit('modalClose', 0);
@@ -99,9 +97,13 @@ onUnmounted(() => {
                                     <input
                                         type="text"
                                         v-model="props.client.client_name"
+                                        disabled
+                                        readonly
                                     />
                                 </td>
-                                <th class="table-header">회사 연락처</th>
+                                <th class="table-header">
+                                    회사 연락처<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
@@ -112,14 +114,18 @@ onUnmounted(() => {
 
                             <!-- 제조사 -->
                             <tr>
-                                <th class="table-header">담당자</th>
+                                <th class="table-header">
+                                    담당자<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
                                         v-model="props.client.person"
                                     />
                                 </td>
-                                <th class="table-header">담당자 연락처</th>
+                                <th class="table-header">
+                                    담당자 연락처<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
@@ -130,7 +136,9 @@ onUnmounted(() => {
 
                             <!-- 거래처 -->
                             <tr>
-                                <th class="table-header">우편번호</th>
+                                <th class="table-header">
+                                    우편번호<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <div class="postcode-group">
                                         <input
@@ -146,7 +154,9 @@ onUnmounted(() => {
                                         </button>
                                     </div>
                                 </td>
-                                <th class="table-header">주소</th>
+                                <th class="table-header">
+                                    주소<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
@@ -157,14 +167,18 @@ onUnmounted(() => {
 
                             <!-- 메모 -->
                             <tr>
-                                <th class="table-header">상세주소</th>
+                                <th class="table-header">
+                                    상세주소<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
                                         v-model="props.client.detail_addr"
                                     />
                                 </td>
-                                <th class="table-header">사업자 번호</th>
+                                <th class="table-header">
+                                    사업자 번호<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
@@ -173,7 +187,9 @@ onUnmounted(() => {
                                 </td>
                             </tr>
                             <tr>
-                                <th class="table-header">은행</th>
+                                <th class="table-header">
+                                    은행<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <select v-model="props.client.bank">
                                         <option value="" disabled>전체</option>
@@ -339,5 +355,9 @@ input[type='date']:focus,
 select:focus {
     border-color: #3bb2ea;
     outline: none;
+}
+
+.font_red {
+    color: #fe1414;
 }
 </style>

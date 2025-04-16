@@ -15,10 +15,6 @@ const selectedEstimateId = ref(null);
 const selectedClientId = ref(null);
 const route = useRoute();
 
-onMounted(() => {
-    loadEstimateList(); // 페이지 로드 시 데이터 불러오기
-});
-
 // 견적서 목록 불러오기 (검색 조건 포함)
 const loadEstimateList = () => {
     const param = {
@@ -58,6 +54,10 @@ const detailEst = (clientId, id) => {
     selectedEstimateId.value = id;
     selectedClientId.value = clientId;
 };
+
+onMounted(() => {
+    loadEstimateList(); // 페이지 로드 시 데이터 불러오기
+});
 </script>
 
 <template>
@@ -158,8 +158,9 @@ table {
     }
 
     th {
-        background-color: #2676bf;
-        color: #ddd;
+        background: #f4f4f4;
+        font-weight: bold;
+        color: black;
     }
 
     /* 테이블 올렸을 때 */

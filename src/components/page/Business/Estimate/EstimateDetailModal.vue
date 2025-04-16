@@ -2,7 +2,6 @@
 import axios from 'axios';
 import { defineProps, onMounted, onUnmounted, ref } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
-import { deprecations } from 'sass';
 const estimate = ref('');
 const estimateDetailData = ref([]);
 

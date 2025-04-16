@@ -4,7 +4,9 @@
             <div class="modal-container">
                 <table class="modal-table">
                     <tr>
-                        <td class="label">계정대분류명</td>
+                        <td class="label">
+                            계정대분류명<span class="font_red">*</span>
+                        </td>
                         <td>
                             <select v-model="searchAccount.group_code">
                                 <option value="">선택</option>
@@ -17,7 +19,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">계정세부명</td>
+                        <td class="label">
+                            계정세부명<span class="font_red">*</span>
+                        </td>
                         <td>
                             <input
                                 type="text"
@@ -27,7 +31,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">상세내용</td>
+                        <td class="label">
+                            상세내용<span class="font_red">*</span>
+                        </td>
                         <td>
                             <input
                                 type="text"
@@ -37,7 +43,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">수입/지출 구분</td>
+                        <td class="label">
+                            수입/지출 구분<span class="font_red">*</span>
+                        </td>
                         <td>
                             <select v-model="searchAccount.code_type">
                                 <option value="">선택</option>
@@ -46,8 +54,10 @@
                             </select>
                         </td>
                     </tr>
-                    <tr v-if="!id">
-                        <td class="label">사용여부</td>
+                    <tr v-if="!id || searchAccount.use_yn === 'N'">
+                        <td class="label">
+                            사용여부<span class="font_red">*</span>
+                        </td>
                         <td>
                             <select v-model="searchAccount.use_yn">
                                 <option value="Y">사용</option>
@@ -313,5 +323,8 @@ button:active {
     background-color: #3e8e41;
     box-shadow: 0 2px #666;
     transform: translateY(2px);
+}
+.font_red {
+    color: #fe1414;
 }
 </style>

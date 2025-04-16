@@ -4,7 +4,9 @@
             <div class="modal-container">
                 <table class="modal-table">
                     <tr>
-                        <td class="label">공통코드</td>
+                        <td class="label">
+                            공통코드<span class="font_red">*</span>
+                        </td>
                         <td>
                             <input
                                 type="text"
@@ -13,7 +15,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">공통코드명</td>
+                        <td class="label">
+                            공통코드명<span class="font_red">*</span>
+                        </td>
                         <td>
                             <input
                                 type="text"
@@ -22,7 +26,9 @@
                         </td>
                     </tr>
                     <tr v-if="!id || groupDetail.useYn === 'N'">
-                        <td class="label">사용여부</td>
+                        <td class="label">
+                            사용여부<span class="font_red">*</span>
+                        </td>
                         <td>
                             <select v-model="groupDetail.useYn">
                                 <option value="Y">사용</option>
@@ -31,7 +37,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">비고</td>
+                        <td class="label">
+                            비고<span class="font_red">*</span>
+                        </td>
                         <td>
                             <input type="text" v-model="groupDetail.note" />
                         </td>
@@ -310,5 +318,8 @@ button:active {
     background-color: #3e8e41;
     box-shadow: 0 2px #666;
     transform: translateY(2px);
+}
+.font_red {
+    color: #fe1414;
 }
 </style>

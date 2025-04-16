@@ -10,7 +10,6 @@ const modalState = useModalStore();
 const clients = ref(''); // 고객 목록
 const manufacturers = ref(''); //제조사 목록
 const selectedClient = ref('');
-const modalType = ref('');
 const searchClient = ref('');
 const cPage = ref(1);
 
@@ -148,8 +147,14 @@ onUnmounted(() => {
                                 <td>{{ orderEsti.clientName }}</td>
                                 <td>{{ orderEsti.productName }}</td>
                                 <td>{{ orderEsti.totalDeliveryCount }}</td>
-                                <td>{{ orderEsti.totalSupplyPrice }}</td>
-                                <td>{{ orderEsti.totalTax }}</td>
+                                <td>
+                                    {{
+                                        orderEsti.totalSupplyPrice?.toLocaleString()
+                                    }}
+                                </td>
+                                <td>
+                                    {{ orderEsti.totalTax?.toLocaleString() }}
+                                </td>
                                 <td>
                                     <button
                                         @click="
@@ -178,12 +183,19 @@ onUnmounted(() => {
 
                     <h3>수주서 작성</h3>
 
+                    <div>
+                        <p style="margin-right: 10px">
+                            납기일
+                            <input type="date" v-model="orderDeliveryDate" />
+                        </p>
+                    </div>
+
                     <table>
                         <thead>
                             <tr>
                                 <th class="table-header">제조업체</th>
                                 <th class="table-header">제품명</th>
-                                <th class="table-header">납기일</th>
+                                <!-- <th class="table-header">납기일</th> -->
                                 <th class="table-header">영역구분</th>
                                 <th class="table-header">제품단가</th>
                                 <th class="table-header">수량</th>
@@ -200,18 +212,22 @@ onUnmounted(() => {
                                 >
                                     <td>{{ item.manufacturerName }}</td>
                                     <td>{{ item.productName }}</td>
-                                    <td>
+                                    <!-- <td>
                                         <input
                                             type="date"
                                             v-model="orderDeliveryDate"
                                         />
-                                    </td>
+                                    </td> -->
                                     <td>{{ item.salesArea }}</td>
-                                    <td>{{ item.unitPrice }}</td>
+                                    <td>
+                                        {{ item.unitPrice?.toLocaleString() }}
+                                    </td>
                                     <td>
                                         {{ item.quantity }}
                                     </td>
-                                    <td>{{ item.supplyPrice }}</td>
+                                    <td>
+                                        {{ item.supplyPrice?.toLocaleString() }}
+                                    </td>
                                 </tr>
                             </template>
                             <template v-else>

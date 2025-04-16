@@ -48,16 +48,16 @@ const registerOrderModal = () => {
     modalState.setModalState(true);
 };
 
-onMounted(() => {
-    getOrder();
-});
-
 // 모달이 성공적으로 닫힌 후 실행될 함수
 const onPostSuccess = () => {
     modalState.setModalState(); // 모달 열기
     modalType.value = ''; // 모달 타입 초기화
     getOrder(); // 목록 새로고침
 };
+
+onMounted(() => {
+    getOrder();
+});
 
 watch(() => route.query, getOrder);
 </script>
@@ -156,8 +156,9 @@ table {
     }
 
     th {
-        background-color: #2676bf;
-        color: #ddd;
+        background: #f4f4f4;
+        font-weight: bold;
+        color: black;
     }
 
     /* 테이블 올렸을 때 */
