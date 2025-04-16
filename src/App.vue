@@ -9,9 +9,9 @@ const router = useRouter();
 watch(
   () => userInfo.user?.empId,
   (newVal) => {
-    if (!newVal && router.currentRoute.value.path !== '/login') {
+    if (!newVal && router.currentRoute.value.path !== '/api/loginProc.do') {
       alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
-      router.push('/login');
+      router.push('/api/loginProc.do');
     }
   },
   { immediate: true }

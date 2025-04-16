@@ -6,30 +6,35 @@ import EmployeeYearModal from './EmployeeYearModal.vue';
 
 const address = ref('');
 const addressCode = ref('');
-const emit = defineEmits(['closeModal','OpenRetireModal','closeCommonModal']);
-const props = defineProps(['modalType', 'UserDetail','employeeDetail','imgUrl']);
+const emit = defineEmits(['closeModal', 'OpenRetireModal', 'closeCommonModal']);
+const props = defineProps([
+    'modalType',
+    'UserDetail',
+    'employeeDetail',
+    'imgUrl',
+]);
 const userInfo = useUserInfo();
 
-// 모달창 동시에 띄우기 위한 새로운 타입 변수 
+// 모달창 동시에 띄우기 위한 새로운 타입 변수
 const CommonModal = ref(false);
 
 //사원 등록 및 파일업로드
 const employeeForm = ref({
     employeeName: '',
-    registrationNumber : '',
-    sex : '',
-    birthday : '',
-    finalEducation : '',
-    email : '',
-    hp : '',
-    addressDetail : '',
-    bank : '',
-    bankAccount : '',
-    departmentDetailName : '',
-    jobGradeDetailName : '',
-    jobRoleDetailName : '',
-    regDate : '',
-    emplStatus : ''
+    registrationNumber: '',
+    sex: '',
+    birthday: '',
+    finalEducation: '',
+    email: '',
+    hp: '',
+    addressDetail: '',
+    bank: '',
+    bankAccount: '',
+    departmentDetailName: '',
+    jobGradeDetailName: '',
+    jobRoleDetailName: '',
+    regDate: '',
+    emplStatus: '',
 });
 
 const fileData = ref('');
@@ -46,7 +51,7 @@ const salary = ref(0);
 const NowemployeeId = ref('');
 const NowregDate = new Date();
 
-//근무 연차 
+//근무 연차
 const years = ref('');
 
 //연봉 정보 리스트
@@ -54,18 +59,17 @@ const totalSalary = ref({});
 
 const oldJobGrade = ref('');
 
-
 const showModal = ref(false);
 
 const OpenHobong = () => {
     showModal.value = true;
-}
+};
 
 //연봉 계산기 계산하기
-const Onsalary = (joinDate) => {
+const Onsalary = joinDate => {
     const currentDatae = new Date();
 
-    const anIncome =  getFullYearDiff(joinDate, currentDatae);
+    const anIncome = getFullYearDiff(joinDate, currentDatae);
 
     console.log(anIncome);
 
@@ -91,28 +95,31 @@ const Onsalary = (joinDate) => {
     console.log(salary);
 };
 
-//년 월 비교 
+//년 월 비교
 const getFullYearDiff = (startDate, endDate) => {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-  let diff = end.getFullYear() - start.getFullYear();
+    let diff = end.getFullYear() - start.getFullYear();
 
-  // 아직 1년이 안 지났다면 -1
-  if (
-    end.getMonth() < start.getMonth() || 
-    (end.getMonth() === start.getMonth() && end.getDate() < start.getDate())
-  ) {
-    diff--;
-  }
+    // 아직 1년이 안 지났다면 -1
+    if (
+        end.getMonth() < start.getMonth() ||
+        (end.getMonth() === start.getMonth() && end.getDate() < start.getDate())
+    ) {
+        diff--;
+    }
 
-  return diff;
+    return diff;
 };
 
-//퇴직 
+//퇴직
 const OnRetire = () => {
-
-    if(severancePay.value == 0 && resignationReason.value == '' && resignationDate.value == '' ){
+    if (
+        severancePay.value == 0 &&
+        resignationReason.value == '' &&
+        resignationDate.value == ''
+    ) {
         alert('필수 항목을 입력해주세요');
         return;
     }
@@ -143,55 +150,78 @@ const handlerFile = e => {
         console.log(localImgUrl.value);
     }
     fileData.value = fileInfo[0];
-    
 };
 
 //파일 저장
 const saveEmployee = () => {
-
-
-    //유효성 검사 
-        const requiredFields = [
-    { key: 'employeeName', label: '이름' },
-    { key: 'registrationNumber', label: '주민등록번호' },
-    { key: 'sex', label: '성별' },
-    { key: 'birthday', label: '생년월일' },
-    { key: 'email', label: '이메일' },
-    { key: 'finalEducation', label: '최종학력' },
-    { key: 'addressDetail', label: '상세주소' },
-    { key: 'hp', label: '휴대폰 번호' },
-    { key: 'bank', label: '은행명' },
-    { key: 'bankAccount', label: '계좌번호' },
-    { key: 'departmentDetailName', label: '부서' },
-    { key: 'jobGradeDetailName', label: '직급' },
-    { key: 'regDate', label: '입사일' }
+    //유효성 검사
+    const requiredFields = [
+        { key: 'employeeName', label: '이름' },
+        { key: 'registrationNumber', label: '주민등록번호' },
+        { key: 'sex', label: '성별' },
+        { key: 'birthday', label: '생년월일' },
+        { key: 'email', label: '이메일' },
+        { key: 'finalEducation', label: '최종학력' },
+        { key: 'addressDetail', label: '상세주소' },
+        { key: 'hp', label: '휴대폰 번호' },
+        { key: 'bank', label: '은행명' },
+        { key: 'bankAccount', label: '계좌번호' },
+        { key: 'departmentDetailName', label: '부서' },
+        { key: 'jobGradeDetailName', label: '직급' },
+        { key: 'regDate', label: '입사일' },
     ];
 
     // employeeForm 내부 필드 검사
     for (const field of requiredFields) {
-    const value = employeeForm.value[field.key];
-    if (!value || value === '') {
-        alert(`${field.label}을(를) 입력해주세요.`);
-        return;
-    }
+        const value = employeeForm.value[field.key];
+        if (!value || value === '') {
+            alert(`${field.label}을(를) 입력해주세요.`);
+            return;
+        }
     }
 
     // ref로 선언된 외부 값 검사
     if (!address.value) {
-    alert('주소를 입력해주세요.');
-    return;
+        alert('주소를 입력해주세요.');
+        return;
     }
+
     if (!salary.value) {
-    alert('연봉을 입력해주세요.');
-    return;
+        alert('연봉을 입력해주세요.');
+        return;
     }
 
-    //연봉 제한 
-    if(salary.value == 100000000){
-        alert('연봉 금액이 너무 큽니다.')
+    //연봉 제한
+    if (salary.value == 100000000) {
+        alert('연봉 금액이 너무 큽니다.');
     }
 
-    //생년월일 yyyy-mm-dd 형시기 아닐경우 리턴 
+    // if(employeeForm.value.jobGradeDetailName == '대리'){
+    //     const JoinDate = new Date(employeeForm.value.regDate); // 등록일
+    //     const today = new Date(); // 오늘 날짜
+
+    //     if((today.getFullYear() - JoinDate.getFullYear()) < 1){
+    //         salary.value = 30000000;
+    //     }
+
+    //     if((today.getFullYear() - JoinDate.getFullYear()) == 1){
+    //         salary.value = 35000000;
+    //     }
+
+    //     if((today.getFullYear() - JoinDate.getFullYear()) == 2){
+    //         salary.value = 35000000;
+    //     }
+
+    //     if((today.getFullYear() - JoinDate.getFullYear()) == 3){
+    //         salary.value = 35000000;
+    //     }
+
+    //     if((today.getFullYear() - JoinDate.getFullYear()) == 4){
+    //         salary.value = 35000000;
+    //     }
+    // }
+
+    //생년월일 yyyy-mm-dd 형시기 아닐경우 리턴
 
     const birthday = employeeForm.value.birthday;
 
@@ -199,10 +229,9 @@ const saveEmployee = () => {
     const isValidDate = /^\d{4}-\d{2}-\d{2}$/.test(birthday);
 
     if (!isValidDate) {
-    alert('생년월일 형식은 YYYY-MM-DD로 입력해주세요.');
-    return;
+        alert('생년월일 형식은 YYYY-MM-DD로 입력해주세요.');
+        return;
     }
-
 
     const formData = new FormData();
     if (fileData.value) formData.append('file', fileData.value);
@@ -211,67 +240,80 @@ const saveEmployee = () => {
     employeeForm.value.emplStatus = 'W';
 
     formData.append('employeeName', employeeForm.value.employeeName);
-    formData.append('registrationNumber', employeeForm.value.registrationNumber );
-    formData.append('sex', employeeForm.value.sex );
-    formData.append('birthday', employeeForm.value.birthday );
-    formData.append('finalEducation', employeeForm.value.finalEducation   );
-    formData.append('email', employeeForm.value.email  );
-    formData.append('hp', employeeForm.value.hp );
-    formData.append('address', address.value );
-    formData.append('addressDetail', employeeForm.value.addressDetail );
-    formData.append('bank', employeeForm.value.bank );
-    formData.append('bankAccount', employeeForm.value.bankAccount );
-    formData.append('departmentDetailName', employeeForm.value.departmentDetailName  );
-    formData.append('jobGradeDetailName', employeeForm.value.jobGradeDetailName  );
-    formData.append('jobRoleDetailName', employeeForm.value.jobRoleDetailName  );
-    formData.append('regDate', employeeForm.value.regDate  );
-    formData.append('emplStatus', employeeForm.value.emplStatus  );
+    formData.append(
+        'registrationNumber',
+        employeeForm.value.registrationNumber
+    );
+    formData.append('sex', employeeForm.value.sex);
+    formData.append('birthday', employeeForm.value.birthday);
+    formData.append('finalEducation', employeeForm.value.finalEducation);
+    formData.append('email', employeeForm.value.email);
+    formData.append('hp', employeeForm.value.hp);
+    formData.append('address', address.value);
+    formData.append('addressDetail', employeeForm.value.addressDetail);
+    formData.append('bank', employeeForm.value.bank);
+    formData.append('bankAccount', employeeForm.value.bankAccount);
+    formData.append(
+        'departmentDetailName',
+        employeeForm.value.departmentDetailName
+    );
+    formData.append(
+        'jobGradeDetailName',
+        employeeForm.value.jobGradeDetailName
+    );
+    formData.append('jobRoleDetailName', employeeForm.value.jobRoleDetailName);
+    formData.append('regDate', employeeForm.value.regDate);
+    formData.append('emplStatus', employeeForm.value.emplStatus);
     formData.append('salary', salary.value);
     formData.append('paymentDate', employeeForm.value?.regDate.slice(0, 7));
 
     axios.post('/api/personnel/employeeSave.do', formData).then(res => {
         if (res.data.result === 'success') {
-            alert("사원정보 저장 완료");
+            alert('사원정보 저장 완료');
             closeModal();
-            
         }
     });
 };
 
 //파일 수정
 const updateEmployee = () => {
-    
     const formData = new FormData();
     if (fileData.value) formData.append('file', fileData.value);
 
     formData.append('employeeName', employeeForm.value.employeeName);
-    formData.append('registrationNumber', employeeForm.value.registrationNumber );
-    formData.append('sex', employeeForm.value.sex );
-    formData.append('birthday', employeeForm.value.birthday );
-    formData.append('finalEducation', employeeForm.value.finalEducation   );
-    formData.append('email', employeeForm.value.email  );
-    formData.append('hp', employeeForm.value.hp );
-    formData.append('address', address.value );
-    formData.append('addressDetail', employeeForm.value.addressDetail );
-    formData.append('bank', employeeForm.value.bank );
-    formData.append('bankAccount', employeeForm.value.bankAccount );
-    formData.append('departmentDetailName', employeeForm.value.departmentDetailName  );
-    formData.append('jobGradeDetailName', employeeForm.value.jobGradeDetailName  );
-    formData.append('jobRoleDetailName', employeeForm.value.jobRoleDetailName  );
-    formData.append('regDate', employeeForm.value.regDate  );
-    formData.append('emplStatus', employeeForm.value.emplStatus  );
+    formData.append(
+        'registrationNumber',
+        employeeForm.value.registrationNumber
+    );
+    formData.append('sex', employeeForm.value.sex);
+    formData.append('birthday', employeeForm.value.birthday);
+    formData.append('finalEducation', employeeForm.value.finalEducation);
+    formData.append('email', employeeForm.value.email);
+    formData.append('hp', employeeForm.value.hp);
+    formData.append('address', address.value);
+    formData.append('addressDetail', employeeForm.value.addressDetail);
+    formData.append('bank', employeeForm.value.bank);
+    formData.append('bankAccount', employeeForm.value.bankAccount);
+    formData.append(
+        'departmentDetailName',
+        employeeForm.value.departmentDetailName
+    );
+    formData.append(
+        'jobGradeDetailName',
+        employeeForm.value.jobGradeDetailName
+    );
+    formData.append('jobRoleDetailName', employeeForm.value.jobRoleDetailName);
+    formData.append('regDate', employeeForm.value.regDate);
+    formData.append('emplStatus', employeeForm.value.emplStatus);
     formData.append('employeeId', employeeForm.value.employeeId);
 
     axios.post('/api/personnel/employeeUpdate.do', formData).then(res => {
-
-            alert("사원정보 수장 완료");
-            closeModal();
-
+        alert('사원정보 수장 완료');
+        closeModal();
     });
 };
 
-
-//주소 찾기 
+//주소 찾기
 const openDaumPostcode = () => {
     new window.daum.Postcode({
         oncomplete: function (data) {
@@ -290,74 +332,69 @@ const closeModal = () => {
     emit('closeModal', isModalOpen.value);
 };
 
-
 const handleImgError = () => {
-  imgUrl.value = '/images/default-profile.png';
-}
+    imgUrl.value = '/images/default-profile.png';
+};
 
 const onJobGradeChange = () => {
-  if (!confirm('직급을 변경하시겠습니까?')) {
-    employeeForm.value.jobGradeDetailName = oldJobGrade.value;
-  } else {
-    oldJobGrade.value = employeeForm.value.jobGradeDetailName;
-  }
+    if (!confirm('직급을 변경하시겠습니까?')) {
+        employeeForm.value.jobGradeDetailName = oldJobGrade.value;
+    } else {
+        oldJobGrade.value = employeeForm.value.jobGradeDetailName;
+    }
 };
 
 const onemplStatus = () => {
-    if(employeeForm.value.emplStatus == 'F'){
+    if (employeeForm.value.emplStatus == 'F') {
         CommonModal.value = true;
-        emit('OpenRetireModal',
-            employeeForm.value
-        );
+        emit('OpenRetireModal', employeeForm.value);
     }
-}
-
-
-//주민등록 번호 
-const formatResidentNumber = (e) => {
-  let value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만
-  if (value.length > 6) {
-    value = value.slice(0, 6) + '-' + value.slice(6, 13);
-  }
-  employeeForm.value.registrationNumber= value;
 };
 
-//핸드폰 번호 
-//번호 숫자 형식 바꾸기 
+//주민등록 번호
+const formatResidentNumber = e => {
+    let value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만
+    if (value.length > 6) {
+        value = value.slice(0, 6) + '-' + value.slice(6, 13);
+    }
+    employeeForm.value.registrationNumber = value;
+};
+
+//핸드폰 번호
+//번호 숫자 형식 바꾸기
 const formatPhone = () => {
-  // 숫자만 남기기
-  let digits = employeeForm.value.hp.replace(/\D/g, '');
+    // 숫자만 남기기
+    let digits = employeeForm.value.hp.replace(/\D/g, '');
 
-  // 010-1234-5678 형식으로 만들기
-  if (digits.length <= 3) {
-    employeeForm.value.hp = digits;
-  } else if (digits.length <= 7) {
-    employeeForm.value.hp = `${digits.slice(0, 3)}-${digits.slice(3)}`;
-  } else if (digits.length <= 11) {
-    employeeForm.value.hp = `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
-  } else {
-    employeeForm.value.hp = `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
-  }
+    // 010-1234-5678 형식으로 만들기
+    if (digits.length <= 3) {
+        employeeForm.value.hp = digits;
+    } else if (digits.length <= 7) {
+        employeeForm.value.hp = `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    } else if (digits.length <= 11) {
+        employeeForm.value.hp = `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+    } else {
+        employeeForm.value.hp = `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+    }
 };
 
-//연봉 수샂 형식 변경 하기 
+//연봉 수샂 형식 변경 하기
 // 표시용: 천 단위 콤마 붙여서 보여주기
 const formattedSalary = computed(() => {
-  if (!salary.value) return '';
-  return Number(salary.value).toLocaleString();
+    if (!salary.value) return '';
+    return Number(salary.value).toLocaleString();
 });
 
-const onSalaryInput = (event) => {
-  const input = event.target.value;
-  const onlyNumber = input.replace(/[^0-9]/g, ''); // 숫자만 남기기
-  salary.value = onlyNumber;
+const onSalaryInput = event => {
+    const input = event.target.value;
+    const onlyNumber = input.replace(/[^0-9]/g, ''); // 숫자만 남기기
+    salary.value = onlyNumber;
 
-  // 직접 input에 포맷된 값 넣어주기
-  event.target.value = Number(onlyNumber).toLocaleString();
+    // 직접 input에 포맷된 값 넣어주기
+    event.target.value = Number(onlyNumber).toLocaleString();
 };
 
-
-//퇴직 값이 들어오면 즉각 적용 
+//퇴직 값이 들어오면 즉각 적용
 watch(
     () => props.UserDetail,
     newVal => {
@@ -369,47 +406,43 @@ watch(
     { immediate: true } // 필요에 따라 사용, 없으면 값 바뀔 때만 감지
 );
 
-
-//유저 정보 들어오면 모달창에 적용 
+//유저 정보 들어오면 모달창에 적용
 // props.UserDetail이 바뀔 때 employeeForm에 복사
 watch(
-  () => props.employeeDetail,
-  (newDetail) => {
-
-    if (newDetail) {
-        employeeForm.value = { ...employeeForm.value, ...newDetail }
-        address.value = newDetail.address
-        addressCode.value = newDetail.addressCode
-        employeeForm.value.employeeId = newDetail.employeeId;
-        salary.value = employeeForm.value.salary;
-        console.log(salary.value);
-        // Onsalary(employeeForm.value.regDate);
-        localImgUrl.value = props.imgUrl;
-        
-    } 
-  },
-  { immediate: true } // 모달 열릴 때도 바로 반영
-)
+    () => props.employeeDetail,
+    newDetail => {
+        if (newDetail) {
+            employeeForm.value = { ...employeeForm.value, ...newDetail };
+            address.value = newDetail.address;
+            addressCode.value = newDetail.addressCode;
+            employeeForm.value.employeeId = newDetail.employeeId;
+            salary.value = employeeForm.value.salary;
+            console.log(salary.value);
+            // Onsalary(employeeForm.value.regDate);
+            localImgUrl.value = props.imgUrl;
+        }
+    },
+    { immediate: true } // 모달 열릴 때도 바로 반영
+);
 
 //연봉 감지
 watch(
-  () => props.employeeDetail?.salary,
-  (newSalary) => {
-    if (newSalary !== undefined) {
-      salary.value = newSalary;
-      console.log('연봉 감지됨:', salary.value);
-    }
-  },
-  { immediate: true }
+    () => props.employeeDetail?.salary,
+    newSalary => {
+        if (newSalary !== undefined) {
+            salary.value = newSalary;
+            console.log('연봉 감지됨:', salary.value);
+        }
+    },
+    { immediate: true }
 );
 
-
-//타입 감지 
+//타입 감지
 watch(
-    () => props.modalType ,
-    (Type) => {
-        if(Type  === 'register'){
-            employeeForm.value = {};  // 선택 사항 (초기화)
+    () => props.modalType,
+    Type => {
+        if (Type === 'register') {
+            employeeForm.value = {}; // 선택 사항 (초기화)
             address.value = '';
             addressCode.value = '';
             employeeForm.value.employeeId = '';
@@ -418,14 +451,16 @@ watch(
             return;
         }
     }
-)
+);
 
-
-watch(() => props.imgUrl, (newVal) => {
-  if (newVal) {
-    localImgUrl.value = newVal || '/images/default-profile.png';
-  }
-});
+watch(
+    () => props.imgUrl,
+    newVal => {
+        if (newVal) {
+            localImgUrl.value = newVal || '/images/default-profile.png';
+        }
+    }
+);
 
 // 카카오 API 스크립트 로드
 onMounted(() => {
@@ -445,9 +480,9 @@ onMounted(() => {
                     <button class="modal-close" @click="closeModal">×</button>
                 </div>
 
-                <EmployeeYearModal 
-                :show ="showModal"
-                @close="showModal = false"
+                <EmployeeYearModal
+                    :show="showModal"
+                    @close="showModal = false"
                 />
 
                 <div class="modal-body">
@@ -457,10 +492,15 @@ onMounted(() => {
                             <tr>
                                 <td rowspan="2" colspan="2">
                                     <div id="preview">
-                                        <img :src="localImgUrl" 
-                                        alt="미리보기 이미지" 
-                                        @error="handleImgError "
-                                        style="max-width: 150px; height: auto; border: 1px solid #ccc;"
+                                        <img
+                                            :src="localImgUrl"
+                                            alt="미리보기 이미지"
+                                            @error="handleImgError"
+                                            style="
+                                                max-width: 150px;
+                                                height: auto;
+                                                border: 1px solid #ccc;
+                                            "
                                         />
                                     </div>
                                 </td>
@@ -496,7 +536,9 @@ onMounted(() => {
                                         id="registrationNumber"
                                         placeholder="숫자만 입력"
                                         @input="formatResidentNumber"
-                                        v-model="employeeForm.registrationNumber"
+                                        v-model="
+                                            employeeForm.registrationNumber
+                                        "
                                         maxlength="14"
                                     />
                                 </td>
@@ -683,20 +725,26 @@ onMounted(() => {
                                     <select
                                         class="inputSelect"
                                         id="departmentGroup"
-                                        v-model="employeeForm.departmentDetailName"
+                                        v-model="
+                                            employeeForm.departmentDetailName
+                                        "
                                     >
                                         <option value="">전체</option>
                                         <option value="개발">개발</option>
                                         <option value="회계부">회계부</option>
                                         <option value="영업부">영업부</option>
                                         <option value="경영진">경영진</option>
-                                        <option value="부서부서">부서부서</option>
+                                        <option value="부서부서">
+                                            부서부서
+                                        </option>
                                         <option value="인사부">인사부</option>
                                         <option value="총무부">총무부</option>
                                         <option value="개발1부">개발1부</option>
                                         <option value="개발2부">개발2부</option>
                                         <option value="전산부">전산부</option>
-                                        <option value="리소스관리">리소스관리</option>
+                                        <option value="리소스관리">
+                                            리소스관리
+                                        </option>
                                     </select>
                                 </td>
                                 <th>부서코드</th>
@@ -718,9 +766,33 @@ onMounted(() => {
                                         v-model="employeeForm.jobRoleDetailName"
                                     >
                                         <option value="">-</option>
-                                        <option v-if="employeeForm.departmentDetailName == '회계부'" value="회계분개">회계분개</option>
-                                        <option v-if="employeeForm.departmentDetailName == '영업부'" value="배송기사">배송기사</option>
-                                        <option v-if="employeeForm.departmentDetailName == '총무부'" value="예산기획">예산기획</option>
+                                        <option
+                                            v-if="
+                                                employeeForm.departmentDetailName ==
+                                                '회계부'
+                                            "
+                                            value="회계분개"
+                                        >
+                                            회계분개
+                                        </option>
+                                        <option
+                                            v-if="
+                                                employeeForm.departmentDetailName ==
+                                                '영업부'
+                                            "
+                                            value="배송기사"
+                                        >
+                                            배송기사
+                                        </option>
+                                        <option
+                                            v-if="
+                                                employeeForm.departmentDetailName ==
+                                                '총무부'
+                                            "
+                                            value="예산기획"
+                                        >
+                                            예산기획
+                                        </option>
                                     </select>
                                 </td>
                             </tr>
@@ -730,15 +802,16 @@ onMounted(() => {
                                     <select
                                         class="inputSelect"
                                         id="jobGradeGroup"
-                                        v-model="employeeForm.jobGradeDetailName"
+                                        v-model="
+                                            employeeForm.jobGradeDetailName
+                                        "
                                         @change="onJobGradeChange"
-                                        >
+                                    >
                                         <option value="">전체</option>
                                         <option value="대리">대리</option>
                                         <option value="부장">부장</option>
                                         <option value="과장">과장</option>
                                         <option value="사원">사원</option>
-                                        
                                     </select>
                                 </td>
                                 <th>직급코드</th>
@@ -762,11 +835,11 @@ onMounted(() => {
                                             name="emplStatus"
                                             value="W"
                                             v-model="employeeForm.emplStatus"
-                                            :disabled="modalType == 'register' ||
-                                            employeeForm.emplStatus == 'F'
+                                            :disabled="
+                                                modalType == 'register' ||
+                                                employeeForm.emplStatus == 'F'
                                             "
                                             @change="onemplStatus"
-
                                         />
                                         재직</label
                                     >
@@ -776,8 +849,9 @@ onMounted(() => {
                                             name="emplStatus"
                                             value="F"
                                             v-model="employeeForm.emplStatus"
-                                            :disabled="modalType == 'register'||
-                                            employeeForm.emplStatus == 'F'
+                                            :disabled="
+                                                modalType == 'register' ||
+                                                employeeForm.emplStatus == 'F'
                                             "
                                             @change="onemplStatus"
                                         />
@@ -789,8 +863,9 @@ onMounted(() => {
                                             name="emplStatus"
                                             value="O"
                                             v-model="employeeForm.emplStatus"
-                                            :disabled="modalType == 'register'||
-                                            employeeForm.emplStatus == 'F'
+                                            :disabled="
+                                                modalType == 'register' ||
+                                                employeeForm.emplStatus == 'F'
                                             "
                                             @change="onemplStatus"
                                         />
@@ -834,13 +909,12 @@ onMounted(() => {
                                 <th>연봉</th>
                                 <td colspan="3">
                                     <input
-                                    type="text"
-                                    class="inputTxt"
-                                    id="salary"
-                                    :value="formattedSalary"
-                                    @input="onSalaryInput"
-                                    placeholder="1억 미만으로 입력"
-                                    :readonly="modalType === 'update'"
+                                        type="text"
+                                        class="inputTxt"
+                                        id="salary"
+                                        :value="formattedSalary"
+                                        @input="onSalaryInput"
+                                        placeholder="자동 입력됨"
                                     />
                                 </td>
                                 <th>퇴직금</th>
@@ -863,10 +937,15 @@ onMounted(() => {
                                     />
                                 </td>
                             </tr>
-                            <button @click="OpenHobong" 
-                            style="background-color: #3e4566; color: aliceblue;
-                            width: 50px; height: 30px;
-                            ">
+                            <button
+                                @click="OpenHobong"
+                                style="
+                                    background-color: #3e4566;
+                                    color: aliceblue;
+                                    width: 50px;
+                                    height: 30px;
+                                "
+                            >
                                 호봉
                             </button>
                         </tbody>
@@ -884,7 +963,10 @@ onMounted(() => {
                         <button
                             class="btnType blue"
                             @click="updateEmployee"
-                            v-if="modalType !== 'register' && employeeForm.emplStatus !== 'F'"
+                            v-if="
+                                modalType !== 'register' &&
+                                employeeForm.emplStatus !== 'F'
+                            "
                         >
                             수정
                         </button>
@@ -1092,5 +1174,4 @@ onMounted(() => {
     color: black !important; /* 글자색은 필요에 따라 설정 (흰 배경엔 검정 추천) */
     cursor: pointer !important; /* 마우스 오버 시 포인터로 */
 }
-
 </style>

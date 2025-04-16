@@ -28,6 +28,7 @@ const personnelJbOptions = ref([
     { value: '부장', label: '부장'},
 ]);
 
+//재직자 퇴직자 구분하기 
 const SetEmplStatus = (val) => {
     if (val === 'W') {
         emplStatus.value = 'W'
