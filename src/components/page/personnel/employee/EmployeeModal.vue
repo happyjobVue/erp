@@ -914,6 +914,7 @@ onMounted(() => {
                                         id="salary"
                                         :value="formattedSalary"
                                         @input="onSalaryInput"
+                                        :readonly="modalType === 'register'"
                                         placeholder="자동 입력됨"
                                     />
                                 </td>

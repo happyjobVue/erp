@@ -1,21 +1,6 @@
 <script setup>
 import { RouterView, useRouter } from 'vue-router';
-import { watch } from 'vue';
-import { useUserInfo } from './stores/userInfo';
 
-const userInfo = useUserInfo();
-const router = useRouter();
-
-watch(
-  () => userInfo.user?.empId,
-  (newVal) => {
-    if (!newVal && router.currentRoute.value.path !== '/api/loginProc.do') {
-      alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
-      router.push('/api/loginProc.do');
-    }
-  },
-  { immediate: true }
-);
 </script>
 
 <template>
