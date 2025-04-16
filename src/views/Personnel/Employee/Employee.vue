@@ -231,6 +231,7 @@ const handleRetireInfo = (retireData) => {
         .post(`/api/personnel/emplStatusUpdate.do`, params)
         .then(res => {
             console.log(res.data);
+            alert('퇴직 되었습니다.');
             closeModal();
             personnelSearchList();
         })
