@@ -363,7 +363,7 @@ computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
             <td>{{ personnel.emplStatus }}</td>
             <td>{{ personnel.resignationDate }}</td>
             <td>               
-                <button @click.stop="() => Onretire(personnel)" :disabled="!!personnel.resignationDate">
+                <button @click.stop="() => Onretire(personnel)" :disabled="personnel.emplStatus === 'F'">
                     퇴직처리
                 </button>
             </td>

@@ -164,8 +164,7 @@ onMounted(() => {
                             style="display: flex; justify-content: center"
                         >
                             <Pagination
-                                :totalItems="
-                                    AttendanceList?.attendanceRequestCnt
+                                :totalItems="AttendanceList?.attendanceRequestCnt
                                 "
                                 :items-per-page="5"
                                 :max-pages-shown="5"
