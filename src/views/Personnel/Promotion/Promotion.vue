@@ -77,12 +77,12 @@ function promotionSearch() {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="List in PromotionList.promotionList" :key="List.employeeId">
+                <tr v-for="(List, index) in PromotionList.promotionList" :key="`${List.employeeId}-${index}`">
                     <td>{{ List.employeeNumber }}</td>
                     <td>{{ List.employeeName }}</td>
                     <td>{{ List.departmentCode }}</td>
                     <td>{{ List.departmentDetailName }}</td>
-                    <td>{{ List.jobGrade }}</td>
+                    <td>{{ List.newJobGrade}}</td>
                     <td>{{ List.createdAt }}</td>
                 </tr>
             </tbody>
