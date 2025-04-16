@@ -150,8 +150,9 @@ table {
     }
 
     th {
-        background-color: #2676bf;
-        color: #ddd;
+        background: #f4f4f4;
+        font-weight: bold;
+        color: black;
     }
 
     tbody tr:hover {

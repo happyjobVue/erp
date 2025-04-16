@@ -95,14 +95,6 @@ const closeModal = () => {
     modalState.setModalState();
 };
 
-onMounted(async () => {
-    manufacturers.value = await fetchManufacturers();
-    clients.value = await fetchClient();
-});
-
-onUnmounted(() => {
-    emit('modalClose', 0);
-});
 // 제품 선택 이벤트 핸들러
 
 async function handleManufacturerChange() {
@@ -116,6 +108,15 @@ async function handleManufacturerChange() {
 const calculateSupplyPrice = () => {
     supplyPrice.value = quantity.value * selectedProduct.value.unit_price;
 };
+
+onMounted(async () => {
+    manufacturers.value = await fetchManufacturers();
+    clients.value = await fetchClient();
+});
+
+onUnmounted(() => {
+    emit('modalClose', 0);
+});
 </script>
 
 <template>
@@ -126,7 +127,7 @@ const calculateSupplyPrice = () => {
 
                 <table>
                     <tr>
-                        <th>거래처</th>
+                        <th>거래처<span class="font_red">*</span></th>
                         <td>
                             <select v-model="selectedClient">
                                 <option value="" disabled>전체</option>
@@ -139,11 +140,11 @@ const calculateSupplyPrice = () => {
                                 </option>
                             </select>
                         </td>
-                        <th>납기일</th>
+                        <th>납기일<span class="font_red">*</span></th>
                         <td>
                             <input type="date" v-model="estimateDeliveryDate" />
                         </td>
-                        <th>영역구분</th>
+                        <th>영역구분<span class="font_red">*</span></th>
                         <td>
                             <select v-model="estimateSalesArea">
                                 <option value="" disabled>전체</option>
@@ -157,7 +158,7 @@ const calculateSupplyPrice = () => {
 
                 <table>
                     <tr>
-                        <th>제조업체</th>
+                        <th>제조업체<span class="font_red"> *</span></th>
                         <td>
                             <select
                                 v-model="selectedManufacturer"
@@ -173,7 +174,7 @@ const calculateSupplyPrice = () => {
                                 </option>
                             </select>
                         </td>
-                        <th>제품</th>
+                        <th>제품<span class="font_red"> *</span></th>
                         <td>
                             <select v-model="selectedProduct">
                                 <option value="" disabled>제품</option>
@@ -191,11 +192,12 @@ const calculateSupplyPrice = () => {
                             <input
                                 type="text"
                                 v-model="selectedProduct.unit_price"
+                                disabled
                             />
                         </td>
                     </tr>
                     <tr>
-                        <th>수량</th>
+                        <th>수량<span class="font_red"> *</span></th>
                         <td>
                             <input
                                 type="text"
@@ -228,9 +230,9 @@ const calculateSupplyPrice = () => {
                         <tr v-for="(item, index) in estimateList" :key="index">
                             <td>{{ item.industryName }}</td>
                             <td>{{ item.productName }}</td>
-                            <td>{{ item.unitPrice }}</td>
+                            <td>{{ item.unitPrice?.toLocaleString() }}</td>
                             <td>{{ item.quantity }}</td>
-                            <td>{{ item.supplyPrice }}</td>
+                            <td>{{ item.supplyPrice?.toLocaleString() }}</td>
                             <td>
                                 <div>
                                     <button
@@ -382,5 +384,9 @@ select:focus {
     display: flex;
     justify-content: flex-end; /* 오른쪽 정렬 */
     margin-bottom: 20px;
+}
+
+.font_red {
+    color: #fe1414;
 }
 </style>

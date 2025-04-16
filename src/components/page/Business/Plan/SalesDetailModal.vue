@@ -25,15 +25,6 @@ const detailData = ref({
 
 const emit = defineEmits(['modalClose', 'postSuccess']);
 
-onMounted(() => {
-    if (id) {
-        planDetail(); // id가 있을 때만 호출
-    }
-});
-
-onUnmounted(() => {
-    emit('modalClose', 0);
-});
 // 영업 계획 상세 조회
 async function planDetail() {
     const param = new URLSearchParams({ planNum: id });
@@ -72,6 +63,16 @@ async function updateSalesPlan() {
         alert('저장이 실패되었습니다. 서버 오류가 발생했습니다.');
     }
 }
+
+onMounted(() => {
+    if (id) {
+        planDetail(); // id가 있을 때만 호출
+    }
+});
+
+onUnmounted(() => {
+    emit('modalClose', 0);
+});
 </script>
 
 <template>
@@ -90,6 +91,7 @@ async function updateSalesPlan() {
                                         type="text"
                                         v-model="detailData.emp_name"
                                         readonly
+                                        disabled
                                     />
                                 </td>
                                 <th class="table-header">목표 일자</th>
@@ -98,6 +100,7 @@ async function updateSalesPlan() {
                                         type="date"
                                         v-model="detailData.target_date"
                                         readonly
+                                        disabled
                                     />
                                 </td>
                             </tr>
@@ -110,6 +113,7 @@ async function updateSalesPlan() {
                                         type="text"
                                         :value="detailData.manufacturer_name"
                                         readonly
+                                        disabled
                                     />
                                 </td>
                                 <th class="table-header">상품명</th>
@@ -118,6 +122,7 @@ async function updateSalesPlan() {
                                         type="text"
                                         :value="detailData.product_name"
                                         readonly
+                                        disabled
                                     />
                                 </td>
                             </tr>
@@ -130,9 +135,12 @@ async function updateSalesPlan() {
                                         type="text"
                                         v-model="detailData.client_name"
                                         readonly
+                                        disabled
                                     />
                                 </td>
-                                <th class="table-header">목표 수량</th>
+                                <th class="table-header">
+                                    목표 수량<span class="font_red"> *</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
@@ -143,7 +151,9 @@ async function updateSalesPlan() {
 
                             <!-- 메모 -->
                             <tr>
-                                <th class="table-header">메모</th>
+                                <th class="table-header">
+                                    메모<span class="font_red"> *</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
@@ -277,5 +287,9 @@ input[type='date']:focus,
 select:focus {
     border-color: #3bb2ea;
     outline: none;
+}
+
+.font_red {
+    color: #fe1414;
 }
 </style>

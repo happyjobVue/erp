@@ -7,14 +7,9 @@ const searchClientId = ref('');
 const searchDeliveryDate = ref('');
 const searchEstimateDate = ref('');
 const searchProductId = ref('');
-
 const clients = ref(''); // 고객 목록
 const productList = ref([]); //제품 목록
-// 컴포넌트가 마운트될 때 제조사 목록을 가져오기
-onMounted(async () => {
-    clients.value = await fetchClient();
-    productList.value = await productListAll();
-});
+
 //거래처 ,제품, 수주 날짜, 납기 날짜
 const searchEstimate = () => {
     const query = [];
@@ -35,6 +30,12 @@ const searchEstimate = () => {
 
 onMounted(() => {
     window.location.search && router.replace(window.location.pathname);
+});
+
+// 컴포넌트가 마운트될 때 제조사 목록을 가져오기
+onMounted(async () => {
+    clients.value = await fetchClient();
+    productList.value = await productListAll();
 });
 </script>
 

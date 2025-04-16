@@ -42,10 +42,6 @@ const searchList = () => {
             salesPlanListCnt.value = res.data.salesPlanCnt || 0;
         });
 };
-// 페이지 로드 시 기본 판매 계획 목록 불러오기
-onMounted(() => {
-    salesPlanDefaultList();
-});
 
 // 모달이 성공적으로 닫힌 후 실행될 함수
 const onPostSuccess = () => {
@@ -66,7 +62,10 @@ const openRegisterModal = () => {
     modalType.value = 'register'; // 'register' 모달 열기
     modalState.setModalState(true); // 모달 열기
 };
-
+// 페이지 로드 시 기본 판매 계획 목록 불러오기
+onMounted(() => {
+    salesPlanDefaultList();
+});
 // watch로 라우트 쿼리 변경을 감지하여 목록을 갱신
 watch(() => route.query, searchList);
 </script>
@@ -157,8 +156,9 @@ table {
     }
 
     th {
-        background-color: #2676bf;
-        color: #ddd;
+        background: #f4f4f4;
+        font-weight: bold;
+        color: black;
     }
 
     /* 테이블 올렸을 때 */

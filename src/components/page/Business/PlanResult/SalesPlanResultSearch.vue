@@ -30,16 +30,6 @@ const searchPlanResult = () => {
     router.push(queryString);
 };
 
-onMounted(() => {
-    window.location.search && router.replace(window.location.pathname);
-});
-
-// 컴포넌트가 마운트될 때 제조사 목록을 가져오기
-onMounted(async () => {
-    manufacturer.value = await fetchManufacturers();
-    clients.value = await fetchClient();
-});
-
 // 제품 선택 이벤트 핸들러
 
 async function handleManufacturerChange() {
@@ -49,6 +39,16 @@ async function handleManufacturerChange() {
         );
     }
 }
+
+onMounted(() => {
+    window.location.search && router.replace(window.location.pathname);
+});
+
+// 컴포넌트가 마운트될 때 제조사 목록을 가져오기
+onMounted(async () => {
+    manufacturer.value = await fetchManufacturers();
+    clients.value = await fetchClient();
+});
 </script>
 <template>
     <!-- 사번,조회날짜,제품이름,제조사,거래처처 -->

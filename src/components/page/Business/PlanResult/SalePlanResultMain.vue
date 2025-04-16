@@ -43,7 +43,7 @@ watch(() => route.query, salesPlanReultDefaultList); // route.query 변경 시 s
                     <th scope="col">제품코드</th>
                     <th scope="col">제품이름</th>
                     <th scope="col">목표수량</th>
-                    <th scope="col">실정수량</th>
+                    <th scope="col">실적수량</th>
                     <th scope="col">달성률</th>
                 </tr>
             </thead>
@@ -107,8 +107,9 @@ table {
     }
 
     th {
-        background-color: #2676bf;
-        color: #ddd;
+        background: #f4f4f4;
+        font-weight: bold;
+        color: black;
     }
 }
 
