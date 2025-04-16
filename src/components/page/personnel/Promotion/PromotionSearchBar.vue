@@ -3,7 +3,7 @@ import { reactive, ref } from 'vue';
 import router from '../../../../router';
 
 
-const searchId = ref();
+const searchId = ref('');
 const searchName = ref('');
 const searchRegDateStart = ref('');
 const searchRegDateEnd = ref('');

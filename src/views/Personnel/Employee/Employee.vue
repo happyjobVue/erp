@@ -40,9 +40,10 @@ const personnelSearchList = () => {
 };
 
 //개인 조회 
-const checkPerson = (personnel) => {
-    modalType.value = 'update'
+const checkPerson =  (personnel) => {
     
+    imgUrl.value = '';
+
     const param = {
         employeeId: personnel.employeeId,
         jobGradeCode: personnel.jobGradeCode,
@@ -68,6 +69,7 @@ const checkPerson = (personnel) => {
             } 
 
             isModalOpen.value = true;
+            modalType.value = 'update'
 
         })
         .catch(err => {
@@ -229,6 +231,7 @@ const handleRetireInfo = (retireData) => {
         .post(`/api/personnel/emplStatusUpdate.do`, params)
         .then(res => {
             console.log(res.data);
+            alert('퇴직 되었습니다.');
             closeModal();
             personnelSearchList();
         })

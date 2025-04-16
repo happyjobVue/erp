@@ -10,7 +10,7 @@ const props = defineProps(['summary','DetailAttendace']);
 const userInfo = useUserInfo();
 const attendanceDetail = ref({});
 
-const attendanceList = ref('');
+const attendanceList = ref([]);
 const modalType = ref('');
 
 const form = ref({
@@ -91,6 +91,8 @@ const submitForm = () => {
     const endDate = form.value.reqEd;   // 사용자 선택 종료일
     const selectedName = form.value.name;
 
+    search();
+
     if (isOverlappingRange(startDate, endDate, selectedName)) {
         alert('이미 겹치는 휴가 신청이 존재합니다.');
         return;
@@ -156,16 +158,31 @@ const submitForm = () => {
         });
 };
 
+const toDateOnly = (dateStr) => {
+  const [year, month, day] = dateStr.split('-');
+  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day)); // 시간 제거한 Date 객체
+};
+
 //겹치는 날짜 거르기 시작 날자, 끝날짜 , 이름으로 
 const isOverlappingRange = (selectedStartDate, selectedEndDate, selectedName) => {
-  const selectedStart = new Date(selectedStartDate);
-  const selectedEnd = new Date(selectedEndDate);
+  const selectedStart = toDateOnly(selectedStartDate);
+  const selectedEnd = toDateOnly(selectedEndDate);
+
+  console.log(attendanceList.value);
+
+  console.log(selectedStartDate);
+  console.log(selectedEndDate);
+  console.log(selectedName);
+
 
   return attendanceList.value.some(item => {
+
+    if(item.reqStatus === '반려' || item.reqStatus === '취소') return false;
+
     if (!item.reqSt || !item.reqEd || !item.name) return false;
 
-    const existingStart = new Date(item.reqSt);
-    const existingEnd = new Date(item.reqEd);
+    const existingStart = toDateOnly(item.reqSt);
+    const existingEnd = toDateOnly(item.reqEd);
 
     // 💥 이름도 같고 날짜도 겹치는 경우
     return (
@@ -184,6 +201,8 @@ const UpdateOverlappingRange = (selectedStartDate, selectedEndDate, selectedName
   return attendanceList.value.some(item => {
     // 수정 중인 항목이면 제외
     if (item.id === editingId) return false;
+
+    if(item.reqStatus === '반려' || item.reqStatus === '취소') return false;
 
     if (!item.reqSt || !item.reqEd || !item.name) return false;
 

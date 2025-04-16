@@ -57,6 +57,44 @@ const years = ref('');
 //연봉 정보 리스트
 const totalSalary = ref({});
 
+//연봉 계산 테이블 
+const salaryTable = {
+
+'사원': {
+    0: 30000000,
+    1: 35000000,
+    2: 40000000,
+    3: 45000000,
+    4: 50000000,
+    5: 50000000,
+},
+'대리': {
+    0: 30000000,
+    1: 35000000,
+    2: 40000000,
+    3: 45000000,
+    4: 50000000,
+    5: 50000000,
+},
+'과장': {
+    0: 35000000,
+    1: 40000000,
+    2: 45000000,
+    3: 50000000,
+    4: 55000000,
+    5: 55000000,
+},
+'부장': {
+    0: 55000000,
+    1: 70000000,
+    2: 85000000,
+    3: 100000000,
+    4: 120000000,
+    5: 120000000,
+},
+
+};
+
 const oldJobGrade = ref('');
 
 const showModal = ref(false);
@@ -186,43 +224,11 @@ const saveEmployee = () => {
         return;
     }
 
-    if (!salary.value) {
-        alert('연봉을 입력해주세요.');
-        return;
-    }
-
-    //연봉 제한
-    if (salary.value == 100000000) {
-        alert('연봉 금액이 너무 큽니다.');
-    }
-
-    // if(employeeForm.value.jobGradeDetailName == '대리'){
-    //     const JoinDate = new Date(employeeForm.value.regDate); // 등록일
-    //     const today = new Date(); // 오늘 날짜
-
-    //     if((today.getFullYear() - JoinDate.getFullYear()) < 1){
-    //         salary.value = 30000000;
-    //     }
-
-    //     if((today.getFullYear() - JoinDate.getFullYear()) == 1){
-    //         salary.value = 35000000;
-    //     }
-
-    //     if((today.getFullYear() - JoinDate.getFullYear()) == 2){
-    //         salary.value = 35000000;
-    //     }
-
-    //     if((today.getFullYear() - JoinDate.getFullYear()) == 3){
-    //         salary.value = 35000000;
-    //     }
-
-    //     if((today.getFullYear() - JoinDate.getFullYear()) == 4){
-    //         salary.value = 35000000;
-    //     }
-    // }
+    //연봉 계산 
+    calculateSalary();
+    console.log(salary.value);
 
     //생년월일 yyyy-mm-dd 형시기 아닐경우 리턴
-
     const birthday = employeeForm.value.birthday;
 
     // YYYY-MM-DD 형식인지 확인
@@ -233,6 +239,7 @@ const saveEmployee = () => {
         return;
     }
 
+    //axios로 보내기 
     const formData = new FormData();
     if (fileData.value) formData.append('file', fileData.value);
 
@@ -273,6 +280,34 @@ const saveEmployee = () => {
             closeModal();
         }
     });
+};
+
+//연봉 계산 
+const calculateSalary = () => {
+  const job = employeeForm.value.jobGradeDetailName;
+  const joinDate = new Date(employeeForm.value.regDate);
+  const today = new Date();
+
+  let years = today.getFullYear() - joinDate.getFullYear();
+  const isBeforeAnniversary =
+    today.getMonth() < joinDate.getMonth() ||
+    (today.getMonth() === joinDate.getMonth() && today.getDate() < joinDate.getDate());
+
+  if (isBeforeAnniversary) {
+    years -= 1;
+  }
+
+  // 범위: 최소 0년차, 최대 5년차 → 초과 시 5년차 연봉으로 고정
+  const cappedYears = Math.min(Math.max(years, 0), 5);
+
+  const jobSalaryTable = salaryTable[job];
+  if (!jobSalaryTable) {
+    console.warn(`"${job}" 직급에 대한 연봉 정보 없음`);
+    salary.value = 0;
+    return;
+  }
+
+  salary.value = jobSalaryTable[cappedYears] ?? 0;
 };
 
 //파일 수정
@@ -393,6 +428,16 @@ const onSalaryInput = event => {
     // 직접 input에 포맷된 값 넣어주기
     event.target.value = Number(onlyNumber).toLocaleString();
 };
+
+//퇴직금 숫자만 표시하기
+const filterInput = event => {
+    const input = event.target.value;
+    const onlyNumber = input.replace(/[^0-9]/g, '');
+    severancePay.value = onlyNumber;
+
+    event.target.value = Number(onlyNumber).toLocaleString();
+}
+
 
 //퇴직 값이 들어오면 즉각 적용
 watch(
@@ -1064,6 +1109,7 @@ onMounted(() => {
                                             type="text"
                                             class="inputTxt p100"
                                             placeholder="숫자만 입력"
+                                            @input="filterInput"
                                             v-model="severancePay"
                                         />
                                     </td>

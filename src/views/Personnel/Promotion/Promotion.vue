@@ -39,7 +39,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
             },
         })
         .then(res => {
-            valueName.value = res.data.promotionList;;
+            valueName.value = res.data;
             console.log(valueName.value);
         })
         .catch(err => {
@@ -77,7 +77,7 @@ function promotionSearch() {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="List in PromotionList" :key="List.employeeId">
+                <tr v-for="List in PromotionList.promotionList" :key="List.employeeId">
                     <td>{{ List.employeeNumber }}</td>
                     <td>{{ List.employeeName }}</td>
                     <td>{{ List.departmentCode }}</td>
@@ -88,7 +88,7 @@ function promotionSearch() {
             </tbody>
         </table>
         <Pagination
-            :totalItems="PromotionSearchList?.promotionCnt"
+            :totalItems="PromotionList?.promotionCnt"
             :items-per-page="5"
             :max-pages-shown="5"
             :onClick="PromotionSearchList"
