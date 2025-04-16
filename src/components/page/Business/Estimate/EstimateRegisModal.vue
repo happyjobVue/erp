@@ -189,11 +189,7 @@ onUnmounted(() => {
                         </td>
                         <th>제품 단가</th>
                         <td>
-                            <input
-                                type="text"
-                                v-model="selectedProduct.unit_price"
-                                disabled
-                            />
+                            {{ selectedProduct.unit_price?.toLocaleString() }}
                         </td>
                     </tr>
                     <tr>
@@ -207,7 +203,7 @@ onUnmounted(() => {
                         </td>
                         <th>총액</th>
                         <td>
-                            <input type="text" v-model="supplyPrice" disabled />
+                            {{ supplyPrice?.toLocaleString() }}
                         </td>
                     </tr>
                 </table>
