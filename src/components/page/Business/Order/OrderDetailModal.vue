@@ -49,12 +49,6 @@ const totalOrderAmount = computed(() => {
     }, 0);
 });
 
-onMounted(() => {
-    if (props.clientId && props.orderId) {
-        orderDetail();
-    }
-});
-
 const emit = defineEmits(['modalClose', 'postSuccess']);
 
 const closeModal = () => {
@@ -62,6 +56,12 @@ const closeModal = () => {
 };
 onUnmounted(() => {
     emit('modalClose', 0);
+});
+
+onMounted(() => {
+    if (props.clientId && props.orderId) {
+        orderDetail();
+    }
 });
 </script>
 

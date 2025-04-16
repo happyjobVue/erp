@@ -52,7 +52,7 @@ const execDaumPostcode = () => {
 
 // 전화번호 포맷팅 함수
 function formatPhoneNumber(phone) {
-    return phone.replace(/^(\d{2})(\d{3})(\d{4})$/, '$1-$2-$3');
+    return phone.replace(/^(\d{3})(\d{4})(\d{4})$/, '$1-$2-$3');
 }
 
 // 사업자 번호 포맷팅 함수
@@ -102,6 +102,11 @@ const saveClient = () => {
         alert('주소 검색을 완료해주세요.');
         return;
     }
+
+    const closeModal = () => {
+        modalState.setModalState();
+    };
+
     const param = {
         ISBN: '',
         addr: roadAddress.value,
@@ -133,10 +138,6 @@ const saveClient = () => {
 onUnmounted(() => {
     emit('modalClose', 0);
 });
-
-const closeModal = () => {
-    modalState.setModalState();
-};
 </script>
 
 <template>
@@ -149,14 +150,18 @@ const closeModal = () => {
                         <tbody>
                             <!-- 사원 -->
                             <tr>
-                                <th class="table-header">거래처</th>
+                                <th class="table-header">
+                                    거래처<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
                                         v-model="saveData.client_name"
                                     />
                                 </td>
-                                <th class="table-header">회사 연락처</th>
+                                <th class="table-header">
+                                    회사 연락처<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
@@ -172,14 +177,18 @@ const closeModal = () => {
 
                             <!-- 제조사 -->
                             <tr>
-                                <th class="table-header">담당자</th>
+                                <th class="table-header">
+                                    담당자<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
                                         v-model="saveData.person"
                                     />
                                 </td>
-                                <th class="table-header">담당자 연락처</th>
+                                <th class="table-header">
+                                    담당자 연락처<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
@@ -196,7 +205,9 @@ const closeModal = () => {
 
                             <!-- 거래처 -->
                             <tr>
-                                <th class="table-header">우편번호</th>
+                                <th class="table-header">
+                                    우편번호<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <div class="postcode-group">
                                         <input
@@ -212,7 +223,9 @@ const closeModal = () => {
                                         </button>
                                     </div>
                                 </td>
-                                <th class="table-header">주소</th>
+                                <th class="table-header">
+                                    주소<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input type="text" v-model="roadAddress" />
                                 </td>
@@ -220,14 +233,18 @@ const closeModal = () => {
 
                             <!-- 메모 -->
                             <tr>
-                                <th class="table-header">상세주소</th>
+                                <th class="table-header">
+                                    상세주소<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
                                         v-model="saveData.detail_addr"
                                     />
                                 </td>
-                                <th class="table-header">사업자 번호</th>
+                                <th class="table-header">
+                                    사업자 번호<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
@@ -241,7 +258,9 @@ const closeModal = () => {
                                 </td>
                             </tr>
                             <tr>
-                                <th class="table-header">은행</th>
+                                <th class="table-header">
+                                    은행<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <select v-model="saveData.bank">
                                         <option value="" disabled>전체</option>
@@ -259,7 +278,9 @@ const closeModal = () => {
                                         </option>
                                     </select>
                                 </td>
-                                <th class="table-header">계좌번호</th>
+                                <th class="table-header">
+                                    계좌번호<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
@@ -274,7 +295,9 @@ const closeModal = () => {
                                 </td>
                             </tr>
                             <tr>
-                                <th class="table-header">이메일</th>
+                                <th class="table-header">
+                                    이메일<span class="font_red">*</span>
+                                </th>
                                 <td>
                                     <input
                                         type="text"
@@ -431,5 +454,9 @@ input[type='date']:focus,
 select:focus {
     border-color: #3bb2ea;
     outline: none;
+}
+
+.font_red {
+    color: #fe1414;
 }
 </style>

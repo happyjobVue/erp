@@ -67,7 +67,7 @@ function handleProductChange() {
         selectedProductName.value = selectedProduct.value.name;
     }
 }
-
+const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
 const saveSalesPlan = () => {
     // ✅ 유효성 검사
     if (!userId.user.empId) {
@@ -142,13 +142,21 @@ const closeModal = () => {
                                     v-model="userId.user.userNm"
                                 />
                             </td>
-                            <th class="table-header">목표 일자</th>
+                            <th class="table-header">
+                                목표 일자<span class="font_red"> *</span>
+                            </th>
                             <td>
-                                <input type="date" v-model="targetDate" />
+                                <input
+                                    type="date"
+                                    v-model="targetDate"
+                                    :min="today"
+                                />
                             </td>
                         </tr>
                         <tr>
-                            <th class="table-header">제조사</th>
+                            <th class="table-header">
+                                제조사<span class="font_red"> *</span>
+                            </th>
                             <td>
                                 <select
                                     v-model="selectedManufacturer"
@@ -164,7 +172,9 @@ const closeModal = () => {
                                     </option>
                                 </select>
                             </td>
-                            <th class="table-header">상품명</th>
+                            <th class="table-header">
+                                상품명<span class="font_red"> *</span>
+                            </th>
                             <td>
                                 <select
                                     v-model="selectedProduct"
@@ -182,7 +192,9 @@ const closeModal = () => {
                             </td>
                         </tr>
                         <tr>
-                            <th class="table-header">거래처</th>
+                            <th class="table-header">
+                                거래처<span class="font_red"> *</span>
+                            </th>
                             <td>
                                 <select v-model="SelectedClient">
                                     <option value="" disabled>전체</option>
@@ -195,7 +207,9 @@ const closeModal = () => {
                                     </option>
                                 </select>
                             </td>
-                            <th class="table-header">목표 수량</th>
+                            <th class="table-header">
+                                목표 수량<span class="font_red"> *</span>
+                            </th>
                             <td><input type="text" v-model="goalQuanti" /></td>
                         </tr>
                         <tr>
@@ -324,5 +338,8 @@ select:focus {
     display: flex;
     justify-content: flex-end; /* 오른쪽 정렬 */
     margin-bottom: 20px;
+}
+.font_red {
+    color: #fe1414;
 }
 </style>
