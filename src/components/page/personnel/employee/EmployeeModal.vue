@@ -12,6 +12,7 @@ const props = defineProps([
     'UserDetail',
     'employeeDetail',
     'imgUrl',
+    'isModalOpen'
 ]);
 const userInfo = useUserInfo();
 
@@ -100,6 +101,7 @@ const showModal = ref(false);
 const OpenHobong = () => {
     showModal.value = true;
 };
+const { isModalOpen, modalType } = toRefs(props)
 
 //연봉 계산기 계산하기
 const Onsalary = joinDate => {
@@ -388,18 +390,18 @@ const openDaumPostcode = () => {
         oncomplete: function (data) {
             console.log(data);
             address.value = data.address; // 선택한 주소를 input에 적용
-            employeeForm.zipCode = data.sigunguCode;
+            employeeForm.value.zipCode = data.sigunguCode;
         },
     }).open();
 };
 
 //modal 코드
 
-const isModalOpen = ref(false);
+const saveModalOpen = ref(false);
 
 const closeModal = () => {
-    isModalOpen.value = false;
-    emit('closeModal', isModalOpen.value);
+    saveModalOpen.value = false;
+    emit('closeModal', saveModalOpen.value);
 };
 
 const handleImgError = () => {
@@ -503,6 +505,12 @@ watch(
     },
     { immediate: true } // 모달 열릴 때도 바로 반영
 );
+
+watch([isModalOpen, modalType], ([newOpen, newType], [oldOpen, oldType]) => {
+  if (newOpen && newType === 'register') {
+    employeeForm.value = {}
+  }
+})
 
 //연봉 감지
 watch(

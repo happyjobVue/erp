@@ -269,7 +269,7 @@ const NoqueryString = () => {
 
 //모달 열기 / 모달 창한개로 modalType으로 각각 불러옴 
 const ModalOpening = ({ isModalOpen : isModalOpenval, modalType : modalTypeval  }) => {
-  
+    
     modalType.value = modalTypeval;
     isModalOpen.value = isModalOpenval; 
     
@@ -323,6 +323,7 @@ computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
         :UserDetail="UserDetail"
         :employeeDetail="employeeDetail"
         :imgUrl="imgUrl"
+        :isModalOpen="isModalOpen"
 
         @closeModal="closeModal"
         @update-retire-info="handleRetireInfo"
