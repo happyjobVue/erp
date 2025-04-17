@@ -1,11 +1,7 @@
 <template>
     <div class="divNoticeList">
-        <NoticeModal
-            v-if="modal.modalState"
-            :id="noticeId"
-            @modalClose="noticeId = $event"
-            @postSuccess="onPostSuccess"
-        />
+        <NoticeModal v-if="modal.modalState" :id="noticeId" @modalClose="noticeId = $event"
+            @postSuccess="onPostSuccess" />
         <table>
             <colgroup>
                 <col width="10%" />
@@ -25,11 +21,8 @@
             <tbody>
                 <template v-if="noticeList">
                     <template v-if="noticeList.noticeCnt > 0">
-                        <tr
-                            v-for="notice in noticeList.noticeList"
-                            :key="notice.notiSeq"
-                            @click="handlerModal(notice.notiSeq)"
-                        >
+                        <tr v-for="notice in noticeList.noticeList" :key="notice.notiSeq"
+                            @click="handlerModal(notice.notiSeq)">
                             <td>{{ notice.notiSeq }}</td>
                             <td>{{ notice.notiTitle }}</td>
                             <td>{{ notice.notiDate }}</td>
@@ -44,13 +37,8 @@
                 </template>
             </tbody>
         </table>
-        <Pagination
-            :totalItems="noticeList?.noticeCnt"
-            :items-per-page="5"
-            :max-pages-shown="10"
-            :onClick="searchList"
-            v-model="cPage"
-        />
+        <Pagination :totalItems="noticeList?.noticeCnt" :items-per-page="5" :max-pages-shown="10" :onClick="searchList"
+            v-model="cPage" />
     </div>
 </template>
 
@@ -115,8 +103,8 @@ table {
     }
 
     th {
-        background-color: #2676bf;
-        color: #ddd;
+        background: #f4f4f4;
+        font-weight: bold;
     }
 
     /* 테이블 올렸을 때 */

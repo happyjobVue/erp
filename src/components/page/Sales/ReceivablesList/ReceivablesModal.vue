@@ -204,7 +204,7 @@ const searchDetail = async () => {
 }
 
 const formatCurrency = (value) => {
-    if (!value) return '';
+    if (!value) return "0";
     return value.toLocaleString('ko-KR');
 }
 
