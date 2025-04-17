@@ -75,7 +75,7 @@ const { mutate: clientUpdate } = useMutation({
     mutationFn: editClient,
     onSuccess: result => {
         if (result.data.result === 'success') {
-            console.log('수정?');
+            alert('거래처가 수정되었습니다.');
             setModalState();
             queryClient.invalidateQueries({ queryKey: ['clientList'] });
         }

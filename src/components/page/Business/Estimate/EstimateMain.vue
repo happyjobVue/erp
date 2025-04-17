@@ -1,12 +1,13 @@
 <script setup>
 import axios from 'axios';
 import { useRoute } from 'vue-router';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, watchEffect } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import EstimateDetailModal from './EstimateDetailModal.vue';
 import EstimateRegisModal from './EstimateRegisModal.vue';
-
+import { useQuery } from '@tanstack/vue-query';
 const estimateList = ref();
+
 const estimateCnt = ref();
 const cPage = ref(1);
 const modalType = ref('');
@@ -14,25 +15,38 @@ const modalState = useModalStore();
 const selectedEstimateId = ref(null);
 const selectedClientId = ref(null);
 const route = useRoute();
+const injectedValue = inject('selectValue');
 
 // 견적서 목록 불러오기 (검색 조건 포함)
-const loadEstimateList = () => {
+const loadEstimateList = async () => {
     const param = {
         currentPage: cPage.value,
         pageSize: 5,
-        ...route.query, // 검색 조건이 있을 경우 함께 전달
+        ...injectedValue.value, // 검색 조건이 있을 경우 함께 전달
     };
 
-    axios
-        .post('/api/business/estimate-list/estimateListBody.do', param)
-        .then(res => {
-            estimateList.value = res.data.estimateList;
-            estimateCnt.value = res.data.estimateCnt;
-        })
-        .catch(err => {
-            console.error('Error loading estimate list:', err);
-        });
+    const result = await axios.post(
+        '/api/business/estimate-list/estimateListBody.do',
+        param
+    );
+    return result.data;
 };
+
+const {
+    data: estimate,
+    isSuccess,
+    isLoading,
+} = useQuery({
+    queryKey: ['estimate', cPage, injectedValue],
+    queryFn: loadEstimateList,
+});
+
+watchEffect(() => {
+    if (isSuccess && estimate.value) {
+        estimateList.value = estimate.value.estimateList;
+        estimateCnt.value = estimate.value.estimateCnt;
+    }
+});
 
 // 모달 성공 처리
 const onPostSuccess = () => {
@@ -135,7 +149,6 @@ onMounted(() => {
             :totalItems="estimateCnt"
             :items-per-page="5"
             :max-pages-shown="5"
-            :onClick="loadEstimateList"
             v-model="cPage"
         />
     </div>
