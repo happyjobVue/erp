@@ -1,23 +1,15 @@
 <script setup>
-import router from '@/router';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 
 const searchClientName = ref('');
 const searchCustUpdateDate = ref('');
-
+const injectedValue = inject('selectValue');
 const searchClient = () => {
-    router.push({
-        path: 'client-list',
-        query: {
-            client_name: searchClientName.value,
-            cust_update_date: searchCustUpdateDate.value,
-        },
-    });
+    injectedValue.value = {
+        client_name: searchClientName.value,
+        cust_update_date: searchCustUpdateDate.value,
+    };
 };
-
-onMounted(() => {
-    window.location.search && router.replace(window.location.pathname);
-});
 </script>
 
 <template>

@@ -2,11 +2,13 @@
 import axios from 'axios';
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 
 // 우편번호
 const postcode = ref('');
 const modalState = useModalStore();
 const roadAddress = ref('');
+const queryClient = useQueryClient();
 
 const isScriptLoaded = ref(false); // 스크립트 로딩 상태를 추적하는 변수
 const saveData = ref({
@@ -68,7 +70,7 @@ function formatBankAccount(account) {
 const emit = defineEmits(['modalClose', 'postSuccess']);
 
 // 저장 함수
-const saveClient = () => {
+const saveClient = async () => {
     // ✅ 유효성 검사
     if (
         !saveData.value.client_name ||
@@ -103,10 +105,6 @@ const saveClient = () => {
         return;
     }
 
-    const closeModal = () => {
-        modalState.setModalState();
-    };
-
     const param = {
         ISBN: '',
         addr: roadAddress.value,
@@ -122,21 +120,22 @@ const saveClient = () => {
         ph: saveData.value.ph,
         zip: postcode.value,
     };
-    try {
-        axios
-            .post('/api/business/client-list/insertClientListBody.do', param)
-            .then(() => {
-                alert('거래처가 등록되었습니다.');
-                emit('postSuccess');
-                closeModal();
-            });
-    } catch (error) {
-        alert('거래처 등록을 다시 시도해주세요.');
-    }
+    const result = await axios.post(
+        '/api/business/client-list/insertClientListBody.do',
+        param
+    );
+    return result;
 };
 
-onUnmounted(() => {
-    emit('modalClose', 0);
+const { mutate: saveClientMutate } = useMutation({
+    mutationKey: ['saveClient'],
+    mutationFn: saveClient,
+    onSuccess: result => {
+        if (result.data.result === 'success') {
+            modalState.setModalState();
+            queryClient.invalidateQueries({ queryKey: ['clientList'] });
+        }
+    },
 });
 </script>
 
@@ -316,7 +315,7 @@ onUnmounted(() => {
                     </table>
 
                     <div class="button-container">
-                        <button @click="saveClient()">등록</button>
+                        <button @click="saveClientMutate()">등록</button>
                         <button
                             type="button"
                             @click="modalState.setModalState()"

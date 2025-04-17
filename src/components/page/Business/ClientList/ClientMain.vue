@@ -1,9 +1,10 @@
 <script setup>
 import axios from 'axios';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, inject, watchEffect } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import ClientDetailModal from './ClientDetailModal.vue';
 import ClientRegisterModal from './ClientRegisterModal.vue';
+import { useQuery } from '@tanstack/vue-query';
 
 const modalType = ref('');
 const modalState = useModalStore();
@@ -13,27 +14,38 @@ const clientListCnt = ref();
 const selectedClient = ref();
 const route = useRoute();
 
+const injectedValue = inject('selectValue');
+
 // 공통 데이터 로드 함수 (clientList 및 searchClientList 통합)
-const loadClientList = () => {
+const loadClientList = async () => {
     const param = {
         currentPage: cPage.value,
         pageSize: 5,
-        ...route.query, // route.query를 통해 검색 조건 추가
+        ...injectedValue.value, // route.query를 통해 검색 조건 추가
     };
 
-    axios
-        .post('/api/business/client-list/searchClientListBody.do', param)
-        .then(res => {
-            clients.value = res.data.clientList;
-            clientListCnt.value = res.data.clientListCnt;
-        })
-        .catch(err => {
-            console.error('Error loading client list:', err);
-        });
+    const result = await axios.post(
+        '/api/business/client-list/searchClientListBody.do',
+        param
+    );
+    return result.data;
 };
 
-onMounted(() => {
-    loadClientList(); // 페이지 로드 시 기본 클라이언트 목록 로드
+const {
+    data: clientList,
+    isLoading,
+    isSuccess,
+    refetch,
+} = useQuery({
+    queryKey: ['clientList', cPage, injectedValue],
+    queryFn: loadClientList,
+});
+
+watchEffect(() => {
+    if (isSuccess && clientList.value) {
+        clients.value = clientList.value.clientList;
+        clientListCnt.value = clientList.value.clientListCnt;
+    }
 });
 
 // 등록 모달 열기
@@ -57,7 +69,6 @@ const detailClient = client => {
 };
 
 // 검색된 클라이언트 목록 불러오기 (검색 조건이 변경될 때마다 실행)
-watch(() => route.query, loadClientList);
 </script>
 
 <template>
@@ -128,7 +139,6 @@ watch(() => route.query, loadClientList);
             :totalItems="clientListCnt"
             :items-per-page="5"
             :max-pages-shown="5"
-            :onClick="loadClientList"
             v-model="cPage"
         />
     </div>

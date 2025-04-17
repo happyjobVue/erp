@@ -1,6 +1,10 @@
 <script setup>
+import { provide, ref } from 'vue';
 import ClientMain from '../../../components/page/Business/ClientList/ClientMain.vue';
 import ClientSearch from '../../../components/page/Business/ClientList/ClientSearch.vue';
+
+const provideValue = ref();
+provide('selectValue', provideValue);
 </script>
 
 <template>

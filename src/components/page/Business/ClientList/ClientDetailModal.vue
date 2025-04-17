@@ -2,15 +2,21 @@
 import { defineProps, onMounted, onUnmounted, ref } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import axios from 'axios';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 const modalState = useModalStore();
 const isScriptLoaded = ref(false); // 스크립트 로딩 상태를 추적하는 변수
 const emit = defineEmits(['modalClose', 'postSuccess']);
+const { setModalState } = useModalStore();
+const queryClient = useQueryClient();
 const props = defineProps({
     client: {
         type: Object,
         required: true,
     },
 });
+
+// 로컬 상태로 데이터 복사
+const clientData = ref({ ...props.client });
 
 // 다음 우편번호 스크립트 로드
 const loadDaumPostcodeScript = () => {
@@ -31,8 +37,8 @@ const execDaumPostcode = () => {
     if (isScriptLoaded.value && window.daum && window.daum.Postcode) {
         new daum.Postcode({
             oncomplete: data => {
-                props.client.zip = data.zonecode;
-                props.client.addr = data.address;
+                clientData.value.zip = data.zonecode;
+                clientData.value.addr = data.address;
             },
         }).open();
     } else {
@@ -40,41 +46,40 @@ const execDaumPostcode = () => {
     }
 };
 
-const editClient = () => {
+const editClient = async () => {
     const param = {
         ISBN: '', // ISBN이 비어있는 경우
-        addr: props.client.addr, // 주소
-        bank: props.client.bank, // 은행
-        bank_account: props.client.bank_account, // 계좌번호
-        biz_num: props.client.biz_num, // 사업자 번호
-        client_name: props.client.client_name, // 거래처 이름
-        detail_addr: props.client.detail_addr, // 상세 주소
-        email: props.client.email, // 이메일
-        memo: props.client.memo, // 메모
-        person: props.client.person, // 담당자
-        person_ph: props.client.person_ph, // 담당자 연락처
-        ph: props.client.ph, // 회사 연락처
-        zip: props.client.zip, // 우편번호
-        id: props.client.id,
+        addr: clientData.value.addr, // 주소
+        bank: clientData.value.bank, // 은행
+        bank_account: clientData.value.bank_account, // 계좌번호
+        biz_num: clientData.value.biz_num, // 사업자 번호
+        client_name: clientData.value.client_name, // 거래처 이름
+        detail_addr: clientData.value.detail_addr, // 상세 주소
+        email: clientData.value.email, // 이메일
+        memo: clientData.value.memo, // 메모
+        person: clientData.value.person, // 담당자
+        person_ph: clientData.value.person_ph, // 담당자 연락처
+        ph: clientData.value.ph, // 회사 연락처
+        zip: clientData.value.zip, // 우편번호
+        id: clientData.value.id,
     };
-
-    axios
-        .post(`/api/business/client-list/updateClientListBody.do`, param)
-        .then(() => {
-            alert('거래처 내역이 수정되었습니다.');
-            emit('postSuccess');
-            closeModal();
-        });
+    const result = await axios.post(
+        `/api/business/client-list/updateClientListBody.do`,
+        param
+    );
+    return result;
 };
 
-const closeModal = () => {
-    modalState.setModalState();
-};
-
-onMounted(() => {
-    if (props.client) {
-        console.log('props' + props.client.client_name);
-    }
+const { mutate: clientUpdate } = useMutation({
+    mutationKey: ['clientUpdate'],
+    mutationFn: editClient,
+    onSuccess: result => {
+        if (result.data.result === 'success') {
+            console.log('수정?');
+            setModalState();
+            queryClient.invalidateQueries({ queryKey: ['clientList'] });
+        }
+    },
 });
 
 onUnmounted(() => {
@@ -96,7 +101,7 @@ onUnmounted(() => {
                                 <td>
                                     <input
                                         type="text"
-                                        v-model="props.client.client_name"
+                                        v-model="clientData.client_name"
                                         disabled
                                         readonly
                                     />
@@ -107,7 +112,7 @@ onUnmounted(() => {
                                 <td>
                                     <input
                                         type="text"
-                                        v-model="props.client.ph"
+                                        v-model="clientData.ph"
                                     />
                                 </td>
                             </tr>
@@ -120,7 +125,7 @@ onUnmounted(() => {
                                 <td>
                                     <input
                                         type="text"
-                                        v-model="props.client.person"
+                                        v-model="clientData.person"
                                     />
                                 </td>
                                 <th class="table-header">
@@ -129,7 +134,7 @@ onUnmounted(() => {
                                 <td>
                                     <input
                                         type="text"
-                                        v-model="props.client.person_ph"
+                                        v-model="clientData.person_ph"
                                     />
                                 </td>
                             </tr>
@@ -144,7 +149,7 @@ onUnmounted(() => {
                                         <input
                                             class="post-code"
                                             type="text"
-                                            v-model="props.client.zip"
+                                            v-model="clientData.zip"
                                         />
                                         <button
                                             @click="execDaumPostcode"
@@ -160,7 +165,7 @@ onUnmounted(() => {
                                 <td>
                                     <input
                                         type="text"
-                                        v-model="props.client.addr"
+                                        v-model="clientData.addr"
                                     />
                                 </td>
                             </tr>
@@ -173,7 +178,7 @@ onUnmounted(() => {
                                 <td>
                                     <input
                                         type="text"
-                                        v-model="props.client.detail_addr"
+                                        v-model="clientData.detail_addr"
                                     />
                                 </td>
                                 <th class="table-header">
@@ -182,7 +187,7 @@ onUnmounted(() => {
                                 <td>
                                     <input
                                         type="text"
-                                        v-model="props.client.biz_num"
+                                        v-model="clientData.biz_num"
                                     />
                                 </td>
                             </tr>
@@ -191,7 +196,7 @@ onUnmounted(() => {
                                     은행<span class="font_red">*</span>
                                 </th>
                                 <td>
-                                    <select v-model="props.client.bank">
+                                    <select v-model="clientData.bank">
                                         <option value="" disabled>전체</option>
                                         <option value="신한은행">
                                             신한은행
@@ -211,7 +216,7 @@ onUnmounted(() => {
                                 <td>
                                     <input
                                         type="text"
-                                        v-model="props.client.memo"
+                                        v-model="clientData.memo"
                                     />
                                 </td>
                             </tr>
@@ -219,7 +224,7 @@ onUnmounted(() => {
                     </table>
 
                     <div class="button-container">
-                        <button @click="editClient()">수정</button>
+                        <button @click="clientUpdate">수정</button>
                         <button
                             type="button"
                             @click="modalState.setModalState()"
@@ -232,6 +237,7 @@ onUnmounted(() => {
         </teleport>
     </div>
 </template>
+
 <style lang="scss" scoped>
 .backdrop {
     top: 0%;
