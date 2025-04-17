@@ -28,10 +28,7 @@
                         <label> 비밀번호 </label>
                         <input required type="password" v-model="loginInfo.pwd" />
                     </div>
-                    <div class="joinDiv">
-                        <strong class="strong">[일반회원가입]</strong>
-                        <strong class="strong">[기업회원가입]</strong>
-                    </div>
+                   
                     <div>
                         <button class="login-button" @click="handlerLogin">Login</button>
                     </div>
