@@ -189,7 +189,7 @@ const OnRetire = () => {
 
     console.log(severancePay.value);
 
-    if(severancePay.value <= 0){
+    if(severancePay.value <= 0 || severancePay.value > 100000000){
         alert('퇴직금을 확인해주십쇼');
         return;
     }

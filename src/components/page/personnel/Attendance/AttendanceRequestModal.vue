@@ -81,18 +81,44 @@ axios
 
 // 연차 신청
 const submitForm = () => {
-    if (form.value.reqReason === '' || form.value.reqSt === '' 
-    || form.value.reqEd === '' || form.value.reqTel === '') {
-        alert('기간 및 신청 사유, 비상 연락망을 입력해주세요.');
+
+    //유효성 검사 
+    if (form.value.reqReason === '') {
+        alert('신청 사유를 입력해주세요 ');
         return;
     } 
 
+    if( form.value.reqSt === ''){
+        alert('시작일을 선택해주세요.');
+        return;
+    }
+
+    if( form.value.reqEd === ''){
+        alert('마감일을 선택해주세요.');
+        return;
+    }
+
+    if( form.value.reqTel === ''){
+        alert('비상 연락망을 입력해주세요.');
+        return;
+    }
+
+
+
+
+    //시작일 마감일 체크 
     const startDate = form.value.reqSt; // 사용자 선택 시작일
     const endDate = form.value.reqEd;   // 사용자 선택 종료일
     const selectedName = form.value.name;
 
+    if((new Date(endDate) - new Date(startDate)) < 0){
+        alert("마감일이 시작일보다 먼저 일 수 없습니다.");
+        return;
+    }
+
     search();
 
+    //겹치는 휴가가 있는지 필터링 취소 반려의 경우는 제외하고 
     if (isOverlappingRange(startDate, endDate, selectedName)) {
         alert('이미 겹치는 휴가 신청이 존재합니다.');
         return;
@@ -289,6 +315,11 @@ const UpdateForm = () => {
 
     const start = new Date(form.value.reqSt)
     const end = new Date(form.value.reqEd)
+
+    if((end - start) < 0 ){
+        alert('마감일이 시작일보다 먼저 일 수 없습니다.');
+        return;
+    }
 
     const diffInTime = end - start  // 밀리초 차이
     const diffInDays = diffInTime / (1000 * 60 * 60 * 24)  // 일수 변환
