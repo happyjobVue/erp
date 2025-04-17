@@ -10,7 +10,7 @@
                 <col width="10%" />
             </colgroup>
 
-            <thead>
+            <thead v-if="isSuccess">
                 <tr>
                     <th scope="col">번호</th>
                     <th scope="col">제목</th>
@@ -19,7 +19,7 @@
                 </tr>
             </thead>
             <tbody>
-                <template v-if="noticeList">
+                <template v-if="isSuccess">
                     <template v-if="noticeList.noticeCnt > 0">
                         <tr v-for="notice in noticeList.noticeList" :key="notice.notiSeq"
                             @click="handlerModal(notice.notiSeq)">
@@ -35,41 +35,53 @@
                         </tr>
                     </template>
                 </template>
+
+                <div v-if="isLoading" class="backdrop">
+                    <div class="spinner"></div>
+                </div>
+
             </tbody>
         </table>
-        <Pagination :totalItems="noticeList?.noticeCnt" :items-per-page="5" :max-pages-shown="10" :onClick="searchList"
-            v-model="cPage" />
+        <Pagination v-if="isSuccess" :totalItems="noticeList?.noticeCnt" :items-per-page="5" :max-pages-shown="10"
+            :onClick="refetch" v-model="cPage" />
     </div>
 </template>
 
 <script setup>
 import axios from 'axios';
-import { watch } from 'vue';
+import { inject, watch } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
-const route = useRoute();
-const noticeList = ref();
+import { useQuery } from '@tanstack/vue-query';
+
 const modal = useModalStore();
 const noticeId = ref(0);
 const cPage = ref(1);
 
+const injectedValue = inject('selectValue')
+
 const searchList = async () => {
     const param = new URLSearchParams({
-        ...route.query,
+        ...injectedValue.value,
         pageSize: 5,
         currentPage: cPage.value,
     });
 
-    try {
-        const response = await axios.post(
-            '/api/system/noticeListBody.do',
-            param
-        );
-        console.log('noticeList 응답:', response.data);
-        noticeList.value = response.data;
-    } catch (e) {
-        console.error(e);
-    }
+    const response = await axios.post(
+        '/api/system/noticeListBody.do',
+        param
+    );
+
+    return response.data
 };
+
+
+const { data: noticeList, isLoading, isSuccess, refetch } = useQuery({
+    queryKey: ['noticeList', cPage, injectedValue],
+    queryFn: searchList,
+    // staleTime:1000 * 60,
+    // useQuery 자체 캐시
+    // gcTime:1000 * 60
+})
 
 const handlerModal = id => {
     noticeId.value = id;
@@ -81,14 +93,48 @@ const onPostSuccess = () => {
     searchList();
 };
 
-onMounted(() => {
-    searchList();
-});
+// onMounted(() => {
+//     searchList();
+// });
 
-watch(() => route.query, searchList);
+watch(injectedValue, searchList);
 </script>
 
 <style lang="scss" scoped>
+.backdrop {
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    font-weight: bold;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #fff;
+    border-top: 6px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 table {
     width: 100%;
     border-collapse: collapse;

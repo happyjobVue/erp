@@ -12,27 +12,28 @@
 <!-- setup을 적어야 Composition API를 사용할 수 있다.  -->
 <script setup>
 import router from '@/router';
-import { onMounted } from 'vue';
+import { inject } from 'vue';
 import { useModalStore } from '../../../../stores/modalState'
 const { setModalState } = useModalStore();
 const searchTitle = ref('');
 const searchStDate = ref('');
 const searchEdDate = ref('');
 
-const handleSearch = () => {
-    const query = []
-    !searchTitle.value || query.push(`searchTitle=${searchTitle.value}`)
-    !searchStDate.value || query.push(`searchStDate=${searchStDate.value}`)
-    !searchEdDate.value || query.push(`searchEdDate=${searchEdDate.value}`)
-    const queryString = query.length > 0 ? `?${query.join('&')}` : ''
+const injectedValue = inject('selectValue')
 
-    router.push(queryString)
+const handleSearch = () => {
+
+    injectedValue.value = {
+        searchTitle: searchTitle.value,
+        searchStDate: searchStDate.value,
+        searchEdDate: searchEdDate.value
+    }
 }
 
 // 새로고침 시 queryParam 삭제
-onMounted(() => {
-    window.location.search && router.replace(window.location.pathname)
-})
+// onMounted(() => {
+//     window.location.search && router.replace(window.location.pathname)
+// })
 
 </script>
 

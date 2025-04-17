@@ -17,8 +17,8 @@
                     </div>
                 </div>
                 <div class="button-box">
-                    <button @click="id ? noticeFileUpdate() : noticeFileSave()">{{ id ? '수정' : '저장' }}</button>
-                    <button v-if="id" @click="noticeDelete">삭제</button>
+                    <button @click="id ? fileUpdate() : fileSave()">{{ id ? '수정' : '저장' }}</button>
+                    <button v-if="id" @click="fileDelete()">삭제</button>
                     <button @click="setModalState">나가기</button>
                 </div>
             </div>
@@ -27,10 +27,11 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue';
+import { onUnmounted, watchEffect } from 'vue';
 import { useUserInfo } from '../../../../stores/userInfo';
 import { useModalStore } from '../../../../stores/modalState'
 import axios from 'axios'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 const { setModalState } = useModalStore();
 const { id } = defineProps(['id'])
 const emit = defineEmits(['modalClose', 'postSuccess'])
@@ -38,19 +39,20 @@ const noticeDetail = ref({})
 const userInfo = useUserInfo()
 const imgUrl = ref('')
 const fileData = ref('')
+const queryClient = useQueryClient()
 
 const searchDetail = async () => {
-    try {
-        const response = await axios.post('/api/system/noticeFileDetailBody.do', { noticeSeq: id })
-        noticeDetail.value = response.data.detail
-        if (noticeDetail.value.fileExt === 'png' || noticeDetail.value.fileExt === 'jpg' || noticeDetail.value.fileExt === "gif" || noticeDetail.value.fileExt === "jpeg") {
-            getFileImage()
-        }
-
-    } catch (e) {
-        console.error(e);
-    }
+    const response = await axios.post('/api/system/noticeFileDetailBody.do', { noticeSeq: id })
+    return response.data.detail
 }
+
+const { data: queryData, isSuccess } = useQuery({
+    queryKey: ['noticeDetail', id],
+    queryFn: searchDetail,
+    staleTime: 1000 * 60 * 5,
+    enabled: !!id
+})
+
 
 const getFileImage = async () => {
     const param = new URLSearchParams();
@@ -65,6 +67,14 @@ const getFileImage = async () => {
     }
 }
 
+watchEffect(() => {
+    if (isSuccess && queryData.value) {
+        noticeDetail.value = { ...queryData.value }
+        if (noticeDetail.value.fileExt === 'png' || noticeDetail.value.fileExt === 'jpg' || noticeDetail.value.fileExt === "gif" || noticeDetail.value.fileExt === "jpeg") {
+            getFileImage()
+        }
+    }
+})
 
 const downloadFileImage = async () => {
     const param = new URLSearchParams();
@@ -109,18 +119,21 @@ const noticeFileSave = async () => {
     if (fileData.value) {
         formData.append('file', fileData.value)
     }
-    try {
-        const res = await axios.post('/api/system/noticeSaveFileForm.do', formData)
-        if (res.data.result === 'success') {
-            emit('postSuccess')
-        } else {
-            alert("저장 실패")
-        }
-    } catch (e) {
-        console.error(e);
-    }
+    return await axios.post('/api/system/noticeSaveFileForm.do', formData)
 
 }
+
+const { mutate: fileSave } = useMutation({
+    mutationKey: ['noticeSave'],
+    mutationFn: noticeFileSave,
+    onSuccess: result => {
+        if (result.data.result === "success") {
+            //1.리스트를 재조회
+            setModalState()
+            queryClient.invalidateQueries({ queryKey: ["noticeList"] })
+        }
+    }
+})
 
 const noticeFileUpdate = async () => {
     const textData = {
@@ -133,18 +146,23 @@ const noticeFileUpdate = async () => {
     if (fileData.value) {
         formData.append('file', fileData.value)
     }
-    try {
-        const res = await axios.post('/api/system/noticeUpdateFileForm.do', formData)
-        if (res.data.result === 'success') {
-            emit('postSuccess')
-        } else {
-            alert("저장 실패")
-        }
-    } catch (e) {
-        console.error(e);
-    }
+    return await axios.post('/api/system/noticeUpdateFileForm.do', formData)
 
 }
+
+const { mutate: fileUpdate } = useMutation({
+    mutationKey: ['noticeUpdate'],
+    mutationFn: noticeFileUpdate,
+    onSuccess: result => {
+        if (result.data.result === "success") {
+            //1.리스트를 재조회
+            setModalState()
+            queryClient.invalidateQueries({ queryKey: ["noticeList"] })
+            //exact -> queryKey가 noticeDetail이고 id가 정확히 같은 것의 캐시 무효화
+            queryClient.invalidateQueries({ queryKey: ["noticeDetail", id], exact:true })
+        }
+    }
+})
 
 
 
@@ -164,17 +182,21 @@ const noticeUpdate = async () => {
 }
 
 const noticeDelete = async () => {
-    try {
-        const res = await axios.post('/api/system/noticeDeleteBody.do', { noticeSeq: id })
-        if (res.data.result === 'success') {
-            emit('postSuccess')
-        } else {
-            alert("삭제 실패")
-        }
-    } catch (e) {
-        console.error(e);
-    }
+    return await axios.post('/api/system/noticeDeleteBody.do', { noticeSeq: id })
 }
+
+const { mutate: fileDelete } = useMutation({
+    mutationKey: ['noticeDelete'],
+    mutationFn: noticeDelete,
+    onSuccess: result => {
+        if (result.data.result === "success") {
+            //1.리스트를 재조회
+            setModalState()
+            queryClient.invalidateQueries({ queryKey: ["noticeList"] }) 
+        }
+    }
+})
+
 
 const fileHandler = (e) => {
     const fileInfo = e.target.files
@@ -190,9 +212,9 @@ const fileHandler = (e) => {
 }
 
 
-onMounted(() => {
-    id && searchDetail()
-})
+// onMounted(() => {
+//     id && searchDetail()
+// })
 
 onUnmounted(() => {
     emit('modalClose', 0)
