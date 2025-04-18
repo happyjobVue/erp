@@ -9,26 +9,16 @@
     </div>
 </template>
 <script setup>
-import router from '@/router'
-import { onMounted } from 'vue';
+import { inject, } from 'vue';
 
 const searchPaymentMonth = ref('')
+const injectedValue = inject('selectValue')
 
 const handleSearch = () => {
-    const query = []
-    if (searchPaymentMonth.value) {
-        query.push(`searchPaymentMonth=${searchPaymentMonth.value}`)
+    injectedValue.value = {
+        searchPaymentMonth: searchPaymentMonth.value,
     }
-
-    const queryString = query.length > 0 ? `?${query.join('&')}` : ''
-
-    router.push(queryString)
 }
-
-onMounted(() => {
-    window.location.search && router.replace(window.location.pathname)
-})
-
 </script>
 <style lang="scss" scoped>
 .container {

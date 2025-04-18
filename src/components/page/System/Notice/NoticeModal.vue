@@ -144,6 +144,7 @@ const noticeFileUpdate = async () => {
     const formData = new FormData()
     formData.append('text', new Blob([JSON.stringify(textData)], { type: 'application/json' }))
     if (fileData.value) {
+        console.log("fileData")
         formData.append('file', fileData.value)
     }
     return await axios.post('/api/system/noticeUpdateFileForm.do', formData)
@@ -210,15 +211,6 @@ const fileHandler = (e) => {
     fileData.value = fileInfo[0];
 
 }
-
-
-// onMounted(() => {
-//     id && searchDetail()
-// })
-
-onUnmounted(() => {
-    emit('modalClose', 0)
-})
 
 </script>
 

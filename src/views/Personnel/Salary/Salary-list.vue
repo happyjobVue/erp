@@ -5,4 +5,9 @@
 </template>
 
 <script setup>
+import { provide, ref } from 'vue';
+
+const provideValue = ref()
+
+provide('selectValue', provideValue)
 </script>

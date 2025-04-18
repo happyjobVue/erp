@@ -22,9 +22,9 @@
                     </tbody>
                 </table>
                 <div class="button-box">
-                    <button type="button" @click="detailCode ? dpUpdate() : dpSave()">{{ detailCode
+                    <button type="button" @click="detailCode ? departMentUpdate() : departMentSave()">{{ detailCode
                         ? '수정' : '등록'
-                        }}</button>
+                    }}</button>
                     <button type="button" @click="setModalState">취소</button>
                 </div>
 
@@ -34,96 +34,119 @@
 </template>
 <script setup>
 import axios from 'axios';
-import { onMounted, onUnmounted } from 'vue';
+import { onUnmounted } from 'vue';
 import Swal from "sweetalert2";
 import { useModalStore } from '../../../../stores/modalState';
+import { useMutation, useQuery, useQueryClient  } from '@tanstack/vue-query';
 const { detailCode } = defineProps(['detailCode'])
 const dpDetail = ref({})
 const oldDetailCode = ref("")
 const emit = defineEmits(['modalClose', 'saveSuccess'])
 const { setModalState } = useModalStore()
+const queryClient = useQueryClient()
 
 
 const searchDetail = async () => {
-    try {
-        const res = await axios.post('/api/system/departmentDetailBody', { detailCode })
-        dpDetail.value = res.data.detail
-        oldDetailCode.value = res.data.detail.detailCode
-
-    } catch (e) {
-        console.log(e)
-    }
+    const res = await axios.post('/api/system/departmentDetailBody', { detailCode })
+    return res.data.detail
 }
+
+const { data: queryData, isSuccess } = useQuery({
+    queryKey: ['dpDetail', detailCode],
+    queryFn: searchDetail,
+    staleTime: 1000 * 60 * 5,
+    enabled: !!detailCode
+})
+
+watchEffect(() => {
+    if (isSuccess && queryData.value) {
+        dpDetail.value = { ...queryData.value }
+        oldDetailCode.value = queryData.value.detailCode
+    }
+})
+
 
 const dpSave = async () => {
     if (!checkNotEmpty()) {
         return
     }
     const param = new URLSearchParams(dpDetail.value)
+    return await axios.post('/api/system/departmentSave', param)
+}
 
-    try {
-        const res = await axios.post('/api/system/departmentSave', param)
-        if (res.data.result === "fail") {
+const { mutate: departMentSave } = useMutation({
+    mutationKey: ['dpSave'],
+    mutationFn: dpSave,
+    onSuccess: result => {
+        if (result.data.result === "success") {
             Swal.fire({
-                icon: "error",
-                title: `${res.data.message}`,
+                icon: "success",
+                title: `${result.data.message}`,
                 confirmButtonText: "확인",
             }).then((res) => {
                 if (res.isConfirmed) {
-                    emit('saveSuccess')
+                    setModalState()
+                    queryClient.invalidateQueries({ queryKey: ["departMentList"] })
                 }
             })
         } else {
             Swal.fire({
-                icon: "success",
-                title: `${res.data.message}`,
+                icon: "error",
+                title: `${result.data.message}`,
                 confirmButtonText: "확인",
             }).then((res) => {
                 if (res.isConfirmed) {
-                    emit('saveSuccess')
+                    setModalState()
+                    queryClient.invalidateQueries({ queryKey: ["departMentList"] })
                 }
             })
-
         }
-    } catch (e) {
-        console.error(e);
     }
-}
+})
 
 const dpUpdate = async () => {
+    if (!checkNotEmpty()) {
+        return
+    }
     const param = new URLSearchParams({
         oldDetailCode: oldDetailCode.value,
         newDetailCode: dpDetail.value.detailCode,
         detailName: dpDetail.value.detailName
     })
-    try {
-        const res = await axios.post('/api/system/departmentUpdate', param)
-        if (res.data.result === "fail") {
+    return await axios.post('/api/system/departmentUpdate', param)
+}
+
+const { mutate: departMentUpdate } = useMutation({
+    mutationKey: ['dpUpdate'],
+    mutationFn: dpUpdate,
+    onSuccess: result => {
+        if (result.data.result === "success") {
             Swal.fire({
-                icon: "error",
-                title: `${res.data.message}`,
+                icon: "success",
+                title: `${result.data.message}`,
                 confirmButtonText: "확인",
             }).then((res) => {
                 if (res.isConfirmed) {
-                    emit('saveSuccess')
+                    setModalState()
+                    queryClient.invalidateQueries({ queryKey: ["departMentList"] })
+                    queryClient.invalidateQueries({ queryKey: ["noticeDetail", id], exact:true })
                 }
             })
         } else {
             Swal.fire({
-                icon: "success",
-                title: `${res.data.message}`,
+                icon: "error",
+                title: `${result.data.message}`,
                 confirmButtonText: "확인",
             }).then((res) => {
                 if (res.isConfirmed) {
-                    emit('saveSuccess')
+                    setModalState()
+                    queryClient.invalidateQueries({ queryKey: ["departMentList"] })
                 }
             })
-
         }
-    } catch (e) {
-        console.error(e);
     }
-}
+})
+
 
 const checkNotEmpty = () => {
     const fields = [
@@ -145,10 +168,6 @@ const checkNotEmpty = () => {
 
     return true
 };
-
-onMounted(() => {
-    detailCode && searchDetail()
-})
 
 onUnmounted(() => {
     emit('modalClose', 0)

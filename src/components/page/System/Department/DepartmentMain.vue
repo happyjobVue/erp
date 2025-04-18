@@ -8,14 +8,14 @@
                 <col width="50%" />
             </colgroup>
 
-            <thead>
+            <thead v-if="isSuccess">
                 <tr>
                     <th scope="col">부서코드</th>
                     <th scope="col">부서명</th>
                 </tr>
             </thead>
             <tbody>
-                <template v-if="dpList">
+                <template v-if="isSuccess">
                     <template v-if="dpList.departmentCnt > 0">
                         <tr v-for="dp in dpList.departmentList" :key="dp.detailCode
                             " @click="handlerModal(dp.detailCode)">
@@ -30,36 +30,44 @@
                     </template>
                 </template>
             </tbody>
+            <div v-if="isLoading" class="backdrop">
+                <div class="spinner"></div>
+            </div>
         </table>
-        <Pagination :totalItems="dpList?.departmentCnt" :items-per-page="5" :max-pages-shown="10" :onClick="searchDp"
-            v-model="cPage" />
+        <Pagination v-if="isSuccess" :totalItems="dpList?.departmentCnt" :items-per-page="5" :max-pages-shown="10"
+            :onClick="refetch" v-model="cPage" />
     </div>
 </template>
 <script setup>
 import axios from 'axios';
 import { useModalStore } from '../../../../stores/modalState';
-import { onMounted, watch } from 'vue';
+import { inject, watch } from 'vue';
+import { useQuery } from '@tanstack/vue-query';
 
-const route = useRoute()
-const dpList = ref()
 const modal = useModalStore()
 const detailCode = ref("")
 const cPage = ref(1)
+const injectedValue = inject('selectValue')
 
 const searchDp = async () => {
     const param = {
-        ...route.query,
+        ...injectedValue.value,
         pageSize: 5,
         currentPage: cPage.value
     }
 
-    try {
-        const res = await axios.post('/api/system/departmentListBody', param)
-        dpList.value = res.data
-    } catch (e) {
-        console.error(e)
-    }
+    const res = await axios.post('/api/system/departmentListBody', param)
+
+    return res.data
 }
+
+const { data: dpList, isLoading, isSuccess, refetch } = useQuery({
+    queryKey: ['departMentList', cPage.value, injectedValue],
+    queryFn: searchDp,
+    // staleTime:1000 * 60,
+    // useQuery 자체 캐시
+    // gcTime:1000 * 60
+})
 
 const handlerModal = (code) => {
     detailCode.value = code
@@ -71,15 +79,43 @@ const onSaveSuccess = () => {
     searchDp()
 }
 
-onMounted(() => {
-    searchDp()
-})
-
-watch(() => route.query, searchDp)
-
 
 </script>
 <style lang="scss" scoped>
+.backdrop {
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    font-weight: bold;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #fff;
+    border-top: 6px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
