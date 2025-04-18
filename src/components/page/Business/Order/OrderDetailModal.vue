@@ -32,7 +32,6 @@ async function orderDetail() {
         clientData.value = response.data.client;
         orderDetailData.value = response.data.orderDetail;
         orderData.value = response.data.order;
-        console.log(response.data);
     } catch (error) {
         console.log('에러');
     }

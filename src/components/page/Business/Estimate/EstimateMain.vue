@@ -7,7 +7,6 @@ import EstimateDetailModal from './EstimateDetailModal.vue';
 import EstimateRegisModal from './EstimateRegisModal.vue';
 import { useQuery } from '@tanstack/vue-query';
 const estimateList = ref();
-
 const estimateCnt = ref();
 const cPage = ref(1);
 const modalType = ref('');
@@ -22,7 +21,7 @@ const loadEstimateList = async () => {
     const param = {
         currentPage: cPage.value,
         pageSize: 5,
-        ...injectedValue.value, // 검색 조건이 있을 경우 함께 전달
+        ...injectedValue.value,
     };
 
     const result = await axios.post(
@@ -32,11 +31,7 @@ const loadEstimateList = async () => {
     return result.data;
 };
 
-const {
-    data: estimate,
-    isSuccess,
-    isLoading,
-} = useQuery({
+const { data: estimate, isSuccess } = useQuery({
     queryKey: ['estimate', cPage, injectedValue],
     queryFn: loadEstimateList,
 });

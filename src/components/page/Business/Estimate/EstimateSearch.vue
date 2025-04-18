@@ -6,10 +6,8 @@ const searchClientId = ref('');
 const searchDeliveryDate = ref('');
 const searchEstimateDate = ref('');
 const searchProductId = ref('');
-
 const clients = ref(''); // 고객 목록
 const productList = ref([]); //제품 목록
-
 const injectedValue = inject('selectValue');
 
 // 컴포넌트가 마운트될 때 제조사 목록을 가져오기

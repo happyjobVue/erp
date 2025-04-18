@@ -36,14 +36,12 @@ const getOrder = () => {
 const detailOrder = (id, clientId) => {
     modalType.value = 'view';
     modalState.setModalState(true);
-
     selectedClientId.value = clientId;
     selectedOrderId.value = id;
 };
 
 //등록 모달 열기
 const registerOrderModal = () => {
-    console.log('등록');
     modalType.value = 'register';
     modalState.setModalState(true);
 };

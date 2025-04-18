@@ -26,7 +26,6 @@ const handlerSearch = () => {
     !selectedProduct.value || query.push(`productId=${selectedProduct.value}`);
     !searchStDate.value || query.push(`searchStDate=${searchStDate.value}`);
     const queryString = query.length > 0 ? `?${query.join('&')}` : '';
-    console.log(queryString);
 
     router.push(queryString);
 };

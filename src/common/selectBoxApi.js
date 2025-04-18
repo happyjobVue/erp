@@ -20,10 +20,10 @@ export async function fetchProductsByManufacturer(industryCode) {
             '/api/business/sales-plan/getProductList.do',
             params
         );
-        return response.data.productList;
+        return response.data.productList; // 제품 목록 반환
     } catch (error) {
         console.error('제품 목록 오류:', error);
-        return [];
+        return []; // 오류 시 빈 배열 반환
     }
 }
 

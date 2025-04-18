@@ -60,8 +60,6 @@ async function orderEstiDetailList(estiId) {
         orderEstiProductList.value = response.data.estimateDetail;
         orderEstimateList.value = '';
         orderEstimateCnt.value = '';
-
-        console.log(orderEstiProductList);
     } catch (error) {
         console.error('Error fetching estimate details:', error);
     }
