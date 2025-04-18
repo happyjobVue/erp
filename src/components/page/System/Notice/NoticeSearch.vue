@@ -30,11 +30,6 @@ const handleSearch = () => {
     }
 }
 
-// 새로고침 시 queryParam 삭제
-// onMounted(() => {
-//     window.location.search && router.replace(window.location.pathname)
-// })
-
 </script>
 
 <style lang="scss" scoped>

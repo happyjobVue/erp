@@ -1,7 +1,7 @@
 <template>
     <SalaryListModal v-if="modal.modalState" />
     <div class="salary-container">
-        <div class="employ-box">
+        <div v-if="isSuccess" class="employ-box">
             <div class="employ-item">
                 <span class="item-span">사원명</span>
                 <input class="employ-input" v-model="employeeInfo.employeeName" type="text">
@@ -15,7 +15,7 @@
                 <input class="employ-input" v-model="employeeInfo.workingYear" type="text">
             </div>
         </div>
-        <div class="salary-box" v-if="route.query.searchPaymentMonth && employeeInfo.nationalPension ">
+        <div class="salary-box" v-if="isSuccess && employeeInfo.nationalPension">
             <div class="left-salary">
                 <table>
                     <tr>
@@ -68,52 +68,77 @@
                 </table>
             </div>
         </div>
-
+        <div v-if="isLoading" class="backdrop">
+            <div class="spinner"></div>
+        </div>
     </div>
 </template>
 <script setup>
 import axios from 'axios'
-import { onMounted, watch } from 'vue'
+import { watch } from 'vue'
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiHelpCircleOutline } from '@mdi/js'
 import { useModalStore } from '../../../../stores/modalState';
+import { useQuery } from '@tanstack/vue-query';
 const modal = useModalStore()
 const path = mdiHelpCircleOutline
-const employeeInfo = ref({})
-const route = useRoute()
-
+const injectedValue = inject('selectValue')
 const searchSalary = async () => {
     const param = new URLSearchParams({
-        ...route.query,
+        ...injectedValue.value,
     })
 
-    try {
-        const res = await axios.post('/api/personnel/salaryListDetail.do', param)
-        employeeInfo.value = res.data.salaryListDetail
-    } catch (e) {
-        console.error(e)
-    }
+    const res = await axios.post('/api/personnel/salaryListDetail.do', param)
+
+    return res.data.salaryListDetail
 }
 
-const searchInfo = async () => {
-    try {
-        const res = await axios.post('/api/personnel/salaryListDetail.do')
-        employeeInfo.value = res.data.salaryListDetail
-    } catch (e) {
-        console.error(e)
-    }
-
-}
-
-onMounted(() => {
-    searchInfo()
+const { data: employeeInfo, isLoading, isSuccess } = useQuery({
+    queryKey: ['employeeInfo', injectedValue],
+    queryFn: searchSalary,
+    // staleTime:1000 * 60,
+    // useQuery 자체 캐시
+    // gcTime:1000 * 60
 })
 
-watch(() => route.query, searchSalary)
 
 
 </script>
 <style lang="scss" scoped>
+.backdrop {
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    font-weight: bold;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #fff;
+    border-top: 6px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 .salary-container {
     border: 1px solid #ddd;
 }

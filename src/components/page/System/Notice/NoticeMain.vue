@@ -76,7 +76,7 @@ const searchList = async () => {
 
 
 const { data: noticeList, isLoading, isSuccess, refetch } = useQuery({
-    queryKey: ['noticeList', cPage, injectedValue],
+    queryKey: ['noticeList', cPage.value, injectedValue],
     queryFn: searchList,
     // staleTime:1000 * 60,
     // useQuery 자체 캐시
@@ -93,11 +93,6 @@ const onPostSuccess = () => {
     searchList();
 };
 
-// onMounted(() => {
-//     searchList();
-// });
-
-watch(injectedValue, searchList);
 </script>
 
 <style lang="scss" scoped>
