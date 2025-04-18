@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios';
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, reactive } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 
@@ -11,7 +11,7 @@ const roadAddress = ref('');
 const queryClient = useQueryClient();
 
 const isScriptLoaded = ref(false); // 스크립트 로딩 상태를 추적하는 변수
-const saveData = ref({
+const saveData = reactive({
     bank: '',
     bank_account: '',
     biz_num: '',
@@ -72,30 +72,27 @@ const emit = defineEmits(['modalClose', 'postSuccess']);
 // 저장 함수
 const saveClient = async () => {
     // ✅ 유효성 검사
-    if (
-        !saveData.value.client_name ||
-        saveData.value.client_name.trim() === ''
-    ) {
+    if (!saveData.client_name || saveData.client_name.trim() === '') {
         alert('거래처명을 입력해주세요.');
         return;
     }
 
-    if (!saveData.value.biz_num || saveData.value.biz_num.trim() === '') {
+    if (!saveData.biz_num || saveData.biz_num.trim() === '') {
         alert('사업자등록번호를 입력해주세요.');
         return;
     }
 
-    if (!saveData.value.person || saveData.value.person.trim() === '') {
+    if (!saveData.person || saveData.person.trim() === '') {
         alert('담당자명을 입력해주세요.');
         return;
     }
 
-    if (!saveData.value.person_ph || saveData.value.person_ph.trim() === '') {
+    if (!saveData.person_ph || saveData.person_ph.trim() === '') {
         alert('담당자 연락처를 입력해주세요.');
         return;
     }
 
-    if (!saveData.value.ph || saveData.value.ph.trim() === '') {
+    if (!saveData.ph || saveData.ph.trim() === '') {
         alert('회사 전화번호를 입력해주세요.');
         return;
     }
@@ -108,16 +105,16 @@ const saveClient = async () => {
     const param = {
         ISBN: '',
         addr: roadAddress.value,
-        bank: saveData.value.bank,
-        bank_account: saveData.value.bank_account,
-        biz_num: saveData.value.biz_num,
-        client_name: saveData.value.client_name,
-        detail_addr: saveData.value.detail_addr,
-        email: saveData.value.email,
-        memo: saveData.value.memo,
-        person: saveData.value.person,
-        person_ph: saveData.value.person_ph,
-        ph: saveData.value.ph,
+        bank: saveData.bank,
+        bank_account: saveData.bank_account,
+        biz_num: saveData.biz_num,
+        client_name: saveData.client_name,
+        detail_addr: saveData.detail_addr,
+        email: saveData.email,
+        memo: saveData.memo,
+        person: saveData.person,
+        person_ph: saveData.person_ph,
+        ph: saveData.ph,
         zip: postcode.value,
     };
     const result = await axios.post(
