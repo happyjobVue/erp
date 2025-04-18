@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { fetchClient, productListAll } from '../../../../common/selectBoxApi';
 
 const searchClientId = ref('');
 const searchDeliveryDate = ref('');
@@ -10,6 +11,12 @@ const clients = ref(''); // 고객 목록
 const productList = ref([]); //제품 목록
 
 const injectedValue = inject('selectValue');
+
+// 컴포넌트가 마운트될 때 제조사 목록을 가져오기
+onMounted(async () => {
+    clients.value = await fetchClient();
+    productList.value = await productListAll();
+});
 
 //거래처 ,제품, 수주 날짜, 납기 날짜
 const searchEstimate = () => {
