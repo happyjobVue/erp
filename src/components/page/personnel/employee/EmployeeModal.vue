@@ -262,8 +262,37 @@ const handlerFile = e => {
     fileData.value = fileInfo[0];
 };
 
+//연봉 계산
+const calculateSalary = () => {
+    const job = employeeForm.value.jobGradeDetailName;
+    const joinDate = new Date(employeeForm.value.regDate);
+    const today = new Date();
+
+    let years = today.getFullYear() - joinDate.getFullYear();
+    const isBeforeAnniversary =
+        today.getMonth() < joinDate.getMonth() ||
+        (today.getMonth() === joinDate.getMonth() &&
+            today.getDate() < joinDate.getDate());
+
+    if (isBeforeAnniversary) {
+        years -= 1;
+    }
+
+    // 범위: 최소 0년차, 최대 5년차 → 초과 시 5년차 연봉으로 고정
+    const cappedYears = Math.min(Math.max(years, 0), 5);
+
+    const jobSalaryTable = salaryTable[job];
+    if (!jobSalaryTable) {
+        console.warn(`"${job}" 직급에 대한 연봉 정보 없음`);
+        salary.value = 0;
+        return;
+    }
+
+    salary.value = jobSalaryTable[cappedYears] ?? 0;
+};
+
 //파일 저장
-const saveEmployee = () => {
+const saveEmployee = async() => {
     //유효성 검사
     const requiredFields = [
         { key: 'employeeName', label: '이름' },
@@ -319,10 +348,7 @@ const saveEmployee = () => {
     employeeForm.value.emplStatus = 'W';
 
     formData.append('employeeName', employeeForm.value.employeeName);
-    formData.append(
-        'registrationNumber',
-        employeeForm.value.registrationNumber
-    );
+    formData.append('registrationNumber',employeeForm.value.registrationNumber);
     formData.append('sex', employeeForm.value.sex);
     formData.append('birthday', employeeForm.value.birthday);
     formData.append('finalEducation', employeeForm.value.finalEducation);
@@ -332,14 +358,8 @@ const saveEmployee = () => {
     formData.append('addressDetail', employeeForm.value.addressDetail);
     formData.append('bank', employeeForm.value.bank);
     formData.append('bankAccount', employeeForm.value.bankAccount);
-    formData.append(
-        'departmentDetailName',
-        employeeForm.value.departmentDetailName
-    );
-    formData.append(
-        'jobGradeDetailName',
-        employeeForm.value.jobGradeDetailName
-    );
+    formData.append('departmentDetailName',employeeForm.value.departmentDetailName);
+    formData.append('jobGradeDetailName',employeeForm.value.jobGradeDetailName);
     formData.append('jobRoleDetailName', employeeForm.value.jobRoleDetailName);
     formData.append('regDate', employeeForm.value.regDate);
     formData.append('emplStatus', employeeForm.value.emplStatus);
@@ -347,47 +367,25 @@ const saveEmployee = () => {
     formData.append('zipCode', employeeForm.value.zipCode);
     formData.append('paymentDate', employeeForm.value?.regDate.slice(0, 7));
 
-    axios.post('/api/personnel/employeeSave.do', formData).then(res => {
-        if (res.data.result === 'success') {
+    return await axios.post('/api/personnel/employeeSave.do', formData)
+};
+
+const { mutate: saveFile } = useMutation({
+    mutationKey: ['EmployeeSave'],
+    mutationFn: saveEmployee,
+    onSuccess: result => {
+        if(result.data.result === 'success'){
             alert('사원정보 저장 완료');
             closeModal();
             emit('searchlist');
-
         }
-    });
-};
+    } 
+})
 
-//연봉 계산
-const calculateSalary = () => {
-    const job = employeeForm.value.jobGradeDetailName;
-    const joinDate = new Date(employeeForm.value.regDate);
-    const today = new Date();
 
-    let years = today.getFullYear() - joinDate.getFullYear();
-    const isBeforeAnniversary =
-        today.getMonth() < joinDate.getMonth() ||
-        (today.getMonth() === joinDate.getMonth() &&
-            today.getDate() < joinDate.getDate());
-
-    if (isBeforeAnniversary) {
-        years -= 1;
-    }
-
-    // 범위: 최소 0년차, 최대 5년차 → 초과 시 5년차 연봉으로 고정
-    const cappedYears = Math.min(Math.max(years, 0), 5);
-
-    const jobSalaryTable = salaryTable[job];
-    if (!jobSalaryTable) {
-        console.warn(`"${job}" 직급에 대한 연봉 정보 없음`);
-        salary.value = 0;
-        return;
-    }
-
-    salary.value = jobSalaryTable[cappedYears] ?? 0;
-};
 
 //파일 수정
-const updateEmployee = () => {
+const updateEmployee = async () => {
     const formData = new FormData();
     if (fileData.value) formData.append('file', fileData.value);
 
@@ -419,11 +417,7 @@ const updateEmployee = () => {
     formData.append('employeeId', employeeForm.value.employeeId);
     formData.append('zipCode', employeeForm.value.zipCode);
 
-    axios.post('/api/personnel/employeeUpdate.do', formData).then(res => {
-        alert('사원정보 수정 완료');
-        closeModal();
-        emit('searchlist');
-    });
+    return await axios.post('/api/personnel/employeeUpdate.do', formData)
 };
 
 
@@ -435,9 +429,7 @@ const {mutate: updateEmployeeMutate} = useMutation({
         if(result.data.result === 'success'){
             alert('사원정보 수정 완료');
             closeModal();
-            queryClient.invalidateQueries({ queryKey: ['personnelList']});
-            queryClient.invalidateQueries({ queryKey: ['DetailEmployee', id], 
-            exact: true,});
+            emit('searchlist');
         }
     }
 })
@@ -1100,7 +1092,7 @@ onMounted(() => {
                     <div class="btn_areaC mt30">
                         <button
                             class="btnType blue"
-                            @click="saveEmployee"
+                            @click="saveFile"
                             v-if="modalType === 'register'"
                         >
                             등록
