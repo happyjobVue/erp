@@ -1,37 +1,50 @@
 <script setup>
-import { onMounted, reactive } from 'vue';
+import { inject, onMounted, reactive } from 'vue';
 import PromotionSearchBar from '../../../components/page/personnel/Promotion/PromotionSearchBar.vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import Pagination from '../../../components/common/Pagination.vue';
+import { useQuery } from '@tanstack/vue-query';
 
-const PromotionList = ref([]);
+// const PromotionList = ref([]);
+const FilterPromotionList = ref([]);
 const route = useRoute();
 const cPage = ref(1);
 
-const PromotionSearchList = () => {
+const PromotionsearchParams = inject('PromotionsearchParams');
+
+const PromotionSearchList = async () => {
     console.log('쿼리 값:', route.query);
 
     const param = {
-        ...route.query,
+        ...PromotionsearchParams.value,
         pageSize: 5,
         currentPage: cPage.value,
     };
 
-    AxiosRequest('promotionListBody',param ,PromotionList);
+    const result =  await axios
+        .post(`/api/personnel/promotionListBody`, param, {
+            headers: {
+                'Content-Type': 'application/json', // JSON 형식으로 전송
+            },
+        });
+
+        console.log(result.data);
+        return result.data;
+
+    //AxiosRequest('promotionListBody',param ,PromotionList);
+    //FilterPromotionList.value = PromotionList.promotionList.filter(item => item.employeeNumber);
 
 };
 
-watch(() => route.query, () => {
-    PromotionSearchList();
+const { data : PromotionList, refetch,isLoading } = useQuery({
+    queryKey: ['PromotionList',PromotionsearchParams, cPage],
+    queryFn: PromotionSearchList,
 });
 
-onMounted(() => {
-    PromotionSearchList()
-});
 
 //Axios 요청 함수 
-const AxiosRequest =  (UrlInfo, param, valueName) => {
+const AxiosRequest =  (UrlInfo, param) => {
     axios
         .post(`/api/personnel/${UrlInfo}`, param, {
             headers: {
@@ -39,8 +52,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
             },
         })
         .then(res => {
-            valueName.value = res.data;
-            console.log(valueName.value);
+
         })
         .catch(err => {
             console.error('에러 발생:', err);
@@ -50,19 +62,32 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
 function promotionSearch() {
     console.log('🔍 검색 조건:', filters);
 }
+
+
+//값읋 감지해서 다른 페이지 있더라도 바로 1페이지로 갈 수 있게끔 
+watch(
+  () => PromotionsearchParams.value,
+  () => {
+    cPage.value = 1;
+  },
+  { deep: true }
+);
+
 </script>
 
 <template>
 
     <div class="promotion-container">
         <div class="page-header">
+            🏠
             <span class="nav-path">인사/급여</span> &gt;
             <strong>승진내역 관리</strong>
         </div>
 
         <h2 class="section-title">승진내역 관리</h2>
 
-        <PromotionSearchBar />
+        <PromotionSearchBar 
+        />
 
         <!-- 테이블 -->
         <table class="promotion-table">
@@ -77,13 +102,14 @@ function promotionSearch() {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(List, index) in PromotionList.promotionList" :key="`${List.employeeId}-${index}`">
+                <tr v-for="(List, index) in PromotionList?.promotionList" :key="`${List.employeeId}-${index}`">
                     <td>{{ List.employeeNumber }}</td>
                     <td>{{ List.employeeName }}</td>
                     <td>{{ List.departmentCode }}</td>
                     <td>{{ List.departmentDetailName }}</td>
                     <td>{{ List.newJobGrade}}</td>
                     <td>{{ List.createdAt }}</td>
+                    <td v-if="isLoading">...로딩중</td>
                 </tr>
             </tbody>
         </table>
@@ -91,7 +117,7 @@ function promotionSearch() {
             :totalItems="PromotionList?.promotionCnt"
             :items-per-page="5"
             :max-pages-shown="5"
-            :onClick="PromotionSearchList"
+            :onClick="refetch"
             v-model="cPage"
          />
     </div>

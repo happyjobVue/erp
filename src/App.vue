@@ -1,6 +1,6 @@
 <script setup>
 import { RouterView, useRouter } from 'vue-router';
-import { watch } from 'vue';
+import { provide, ref, watch } from 'vue';
 import { useUserInfo } from './stores/userInfo';
 
 
@@ -30,6 +30,12 @@ import { useUserInfo } from './stores/userInfo';
 //   },
 //   { immediate: true }
 // );
+
+const EmployeesearchParams = ref({});
+provide('EmployeesearchParams', EmployeesearchParams);
+const PromotionsearchParams = ref({});
+provide('PromotionsearchParams', PromotionsearchParams);
+
 </script>
 
 <template>

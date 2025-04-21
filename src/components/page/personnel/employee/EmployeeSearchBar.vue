@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { inject, ref } from 'vue';
 import router from '../../../../router';
 
 const searchName = ref('');
@@ -10,7 +10,7 @@ const jobGrade = ref('');
 const emplStatus = ref('');
 const searchId = ref();
 
-const emit = defineEmits(['emplStatusW','emplStatusF','ModalOpening']);
+const emit = defineEmits(['emplStatusW','emplStatusF','ModalOpening','EmplStatus', 'OnEmplStatus']);
 
 const personnelDptOptions = ref([
     { value: '회계부', label: '회계부'},
@@ -28,50 +28,62 @@ const personnelJbOptions = ref([
     { value: '부장', label: '부장'},
 ]);
 
+const EmployeesearchParams = inject('EmployeesearchParams');
+
 //재직자 퇴직자 구분하기 
 const SetEmplStatus = (val) => {
     if (val === 'W') {
         emplStatus.value = 'W'
         emit('EmplStatus', emplStatus.value );
-        emit('OnEmplStatus');
+        // emit('OnEmplStatus');
+        EmployeesearchParams.value.emplStatus = emplStatus.value
+
 
     } else if(val === 'F') {
         emplStatus.value = 'F'
         emit('EmplStatus', emplStatus.value);
-        emit('OnEmplStatus');
+        // emit('OnEmplStatus');
+        EmployeesearchParams.value.emplStatus = emplStatus.value
+
     }
 };
 
 const handlerSearch = () => {
-    const query = [];
 
-    !searchName.value || query.push(`searchName=${searchName.value}`);
-    !searchRegDateStart.value ||
-        query.push(`searchRegDateStart=${searchRegDateStart.value}`);
-    !searchRegDateEnd.value ||
-        query.push(`searchRegDateEnd=${searchRegDateEnd.value}`);
-    !department.value || query.push(`department=${department.value}`);
-    !jobGrade.value || query.push(`jobGrade=${jobGrade.value}`);
-    !emplStatus.value || query.push(`emplStatus=${emplStatus.value}`);
-    !searchId.value || query.push(`searchId=${searchId.value}`);
+    //searchParams.value = '';
 
-    const queryString = query.length > 0 ? `?${query.join('&')}` : '';
+    EmployeesearchParams.value.searchName = searchName.value;
+    EmployeesearchParams.value.searchRegDateStart = searchRegDateStart.value;
+    EmployeesearchParams.value.searchRegDateEnd = searchRegDateEnd.value;
+    EmployeesearchParams.value.department = department.value;
+    EmployeesearchParams.value.jobGrade = jobGrade.value;
+    EmployeesearchParams.value.emplStatus = '';
+    EmployeesearchParams.value.searchId = searchId.value;
 
-    router.push(queryString);
+    // const query = [];
+
+    // !searchName.value || query.push(`searchName=${searchName.value}`);
+    // !searchRegDateStart.value ||
+    //     query.push(`searchRegDateStart=${searchRegDateStart.value}`);
+    // !searchRegDateEnd.value ||
+    //     query.push(`searchRegDateEnd=${searchRegDateEnd.value}`);
+    // !department.value || query.push(`department=${department.value}`);
+    // !jobGrade.value || query.push(`jobGrade=${jobGrade.value}`);
+    // !emplStatus.value || query.push(`emplStatus=${emplStatus.value}`);
+    // !searchId.value || query.push(`searchId=${searchId.value}`);
+
+    // const queryString = query.length > 0 ? `?${query.join('&')}` : '';
+
+    // router.push(queryString);
 };
 
 
 //modal 코드
 
 const isModalOpen = ref(false);
-const ResimodalType = ref('register');
 
 const openModal = () => {
-  isModalOpen.value = true;
-  emit('ModalOpening', {
-    isModalOpen : isModalOpen.value,
-    modalType: ResimodalType.value
-  });
+  emit('ModalOpening');
 };
 
 const closeModal = () => {
@@ -135,9 +147,12 @@ onMounted(() => {
                 <button @click="() => SetEmplStatus('F')" class="btn">퇴직자</button>
             </div>
             <div>
-                <label>입사일 조회</label>
-                <input type="date" v-model="searchRegDateStart" />
-                <input type="date" v-model="searchRegDateEnd" />
+                <label>입사일 조회 </label>
+                <input type="date" v-model="searchRegDateStart" 
+                style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; background-color: #f9f9f9; color: #333;"/>
+                <input type="date" v-model="searchRegDateEnd" 
+                 style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; background-color: #f9f9f9; color: #333;"
+                />
                 <button @click="handlerSearch" class="btn search-btn">검색</button>
                 <button class="btn register-btn" @click="openModal">사원 등록</button>
             </div>

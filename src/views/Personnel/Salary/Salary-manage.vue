@@ -25,8 +25,22 @@ const SalarySearchList = () => {
         pageSize: 5,
         currentPage: cPage.value,
     };
-     showDetail.value = false;
-     AxiosRequest('salaryListBody',param ,SalaryList);
+    showDetail.value = false;
+    
+    axios
+        .post(`/api/personnel/salaryListBody`, param, {
+            headers: {
+                'Content-Type': 'application/json', // JSON 형식으로 전송
+            },
+        })
+        .then(res => {
+            SalaryList.value = res.data;
+            console.log(SalaryList.value);
+        })
+        .catch(err => {
+            console.error('에러 발생:', err);
+        });
+
 
 };
 
@@ -143,35 +157,63 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
   };
 
     //상세 보기
-    const DetailSalary = (employeeName, page = dPage.value) => {
-        console.log('쿼리 값:', route.query);
+    const DetailSalary = (employeeName) => {
 
-        selectedEmployeeName.value = employeeName;
+        if(selectedEmployeeName.value != employeeName){
+          selectedEmployeeName.value = employeeName;
+        }
+
+        dPage.value = 1;
 
         const param = {
-            searchEmployeeName: employeeName,
+            searchEmployeeName: selectedEmployeeName.value,
             pageSize: 5,
-            currentPage: page,
+            currentPage: dPage.value,
         };
 
-        AxiosRequest('salaryListBody',param ,DetailSalaryList);
-        showDetail.value = true;
-        }
+        axios
+        .post(`/api/personnel/salaryListBody`, param, {
+            headers: {
+                'Content-Type': 'application/json', // JSON 형식으로 전송
+            },
+        })
+        .then(res => {
+            DetailSalaryList.value = res.data;
+            console.log(SalaryList.value);
+            showDetail.value = true;
+        })
+        .catch(err => {
+            console.error('에러 발생:', err);
+        });
+    }
+
+    //상세 보기
+    const PageDetailSalary = (page) => {
+
+          dPage.value = page;
+
+          const param = {
+              searchEmployeeName: selectedEmployeeName.value,
+              pageSize: 5,
+              currentPage: dPage.value,
+          };
+
+          axios
+          .post(`/api/personnel/salaryListBody`, param, {
+              headers: {
+                  'Content-Type': 'application/json', // JSON 형식으로 전송
+              },
+          })
+          .then(res => {
+              DetailSalaryList.value = res.data;
+              console.log(DetailSalaryList.value);
+              showDetail.value = true;
+          })
+          .catch(err => {
+              console.error('에러 발생:', err);
+          });
+    }
   
-  const closeDetail = () => {
-    showDetail.value = false;
-  };
- 
-  const handleRefresh = () => {
-  window.location.reload();
-  };
-
-  const handleDetailPageChange = (page) => {
-    dPage.value = page;
-    DetailSalary(selectedEmployeeName.value, page);
-  }
-
-
   watch(() => route.query, () => {
     cPage.value = 1;
     SalarySearchList();
@@ -210,7 +252,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="List in SalaryList.salaryList" :key="List.employeeId" @click="() => DetailSalary(List.employeeName)">
+          <tr v-for="List in SalaryList.salaryList" :key="List.salaryId" @click="() => DetailSalary(List.employeeName)">
                 <td>{{ List.paymentDate }}</td>
                 <td>{{ List.departmentDetailName }}</td>
                 <td>{{ List.jobGradeDetailName }}</td>
@@ -269,7 +311,7 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
           </tr>
         </thead>
         <tbody>
-        <tr v-for="List in DetailSalaryList.salaryList" :key="List.employeeId">
+        <tr v-for="List in DetailSalaryList.salaryList" :key="List.salaryId">
                 <td>{{ List.paymentDate }}</td>
                 <td>{{ List.departmentDetailName }}</td>
                 <td>{{ List.jobGradeDetailName }}</td>  
@@ -288,10 +330,10 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
         </tbody>
       </table>  
         <Pagination
-            :totalItems="SalaryList?.salaryCnt"
+            :totalItems="DetailSalaryList?.salaryCnt"
             :items-per-page="5"
             :max-pages-shown="5"
-            :onClick="handleDetailPageChange"
+            :onClick="PageDetailSalary"
             v-model="dPage"
       />
       </div>

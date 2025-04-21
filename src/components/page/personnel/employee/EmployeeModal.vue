@@ -1,45 +1,32 @@
 <script setup>
 import axios from 'axios';
-import { ref, onMounted, watch, readonly } from 'vue';
+import { ref, onMounted, watch, readonly, inject, watchEffect, toRef, toRefs } from 'vue';
 import { useUserInfo } from '../../../../stores/userInfo';
 import EmployeeYearModal from './EmployeeYearModal.vue';
+import { useMutation, useQuery } from '@tanstack/vue-query';
 
 const address = ref('');
 const addressCode = ref('');
-const emit = defineEmits(['closeModal', 'OpenRetireModal', 'closeCommonModal']);
+const emit = defineEmits(['closeModal', 'OpenRetireModal', 'closeCommonModal', 'searchlist', 'update-retire-info']);
 const props = defineProps([
+    'employeeId',
+    'jobGradeCode',
     'modalType',
+    'isModalOpen',
     'UserDetail',
-    'employeeDetail',
-    'imgUrl',
-    'isModalOpen'
+    'CommonModal',
+    'regeResign'
 ]);
-const userInfo = useUserInfo();
 
-// 모달창 동시에 띄우기 위한 새로운 타입 변수
-const CommonModal = ref(false);
+const { employeeId, jobGradeCode, modalType, isModalOpen, UserDetail, CommonModal, regeResign} = toRefs(props);
 
 //사원 등록 및 파일업로드
-const employeeForm = ref({
-    employeeName: '',
-    registrationNumber: '',
-    sex: '',
-    birthday: '',
-    finalEducation: '',
-    email: '',
-    hp: '',
-    addressDetail: '',
-    bank: '',
-    bankAccount: '',
-    departmentDetailName: '',
-    jobGradeDetailName: '',
-    jobRoleDetailName: '',
-    regDate: '',
-    emplStatus: '',
-});
+const employeeForm = ref({});
 
 const fileData = ref('');
-const localImgUrl = ref('');
+const imgUrl = ref('');
+
+//사진 랜더링 되고 나서 창 띄우기
 
 //퇴직이유
 const resignationReason = ref('');
@@ -49,14 +36,13 @@ const resignationDate = ref('');
 const severancePay = ref(0);
 //연봉
 const salary = ref(0);
+
+//퇴직모달창에 내릴 변수 
 const NowemployeeId = ref('');
 const NowregDate = new Date();
 
 //근무 연차
 const years = ref('');
-
-//연봉 정보 리스트
-const totalSalary = ref({});
 
 //연봉 계산 테이블
 const salaryTable = {
@@ -101,59 +87,111 @@ const showModal = ref(false);
 const OpenHobong = () => {
     showModal.value = true;
 };
-const { isModalOpen, modalType } = toRefs(props)
 
-//연봉 계산기 계산하기
-const Onsalary = joinDate => {
-    const currentDatae = new Date();
+//개인 조회 
+const searchDetail= async () => {
 
-    const anIncome = getFullYearDiff(joinDate, currentDatae);
+        imgUrl.value = '';
 
-    console.log(anIncome);
+        const param = {
+            employeeId: employeeId.value,
+            jobGradeCode: jobGradeCode.value,
+        }
 
-    if (anIncome >= 0 && anIncome <= 1) {
-        salary.value = 30000000;
-        years.value = 1;
-    } else if (anIncome === 2) {
-        years.value = 2;
-        salary.value = 35000000;
-    } else if (anIncome === 3) {
-        years.value = 3;
-        salary.value = 40000000;
-    } else if (anIncome === 4) {
-        years.value = 4;
-        salary.value = 45000000;
-    } else if (anIncome === 5) {
-        salary.value = 50000000;
-        years.value = 5;
-    } else {
-        console.log('0~5년 사이가 아닙니다.');
-    }
+        const result = await axios
+            .post(`/api/personnel/employeeDetailBody`, param, {
+                headers: {
+                    'Content-Type': 'application/json', // JSON 형식으로 전송
+                },
+            });
+        OntotalSalary(result.data.detail.employeeName);    
 
-    console.log(salary);
+        return result.data.detail;  
+}
+    
+  
+
+//이미지 불러오기 
+const getFileImage = async () => {
+  const param = new URLSearchParams();
+  param.append('employeeId', employeeId.value);
+
+  await axios
+    .post('/api/personnel/employeeDownloadVue.do', param, {
+      responseType: 'blob',
+    })
+    .then(res => {
+      if (res.status === 204 || res.data.size === 0) {
+        imgUrl.value = '/images/default-profile.png'; // 기본 이미지 경로
+        return;
+      }
+
+      const blob = new Blob([res.data], { type: res.headers['content-type'] });
+      imgUrl.value = URL.createObjectURL(blob);
+      console.log(imgUrl.value);
+    })
+    .catch(err => {
+      console.error('이미지 요청 실패:', err);
+      imgUrl.value = '/images/default-profile.png';
+    });
 };
 
-//년 월 비교
-const getFullYearDiff = (startDate, endDate) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
 
-    let diff = end.getFullYear() - start.getFullYear();
+//연봉 정보 불러오기 
+const OntotalSalary = (val) => {
 
-    // 아직 1년이 안 지났다면 -1
-    if (
-        end.getMonth() < start.getMonth() ||
-        (end.getMonth() === start.getMonth() && end.getDate() < start.getDate())
-    ) {
-        diff--;
-    }
-
-    return diff;
+const param = {
+    searchEmployeeName: val,
+    pageSize: 1,
+    currentPage: 1,
 };
+
+axios
+    .post(`/api/personnel/salaryListBody`, param, {
+        headers: {
+            'Content-Type': 'application/json', // JSON 형식으로 전송
+        },
+    })
+    .then(res => {
+        employeeForm.value.salary = res.data.salaryList[0].salary;
+        salary.value = employeeForm.value.salary;
+        console.log(employeeForm.value);
+    })
+    .catch(err => {
+        console.error('에러 발생:', err);
+    });
+}
+
+
+//조회 useQuery
+const {data: queryData, isSuccess} = useQuery({
+    queryKey: ['DetailEmployee', employeeId],
+    queryFn: searchDetail,
+    enabled: !!employeeId,
+    cacheTime: 1000 * 5,
+});
+
+watchEffect(() => {
+    if(modalType.value !== 'register' && isSuccess && queryData.value ){
+        employeeForm.value = { ...queryData.value };
+        console.log(employeeForm.value);
+        address.value = employeeForm.value.address;
+        addressCode.value = employeeForm.value.zipCode;
+
+        if(
+            employeeForm.value.profileFileExt === 'jpg' ||
+            employeeForm.value.profileFileExt === 'gif' || 
+            employeeForm.value.profileFileExt === 'png') {
+             // db에 있는 파일 데이터를 가지고 썸네일을 만들어 줌
+             getFileImage();
+         }
+
+    }
+})
+
 
 //퇴직
 const OnRetire = () => {
-
 
     //유효성 검사 
     if (
@@ -202,7 +240,7 @@ const OnRetire = () => {
         resignationDate: resignationDate.value,
         severancePay: severancePay.value,
         salary: salary.value,
-        employeeId: NowemployeeId.value,
+        employeeId: props.UserDetail.detail.employeeId,
     });
 };
 
@@ -218,8 +256,8 @@ const handlerFile = e => {
         fileExtension === 'gif' ||
         fileExtension === 'png'
     ) {
-        localImgUrl.value = URL.createObjectURL(fileInfo[0]);
-        console.log(localImgUrl.value);
+        imgUrl.value = URL.createObjectURL(fileInfo[0]);
+        console.log(imgUrl.value);
     }
     fileData.value = fileInfo[0];
 };
@@ -306,13 +344,15 @@ const saveEmployee = () => {
     formData.append('regDate', employeeForm.value.regDate);
     formData.append('emplStatus', employeeForm.value.emplStatus);
     formData.append('salary', salary.value);
-    formData.append('zipCode', addressCode.value);
+    formData.append('zipCode', employeeForm.value.zipCode);
     formData.append('paymentDate', employeeForm.value?.regDate.slice(0, 7));
 
     axios.post('/api/personnel/employeeSave.do', formData).then(res => {
         if (res.data.result === 'success') {
             alert('사원정보 저장 완료');
             closeModal();
+            emit('searchlist');
+
         }
     });
 };
@@ -377,12 +417,30 @@ const updateEmployee = () => {
     formData.append('regDate', employeeForm.value.regDate);
     formData.append('emplStatus', employeeForm.value.emplStatus);
     formData.append('employeeId', employeeForm.value.employeeId);
+    formData.append('zipCode', employeeForm.value.zipCode);
 
     axios.post('/api/personnel/employeeUpdate.do', formData).then(res => {
         alert('사원정보 수정 완료');
         closeModal();
+        emit('searchlist');
     });
 };
+
+
+//수정 useMutation으로
+const {mutate: updateEmployeeMutate} = useMutation({
+    mutationkey : ['updateEmployeeMutate'],
+    mutationFn: updateEmployee,
+    onSuccess: result => {
+        if(result.data.result === 'success'){
+            alert('사원정보 수정 완료');
+            closeModal();
+            queryClient.invalidateQueries({ queryKey: ['personnelList']});
+            queryClient.invalidateQueries({ queryKey: ['DetailEmployee', id], 
+            exact: true,});
+        }
+    }
+})
 
 //주소 찾기
 const openDaumPostcode = () => {
@@ -418,7 +476,13 @@ const onJobGradeChange = () => {
 
 const onemplStatus = () => {
     if (employeeForm.value.emplStatus == 'F') {
+
         CommonModal.value = true;
+        
+        //퇴직금 퇴직 사유 초기화 창열릴 떄마다 
+        severancePay.value = '';
+        resignationReason.value = '';
+
         emit('OpenRetireModal', employeeForm.value);
     }
 };
@@ -475,79 +539,69 @@ const filterInput = event => {
     event.target.value = Number(onlyNumber).toLocaleString();
 };
 
+//은행 형식 계좌형으로 표기하기
+const formatAccountNumber = () => {
+  // 숫자만 남기고 하이픈 넣기 (3-3-6 기준)
+  let digits = employeeForm.value.bankAccount.replace(/\D/g, '');
+
+  if (digits.length <= 3) {
+    employeeForm.value.bankAccount = digits;
+  } else if (digits.length <= 6) {
+    employeeForm.value.bankAccount = `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  } else if (digits.length <= 12) {
+    employeeForm.value.bankAccount = `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6, 12)}`;
+  } else {
+    employeeForm.value.bankAccount = `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6, 12)}`;
+  }
+};
+
 //퇴직 값이 들어오면 즉각 적용
 watch(
-    () => props.UserDetail,
+    () => UserDetail.value,
     newVal => {
+            //창 열릴때마다 퇴직금 이유 초기화 
+            severancePay.value = '';
+            resignationReason.value = '';
         if (newVal && newVal.detail && newVal.detail.employeeId) {
             NowemployeeId.value = newVal.detail.employeeId;
+            console.log(NowemployeeId.value);
             NowregDate.value = newVal.detail.regDate;
+
         }
     },
     { immediate: true } // 필요에 따라 사용, 없으면 값 바뀔 때만 감지
 );
 
-//유저 정보 들어오면 모달창에 적용
-// props.UserDetail이 바뀔 때 employeeForm에 복사
-watch(
-    () => props.employeeDetail,
-    newDetail => {
-        if (newDetail) {
-            employeeForm.value = { ...employeeForm.value, ...newDetail };
-            address.value = newDetail.address;
-            addressCode.value = newDetail.zipCode;
-            employeeForm.value.employeeId = newDetail.employeeId;
-            salary.value = employeeForm.value.salary;
-            console.log(salary.value);
-            // Onsalary(employeeForm.value.regDate);
-            localImgUrl.value = props.imgUrl;
-        }
-    },
-    { immediate: true } // 모달 열릴 때도 바로 반영
-);
-
-watch([isModalOpen, modalType], ([newOpen, newType], [oldOpen, oldType]) => {
-  if (newOpen && newType === 'register') {
-    employeeForm.value = {}
-  }
-})
-
-//연봉 감지
-watch(
-    () => props.employeeDetail?.salary,
-    newSalary => {
-        if (newSalary !== undefined) {
-            salary.value = newSalary;
-            console.log('연봉 감지됨:', salary.value);
-        }
-    },
-    { immediate: true }
-);
 
 //타입 감지
 watch(
-    () => props.modalType,
+    () => modalType.value,
     Type => {
         if (Type === 'register') {
+            console.log(employeeForm.value);
             employeeForm.value = {}; // 선택 사항 (초기화)
             address.value = '';
             addressCode.value = '';
-            employeeForm.value.employeeId = '';
             salary.value = 0;
-            localImgUrl.value = '';
+            imgUrl.value = '';
             return;
         }
     }
 );
 
 watch(
-    () => props.imgUrl,
-    newVal => {
-        if (newVal) {
-            localImgUrl.value = newVal || '/images/default-profile.png';
-        }
+  () => regeResign.value,
+  () => {
+    if (modalType.value === 'register') {
+      employeeForm.value = {};
+      address.value = '';
+      addressCode.value = '';
+      salary.value = 0;
+      imgUrl.value = '';
     }
+  }
 );
+
 
 // 카카오 API 스크립트 로드
 onMounted(() => {
@@ -557,9 +611,11 @@ onMounted(() => {
     script.async = true;
     document.head.appendChild(script);
 });
+
+
 </script>
 <template>
-    <div v-if="modalType === 'register' || modalType === 'update'">
+    <div v-if="modalType === 'register' || modalType === 'update' && isSuccess">
         <div class="modal-overlay">
             <div class="modal-container">
                 <div class="modal-header">
@@ -580,7 +636,7 @@ onMounted(() => {
                                 <td rowspan="2" colspan="2">
                                     <div id="preview">
                                         <img
-                                            :src="localImgUrl"
+                                            :src="imgUrl"
                                             alt="미리보기 이미지"
                                             @error="handleImgError"
                                             style="
@@ -613,7 +669,7 @@ onMounted(() => {
                                 </td>
                             </tr>
                             <tr>
-                                <th>
+                                <th style="width: 80px;">
                                     주민번호 <span class="required">*</span>
                                 </th>
                                 <td colspan="3">
@@ -671,7 +727,7 @@ onMounted(() => {
                                         v-model="employeeForm.birthday"
                                     />
                                 </td>
-                                <th>
+                                <th style="width: 80px;">
                                     최종학력 <span class="required">*</span>
                                 </th>
                                 <td colspan="3">
@@ -785,6 +841,7 @@ onMounted(() => {
                                         class="inputTxt"
                                         id="bankAccount"
                                         placeholder="계좌번호"
+                                        @input="formatAccountNumber"
                                         v-model="employeeForm.bankAccount"
                                     />
                                 </td>
@@ -834,7 +891,7 @@ onMounted(() => {
                                         </option>
                                     </select>
                                 </td>
-                                <th>부서코드</th>
+                                <th style="width: 70px;">부서코드</th>
                                 <td colspan="3">
                                     <input
                                         type="text"
@@ -895,10 +952,10 @@ onMounted(() => {
                                         @change="onJobGradeChange"
                                     >
                                         <option value="">전체</option>
-                                        <option value="대리">대리</option>
-                                        <option value="부장">부장</option>
-                                        <option value="과장">과장</option>
                                         <option value="사원">사원</option>
+                                        <option value="대리">대리</option>
+                                        <option value="과장">과장</option>
+                                        <option value="부장">부장</option>
                                     </select>
                                 </td>
                                 <th>직급코드</th>
@@ -912,10 +969,10 @@ onMounted(() => {
                                         v-model="employeeForm.jobGradeCode"
                                     />
                                 </td>
-                                <th>
+                                <th style="width: 80px;">
                                     재직구분 <span class="required">*</span>
                                 </th>
-                                <td colspan="3">
+                                <td colspan="3" style="width: 230px;">
                                     <label
                                         ><input
                                             type="radio"
@@ -961,7 +1018,7 @@ onMounted(() => {
                                 </td>
                             </tr>
                             <tr>
-                                <th>입사일 <span class="required">*</span></th>
+                                <th style="width: 70px;">입사일 <span class="required">*</span></th>
                                 <td colspan="3">
                                     <input
                                         type="date"
@@ -1050,7 +1107,7 @@ onMounted(() => {
                         </button>
                         <button
                             class="btnType blue"
-                            @click="updateEmployee"
+                            @click="updateEmployeeMutate"
                             v-if="
                                 modalType !== 'register' &&
                                 employeeForm.emplStatus !== 'F'

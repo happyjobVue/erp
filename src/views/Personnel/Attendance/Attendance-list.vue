@@ -138,7 +138,7 @@ const OnshowModal = (val) => {
             <a href="#" class="btn_nav bold">인사/급여</a>
             /
             <span class="btn_nav bold">근태 현황 조회</span>
-            <a href="#" class="btn_set refresh">새로고침</a>
+            <a href="#" class="btn_set refresh">🔄</a>
           </p>
 
           <p class="conTitle"><span>근태 현황 조회</span></p>

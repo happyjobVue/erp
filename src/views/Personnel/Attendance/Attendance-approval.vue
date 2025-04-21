@@ -229,7 +229,7 @@ select {
 
 /* 버튼 */
 .btnType.red {
-    background: linear-gradient(to bottom, #f26262 0%, #d83a3a 100%);
+    background: #007bff;
     color: white;
     padding: 6px 14px;
     text-decoration: none;

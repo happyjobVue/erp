@@ -343,11 +343,12 @@ onMounted(() => {
     border-radius: 3px;
   }
   .btn.red {
-    background-color: #d9534f;
+    background-color: #007bff;
     color: #fff;
   }
+
   .btn.blue {
-    background-color: #337ab7;
+    background-color: #28a745;
     color: #fff;
   }
   .summary-box {

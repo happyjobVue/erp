@@ -10,22 +10,19 @@ const searchRegDateEnd = ref('');
 const department = ref('');
 const jobGrade = ref('');
 
+const PromotionsearchParams = inject('PromotionsearchParams');
 
 const promotionSearch = () => {
-    const query = [];
 
-    !searchName.value || query.push(`searchName=${searchName.value}`);
-    !searchRegDateStart.value ||
-        query.push(`searchRegDateStart=${searchRegDateStart.value}`);
-    !searchRegDateEnd.value ||
-        query.push(`searchRegDateEnd=${searchRegDateEnd.value}`);
-    !department.value || query.push(`department=${department.value}`);
-    !jobGrade.value || query.push(`jobGrade=${jobGrade.value}`);
-    !searchId.value || query.push(`searchId=${searchId.value}`);
+    PromotionsearchParams.value.searchName = searchName.value;
+    PromotionsearchParams.value.searchRegDateStart = searchRegDateStart.value;
+    PromotionsearchParams.value.searchRegDateEnd = searchRegDateEnd.value;
+    PromotionsearchParams.value.department = department.value;
+    PromotionsearchParams.value.jobGrade = jobGrade.value;
+    PromotionsearchParams.value.searchId = searchId.value;
 
-    const queryString = query.length > 0 ? `?${query.join('&')}` : '';
+    console.log(PromotionsearchParams.value);
 
-    router.push(queryString);
 };
 
 const departmentGroupList = [
@@ -103,7 +100,7 @@ const jobGradeGroupList = [
             <input type="date" v-model="searchRegDateStart" />
             <input type="date" v-model="searchRegDateEnd" />
 
-            <button class="btn-search" @click="promotionSearch">검색</button>
+            <button class="btn-search" @click="promotionSearch" style="height: 30px; background-color: #007bff;; color: #fff; border: 0;">검색</button>
         </div>
     </div>
 

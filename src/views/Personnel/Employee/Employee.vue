@@ -1,14 +1,15 @@
 <script setup>
 import EmployeeSearchBar from '../../../components/page/personnel/employee/EmployeeSearchBar.vue';
 import axios from 'axios';
-import { onMounted, ref, watch } from 'vue';
+import { inject, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import Pagination from '../../../components/common/Pagination.vue';
 import EmployeeModal from '../../../components/page/personnel/employee/EmployeeModal.vue';
 import router from '../../../router';
+import { useQuery } from '@tanstack/vue-query';
 
 const route = useRoute();
-const personnelList = ref([]);
+//const personnelList = ref([]);
 const cPage = ref(1);
 const isModalOpen = ref(false);
 //퇴직에 사용될 것 
@@ -25,107 +26,57 @@ const CommonModal = ref(false);
 
 const imgUrl = ref('');
 
+//Id, jobGrade props로 넘기기 
+const employeeId = ref('');
+const jobGradeCode = ref('');
+
+
+//등록 정보창을 수정창에서 바꾸는 게아니라 등록 -> 등록 갈때 값들 초기값을 갱신하기 위해
+const regeResign = ref(false);
+
+//provice 값 
+const EmployeesearchParams = inject('EmployeesearchParams');
+
 //1. 인사 관리 리스트 조회  
-const personnelSearchList = () => {
+const personnelSearchList = async() => {
     console.log('쿼리 값:', route.query);
 
     const param = {
-        ...route.query,
+        ...EmployeesearchParams.value,
         pageSize: 5,
         currentPage: cPage.value,
     };
 
-    AxiosRequest('employeeListBody',param ,personnelList);
-
-};
-
-//개인 조회 
-const checkPerson =  (personnel) => {
-    
-    imgUrl.value = '';
-
-    const param = {
-        employeeId: personnel.employeeId,
-        jobGradeCode: personnel.jobGradeCode,
-    }
-
-    axios
-        .post(`/api/personnel/employeeDetailBody`, param, {
+    const result = await axios
+        .post(`/api/personnel/employeeListBody`, param, {
             headers: {
                 'Content-Type': 'application/json', // JSON 형식으로 전송
             },
         })
-        .then(res => {
-            employeeDetail.value = res.data.detail;
-            OntotalSalary(employeeDetail.value.employeeName)
-            console.log(employeeDetail.value);
-            if (
-                employeeDetail.value.profileFileExt === 'jpg' ||
-                employeeDetail.value.profileFileExt === 'gif' ||
-                employeeDetail.value.profileFileExt === 'png'
-            ) {
-                getFileImage(personnel.employeeId);
-
-            } 
-
-            isModalOpen.value = true;
-            modalType.value = 'update'
-
-        })
-        .catch(err => {
-            console.error('에러 발생:', err);
-        });
-
-}
+        console.log(result.data);
+        return result.data;
 
 
-//연봉 정보 불러오기 
-const OntotalSalary = (val) => {
-
-const param = {
-    searchEmployeeName: val,
-    pageSize: 1,
-    currentPage: 1,
 };
 
-axios
-    .post(`/api/personnel/salaryListBody`, param, {
-        headers: {
-            'Content-Type': 'application/json', // JSON 형식으로 전송
-        },
-    })
-    .then(res => {
-        console.log(res.data.salaryList[0].salary);
-        employeeDetail.value.salary = res.data.salaryList[0].salary;
-        console.log(employeeDetail.value);
-    })
-    .catch(err => {
-        console.error('에러 발생:', err);
-    });
+//조회 useQuery 사용해서 
+const {data: personnelList, refetch} = useQuery ({
+    queryKey: ['personnelList',EmployeesearchParams, cPage],
+    queryFn: personnelSearchList,
+})
+
+
+
+//개인 조회 
+const checkPerson = async (personnel) => {
+    
+    employeeId.value =  personnel.employeeId;
+    console.log(personnel.employeeId);
+    jobGradeCode.value =  personnel.jobGradeCode;
+    modalType.value = 'update';
+    isModalOpen.value = true;
+
 }
-
-const getFileImage = (val) => {
-  const param = new URLSearchParams();
-  param.append('employeeId', val);
-
-  axios
-    .post('/api/personnel/employeeDownloadVue.do', param, {
-      responseType: 'blob',
-    })
-    .then(res => {
-      if (res.status === 204 || res.data.size === 0) {
-        imgUrl.value = '/images/default-profile.png'; // 기본 이미지 경로
-        return;
-      }
-
-      const blob = new Blob([res.data], { type: res.headers['content-type'] });
-      imgUrl.value = URL.createObjectURL(blob);
-    })
-    .catch(err => {
-      console.error('이미지 요청 실패:', err);
-      imgUrl.value = '/images/default-profile.png';
-    });
-};
 
 //2. 재직자, 퇴직자의 따른 재 검색 
 const GetEmplStatus = val => {
@@ -133,19 +84,20 @@ const GetEmplStatus = val => {
 };
 
 const OnEmplStatus = () => {
-    //F W 재직 상태에 따라서 값 변경
-    router.push({
-        path: route.path,
-        query: { ...route.query, emplStatus: chEmplStatus.value},
-    });
 
-    console.log(chEmplStatus.value);
+    // //F W 재직 상태에 따라서 값 변경
+    // router.push({
+    //     path: route.path,
+    //     query: { ...route.query, emplStatus: chEmplStatus.value},
+    // });
 
-    //다시 재 검색
-    if(cPage.value !== 1){
-        cPage.value =1;
-    }
-    personnelSearchList()
+    // console.log(chEmplStatus.value);
+
+    // //다시 재 검색
+    // if(cPage.value !== 1){
+    //     cPage.value =1;
+    // }
+    // personnelSearchList()
 
 };
 
@@ -232,8 +184,8 @@ const handleRetireInfo = (retireData) => {
         .then(res => {
             console.log(res.data);
             alert('퇴직 되었습니다.');
+            refetch();
             closeModal();
-            personnelSearchList();
         })
         .catch(err => {
             console.error('에러 발생:', err);
@@ -263,44 +215,51 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
 }
 
 //queryString 제거 
-const NoqueryString = () => {
-    window.location.search && router.replace(window.location.pathname);
-};
+// const NoqueryString = () => {
+//     window.location.search && router.replace(window.location.pathname);
+// };
+
 
 //모달 열기 / 모달 창한개로 modalType으로 각각 불러옴 
-const ModalOpening = ({ isModalOpen : isModalOpenval, modalType : modalTypeval  }) => {
-    
-    modalType.value = modalTypeval;
-    isModalOpen.value = isModalOpenval; 
-    
+const ModalOpening = () => {
 
+    modalType.value = 'register';
+    isModalOpen.value = true; 
+    regeResign.value = !regeResign.value;
 }
 
+//등록후 리스트 다시 로드
+const searchlist = () => {
+    refetch();
+}
 
 //모달 닫기 
 const closeModal = (val) => {
   isModalOpen.value = val;
-  personnelSearchList();
 };
 
 const closeCommonModal = (val) => {
     CommonModal.value = val;
-    personnelSearchList();
+    refetch();
 }
 
 
-onMounted(() => {
-    console.log('쿼리 값:', route.query);
-    personnelSearchList();
-    NoqueryString();
-});
-
-watch(() => route.query, () => {
-    cPage.value = 1;
-    personnelSearchList();
-});
+// onMounted(() => {
+//     console.log('쿼리 값:', route.query);
+//     personnelSearchList();
+//     NoqueryString();
+// });
 
 computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
+
+//provide를 쓰더라도 결국 cPage옵션을 바꿀려면 어쩔수 없음 
+watch(
+  () => EmployeesearchParams.value,
+  () => {
+    cPage.value = 1;
+  },
+  { deep: true }
+);
 
 </script>
 
@@ -308,27 +267,36 @@ computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
 
     <!-- 사원 검색 바  -->
     <EmployeeSearchBar
-
+        @ModalOpening="ModalOpening"
         @EmplStatus="GetEmplStatus"
-        @OnEmplStatus="OnEmplStatus"
-        @ModalOpening="ModalOpening($event)"
     />
 
-    <!-- 공통 모달  -->
+    <!-- 공통 모달  
+     modalType 등록인지 수정인지 변수
+     employeeId 각 고유값 및 jobGradeCode와 mapper에 필요한 변수
+     isModalOpen 열기 닫기 관리하는 boolean 값 
+
+    CommonModal 퇴직 창 열기, 닫기 
+    employeeForm를 search바에서 가져오기 떄문에 기본 초기값을 상위에서 정해주고 
+    하위에 값을 보내는 형태로
+    -->
     <div v-show="isModalOpen">
         <EmployeeModal 
 
         :modalType="modalType"
+        :employeeId="employeeId"
+        :jobGradeCode="jobGradeCode"
+        :isModalOpen="isModalOpen"
+
         :CommonModal="CommonModal"
         :UserDetail="UserDetail"
-        :employeeDetail="employeeDetail"
-        :imgUrl="imgUrl"
-        :isModalOpen="isModalOpen"
+        :regeResign="regeResign"
 
         @closeModal="closeModal"
         @update-retire-info="handleRetireInfo"
         @OpenRetireModal="OpenRetireModal"
         @closeCommonModal="closeCommonModal"
+        @searchlist="searchlist"
 
         />
     </div> 
@@ -350,7 +318,7 @@ computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
         </thead>
 
         <tr
-            v-for="personnel in personnelList.employeeList"
+            v-for="personnel in personnelList?.employeeList"
             :key="personnel.employeeId"
             @click="() => checkPerson(personnel)"
         >
@@ -373,7 +341,7 @@ computed(() => UserDetail.value.detail?.employeeName || "이름 없음");
         :totalItems="personnelList?.employeeCnt"
         :items-per-page="5"
         :max-pages-shown="5"
-        :onClick="personnelSearchList"
+        :onClick="refetch"
         v-model="cPage"
     />
 </template>

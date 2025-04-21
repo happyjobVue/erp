@@ -195,10 +195,10 @@ onMounted(() => {
   
             <div class="btn_areaC mt30">
               <a href="#" class="btnType blue"  @click.prevent="OnSignFist"
-              v-if="props.DetailRestatus == '검토 대기'"
+              v-if="props.DetailRestatus == '검토 대기' && userInfo.user.userType == 'A'"
               >승인</a>
               <a href="#" class="btnType blue"  @click.prevent="OnSignSecond"
-              v-if="props.DetailRestatus == '승인 대기'"
+              v-if="props.DetailRestatus == '승인 대기' && userInfo.user.userType == 'C'"
               >승인</a>
               <a href="#" class="btnType blue" @click.prevent="reject"
               v-if="props.DetailRestatus !== '취소' && props.DetailRestatus !== '반려' && props.DetailRestatus !== '승인'"
