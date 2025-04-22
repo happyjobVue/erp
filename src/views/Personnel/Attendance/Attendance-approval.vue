@@ -23,6 +23,8 @@ const DetailRestatus = ref('');
 
 const searchList = () => {
 
+    cPage.value = 1;
+
     //페이지 1로 초기화 
     const form = new URLSearchParams();
 
@@ -46,6 +48,34 @@ const searchList = () => {
         });
 };
 
+const PagesearchList = () => {
+
+//페이지 1로 초기화 
+const form = new URLSearchParams();
+
+form.append('searchNumber', searchNumber.value);
+form.append('searchName', searchName.value);
+form.append('searchStDate', searchStDate.value);
+form.append('searchEdDate', searchEdDate.value);
+form.append('searchReqStatus', searchReqStatus.value);
+
+form.append('pageSize', 5);
+form.append('currentPage', cPage.value);
+
+axios
+    .post(`/api/personnel/attendanceList.do`, form)
+    .then(res => {
+        console.log(res.data);
+        AttendanceList.value = res.data;
+    })
+    .catch(err => {
+        console.error('에러 발생:', err);
+    });
+};
+
+
+
+
 //modal에서 상위 컴포넌트 리스트 재조회 
 const ListSearch = () => {
     searchList();
@@ -63,12 +93,6 @@ const OpenApprovalModal = (id, status) => {
 const CloseModal = () => {
   visible.value = false;
 }
-
-watchEffect(() => {
-  if (searchName.value || searchStDate ||searchEdDate.value || searchReqStatus.value) {
-    cPage.value = 1;
-  }
-});
 
 onMounted(() => {
     searchList();
@@ -175,7 +199,7 @@ onMounted(() => {
                                 "
                                 :items-per-page="5"
                                 :max-pages-shown="5"
-                                :onClick="searchList"
+                                :onClick="PagesearchList"
                                 v-model="cPage"
                             />
                         </div>
