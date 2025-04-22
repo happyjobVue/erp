@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import AttendanceApprovalModal from '../../../components/page/personnel/Attendance/AttendanceApprovalModal.vue';
 
 const searchStDate = ref('');
@@ -22,6 +22,8 @@ const AttId = ref('');
 const DetailRestatus = ref('');
 
 const searchList = () => {
+
+    //페이지 1로 초기화 
     const form = new URLSearchParams();
 
     form.append('searchNumber', searchNumber.value);
@@ -62,6 +64,11 @@ const CloseModal = () => {
   visible.value = false;
 }
 
+watchEffect(() => {
+  if (searchName.value || searchStDate ||searchEdDate.value || searchReqStatus.value) {
+    cPage.value = 1;
+  }
+});
 
 onMounted(() => {
     searchList();
