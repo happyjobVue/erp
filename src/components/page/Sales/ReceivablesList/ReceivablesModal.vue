@@ -45,8 +45,8 @@
                                 <th scope="col">번호</th>
                                 <th scope="col">제품명</th>
                                 <th scope="col">수량</th>
-                                <th scope="col">공급가</th>
                                 <th scope="col">제품단가</th>
+                                <th scope="col">공급가</th>
                                 <th scope="col">공급합계</th>
                             </tr>
                         </thead>
@@ -57,9 +57,9 @@
                                         <td>{{ item.receivableId }}</td>
                                         <td td> {{ item.productName }}</td>
                                         <td td> {{ item.quantity }}</td>
-                                        <td td> {{ item.supplyPrice.toLocaleString('ko-KR') }}</td>
                                         <td td> {{ item.unitPrice.toLocaleString('ko-KR') }}</td>
-                                        <td td> {{ item.totalSupplyPrice.toLocaleString('ko-KR') }}</td>
+                                        <td td> {{ item.supplyPrice.toLocaleString('ko-KR') }}</td>
+                                        <td td> {{ (item.supplyPrice * 1.1).toLocaleString('ko-KR') }}</td>
                                     </tr>
                                 </template>
                             </template>
