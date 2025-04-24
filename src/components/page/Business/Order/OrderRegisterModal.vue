@@ -60,10 +60,8 @@ async function orderEstiDetailList(estiId) {
         orderEstiProductList.value = response.data.estimateDetail;
         orderEstimateList.value = '';
         orderEstimateCnt.value = '';
-
-        console.log(orderEstiProductList);
     } catch (error) {
-        console.error('Error fetching estimate details:', error);
+        alert('상품을 조회할 수 없습니다.');
     }
 }
 
@@ -90,7 +88,7 @@ async function saveOrder() {
         emit('postSuccess');
         closeModal();
     } catch (error) {
-        console.error('Error fetching estimate details:', error);
+        alert('수주를 작성할 수 없습니다.');
     }
 }
 

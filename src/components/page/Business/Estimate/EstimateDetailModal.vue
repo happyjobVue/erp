@@ -4,7 +4,6 @@ import { defineProps, onMounted, onUnmounted, ref } from 'vue';
 import { useModalStore } from '../../../../stores/modalState';
 const estimate = ref('');
 const estimateDetailData = ref([]);
-
 const client = ref('');
 const modalState = useModalStore();
 const props = defineProps({
@@ -36,7 +35,7 @@ async function estimateDetail() {
         estimateDetailData.value = response.data.estimateDetail;
         client.value = response.data.client;
     } catch (error) {
-        console.error('Error fetching estimate details:', error);
+        alert('데이터를 불러올 수 없습니다.');
     }
 }
 
@@ -44,10 +43,9 @@ async function updateEstimateDetail() {
     const param = {
         estimateId: props.estimateId,
         clientId: props.clientId,
-        estimateDeliveryDate: estimate.value.deliveryDate, // ✅ 수정
-        estimateSalesArea: estimate.value.salesArea, // ✅ 수정
+        estimateDeliveryDate: estimate.value.deliveryDate,
+        estimateSalesArea: estimate.value.salesArea,
         depositAmount: estimate.value.depositAmount,
-        // 리스트
         estimateList: estimateDetailData.value,
     };
 
@@ -78,8 +76,6 @@ const updateTotalEstimateAmount = () => {
 
 onMounted(() => {
     if (props.estimateId && props.clientId) {
-        console.log(props.estimateId);
-        console.log(props.clientId);
         estimateDetail();
     }
 });

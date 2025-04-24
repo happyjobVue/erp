@@ -1,6 +1,10 @@
 <script setup>
+import { provide, ref } from 'vue';
 import EstimateMain from '../../../components/page/Business/Estimate/EstimateMain.vue';
 import EstimateSearch from '../../../components/page/Business/Estimate/EstimateSearch.vue';
+
+const provideValue = ref();
+provide('selectValue', provideValue);
 </script>
 
 <template>
