@@ -39,7 +39,6 @@ const EmployeesearchParams = inject('EmployeesearchParams');
 
 //1. 인사 관리 리스트 조회  
 const personnelSearchList = async() => {
-    console.log('쿼리 값:', route.query);
 
     const param = {
         ...EmployeesearchParams.value,
@@ -53,7 +52,6 @@ const personnelSearchList = async() => {
                 'Content-Type': 'application/json', // JSON 형식으로 전송
             },
         })
-        console.log(result.data);
         return result.data;
 
 
@@ -71,7 +69,6 @@ const {data: personnelList, refetch} = useQuery ({
 const checkPerson = async (personnel) => {
     
     employeeId.value =  personnel.employeeId;
-    console.log(personnel.employeeId);
     jobGradeCode.value =  personnel.jobGradeCode;
     modalType.value = 'update';
     isModalOpen.value = true;
@@ -121,7 +118,6 @@ const Onretire = (personnel) => {
         })
         .then(res => {
             UserDetail.value = res.data;
-            console.log(UserDetail.value);
             isModalOpen.value = true;
         })
         .catch(err => {
@@ -149,7 +145,6 @@ const OpenRetireModal = (val, ComModal) => {
         })
         .then(res => {
             UserDetail.value = res.data;
-            console.log(UserDetail.value);
             isModalOpen.value = true;
         })
         .catch(err => {
@@ -161,7 +156,6 @@ const OpenRetireModal = (val, ComModal) => {
 
 //퇴직 처리 하기 
 const handleRetireInfo = (retireData) => {
-  console.log("퇴직 정보:", retireData);
 
   // 예: 개별로 꺼낼 수도 있음
   const { resignationReason, resignationDate, severancePay, salary, employeeId } = retireData;
@@ -182,7 +176,6 @@ const handleRetireInfo = (retireData) => {
     axios
         .post(`/api/personnel/emplStatusUpdate.do`, params)
         .then(res => {
-            console.log(res.data);
             alert('퇴직 되었습니다.');
             refetch();
             closeModal();
@@ -207,7 +200,6 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
         })
         .then(res => {
             valueName.value = res.data;
-            console.log(res.data);
         })
         .catch(err => {
             console.error('에러 발생:', err);

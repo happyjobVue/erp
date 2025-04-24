@@ -14,7 +14,6 @@ const cPage = ref(1);
 const PromotionsearchParams = inject('PromotionsearchParams');
 
 const PromotionSearchList = async () => {
-    console.log('쿼리 값:', route.query);
 
     const param = {
         ...PromotionsearchParams.value,
@@ -29,7 +28,6 @@ const PromotionSearchList = async () => {
             },
         });
 
-        console.log(result.data);
         return result.data;
 
     //AxiosRequest('promotionListBody',param ,PromotionList);
@@ -60,7 +58,6 @@ const AxiosRequest =  (UrlInfo, param) => {
 }
 
 function promotionSearch() {
-    console.log('🔍 검색 조건:', filters);
 }
 
 

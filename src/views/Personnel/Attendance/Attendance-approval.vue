@@ -40,7 +40,6 @@ const searchList = () => {
     axios
         .post(`/api/personnel/attendanceList.do`, form)
         .then(res => {
-            console.log(res.data);
             AttendanceList.value = res.data;
         })
         .catch(err => {
@@ -65,7 +64,6 @@ form.append('currentPage', cPage.value);
 axios
     .post(`/api/personnel/attendanceList.do`, form)
     .then(res => {
-        console.log(res.data);
         AttendanceList.value = res.data;
     })
     .catch(err => {
@@ -84,9 +82,6 @@ const ListSearch = () => {
 const OpenApprovalModal = (id, status) => {
     AttId.value = id;
     DetailRestatus.value = status;  
-
-    console.log(AttId);
-    console.log(DetailRestatus);
     visible.value = true;    
 }
 

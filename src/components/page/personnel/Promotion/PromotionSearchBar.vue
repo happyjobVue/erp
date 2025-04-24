@@ -21,8 +21,6 @@ const promotionSearch = () => {
     PromotionsearchParams.value.jobGrade = jobGrade.value;
     PromotionsearchParams.value.searchId = searchId.value;
 
-    console.log(PromotionsearchParams.value);
-
 };
 
 const departmentGroupList = [

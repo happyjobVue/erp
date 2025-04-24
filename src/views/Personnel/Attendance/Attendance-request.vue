@@ -62,20 +62,41 @@ const search = () => {
 
 }
 
+const Pagesearch = () => {
+
+const form = new URLSearchParams();
+
+form.append('searchStDate', searchStDate.value);
+form.append('searchEdDate', searchEdDate.value);
+form.append('searchReqType', searchReqType.value);
+form.append('searchReqStatus', searchReqStatus.value);
+
+form.append('pageSize', 5);
+form.append('currentPage', cPage.value);
+
+axios
+    .post(`/api/personnel/attendanceList.do`, form)
+    .then(res => {
+        console.log(res.data);
+        attendanceList.value = res.data;
+    })
+    .catch(err => {
+        console.error('에러 발생:', err);
+    });
+
+}
+
 //총 연차, 남은 연차, 사용연차 구하기 
 const anualLeave = () => {
 
     const form = new URLSearchParams();
 
     form.append('userIdx', userInfo.user.empId);
-    console.log(userInfo.user.empId);
 
     axios
         .post(`/api/personnel/attendanceCnt.do`,form)
         .then(res => {
-            console.log(res.data);
             summary.value = res.data.attendanceCnt[0];
-            console.log(summary.value.id);
         })
         .catch(err => {
             console.error('에러 발생:', err);
@@ -101,7 +122,6 @@ const reLoadCloseModal = (val) => {
 
 const AttendanceStatus = async (item) => {
   DetailAttendace.value = item.id;
-  console.log(DetailAttendace);
   visible.value = true;
   await nextTick() // 하위 컴포넌트가 렌더링된 다음 실행
   detailModalRef.value?.StatusAttendance(item.id);
@@ -165,7 +185,7 @@ onMounted(() => {
               <select v-model="searchReqStatus">
                 <option value="">전체</option>
                 <option value="검토 대기">검토 대기</option>
-                <option value="1차 승인">승인 대기</option>
+                <option value="승인 대기">승인 대기</option>
                 <option value="승인">승인</option>
                 <option value="반려">반려</option>
                 <option value="취소">취소</option>
@@ -260,7 +280,7 @@ onMounted(() => {
             :totalItems="attendanceList?.attendanceRequestCnt"
             :items-per-page="5"
             :max-pages-shown="5"
-            :onClick="search"
+            :onClick="Pagesearch"
             v-model="cPage"
          />
       </div>

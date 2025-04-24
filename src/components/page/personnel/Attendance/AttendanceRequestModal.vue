@@ -39,7 +39,6 @@ const UserDetail = () => {
             },
         })
         .then(res => {
-            console.log(res.data);
             form.value.deptName = res.data.loginInfo.detail_name;
             form.value.name = res.data.loginInfo.usr_nm;
             form.value.number = res.data.loginInfo.usr_idx ;
@@ -70,7 +69,6 @@ form.append('currentPage', 1);
 axios
     .post(`/api/personnel/attendanceList.do`, form)
     .then(res => {
-        console.log(res.data.attendanceList);
         attendanceList.value = res.data.attendanceList;
     })
     .catch(err => {
@@ -127,8 +125,6 @@ const submitForm = () => {
 
     const params = new URLSearchParams();
 
-    console.log(props.summary.leftAttCnt);
-    
     const leftAtt = props.summary.leftAttCnt;
     const edDate = new Date(form.value.reqEd);
     const StDate = new Date(form.value.reqSt);
@@ -149,7 +145,6 @@ const submitForm = () => {
         }else {
             reqDay.value = 0.5;
         }
-        console.log(reqDay);
     } 
 
     params.append('userIdx', userInfo.user.empId);
@@ -176,7 +171,6 @@ const submitForm = () => {
     axios
         .post(`/api/personnel/attendanceRequest.do`, params)
         .then(res => {
-            console.log(res.data);
             reLoadCloseModal();
         })
         .catch(err => {
@@ -193,13 +187,6 @@ const toDateOnly = (dateStr) => {
 const isOverlappingRange = (selectedStartDate, selectedEndDate, selectedName) => {
   const selectedStart = toDateOnly(selectedStartDate);
   const selectedEnd = toDateOnly(selectedEndDate);
-
-  console.log(attendanceList.value);
-
-  console.log(selectedStartDate);
-  console.log(selectedEndDate);
-  console.log(selectedName);
-
 
   return attendanceList.value.some(item => {
 
@@ -264,14 +251,11 @@ const DetailAttendance = (item) => {
 
     modalType.value = '수정'
 
-    console.log(item);
-
     params.append('id', item);
 
     axios
         .post(`/api/personnel/attendanceDetail.do`, params)
         .then(res => {
-            console.log(res.data);
             form.value.reqdate = res.data.detail.reqdate;
             form.value.reqSt = res.data.detail.reqSt;
             form.value.reqEd = res.data.detail.reqEd;
@@ -289,8 +273,6 @@ const DetailAttendance = (item) => {
             const diffInDays = diffInTime / (1000 * 60 * 60 * 24)  // 일수 변환
 
             form.value.reqDay = diffInDays + 1;
-
-            console.log(form.value.reqDay)
 
             attendanceDetail.value = res.data.detail;
             
@@ -329,8 +311,6 @@ const UpdateForm = () => {
     params.append('reqDay', form.value.reqDay);
     params.append('reqId', form.value.id);
 
-    console.log(form.value.id);
-
     const startDate = form.value.reqSt; // 사용자 선택 시작일
     const endDate = form.value.reqEd;   // 사용자 선택 종료일
     const selectedName = form.value.name;
@@ -344,7 +324,6 @@ const UpdateForm = () => {
     axios
         .post(`/api/personnel/attendanceUpdate.do`, params)
         .then(res => {
-            console.log(res.data);
             alert('수정 완료');
             reLoadCloseModal();
         })
@@ -361,12 +340,9 @@ const CancleForm = () => {
 
     params.append('reqId', form.value.id);
 
-    console.log(form.value.id);
-
     axios
         .post(`/api/personnel/attendanceCancle.do`, params)
         .then(res => {
-            console.log(res.data);
             alert('취소 완료');
             reLoadCloseModal();
         })

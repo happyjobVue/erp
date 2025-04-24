@@ -104,6 +104,7 @@ const searchDetail= async () => {
                     'Content-Type': 'application/json', // JSON 형식으로 전송
                 },
             });
+
         OntotalSalary(result.data.detail.employeeName);    
 
         return result.data.detail;  
@@ -128,7 +129,6 @@ const getFileImage = async () => {
 
       const blob = new Blob([res.data], { type: res.headers['content-type'] });
       imgUrl.value = URL.createObjectURL(blob);
-      console.log(imgUrl.value);
     })
     .catch(err => {
       console.error('이미지 요청 실패:', err);
@@ -155,7 +155,6 @@ axios
     .then(res => {
         employeeForm.value.salary = res.data.salaryList[0].salary;
         salary.value = employeeForm.value.salary;
-        console.log(employeeForm.value);
     })
     .catch(err => {
         console.error('에러 발생:', err);
@@ -174,7 +173,6 @@ const {data: queryData, isSuccess} = useQuery({
 watchEffect(() => {
     if(modalType.value !== 'register' && isSuccess && queryData.value ){
         employeeForm.value = { ...queryData.value };
-        console.log(employeeForm.value);
         address.value = employeeForm.value.address;
         addressCode.value = employeeForm.value.zipCode;
 
@@ -225,8 +223,6 @@ const OnRetire = () => {
         return;
     }
 
-    console.log(severancePay.value);
-
     if(severancePay.value <= 0 || severancePay.value > 100000000){
         alert('퇴직금을 확인해주십쇼');
         return;
@@ -247,7 +243,6 @@ const OnRetire = () => {
 //파일 업로드
 const handlerFile = e => {
     const fileInfo = e.target.files;
-    console.log(fileInfo);
     const fileInfoSplit = fileInfo[0].name.split('.');
     const fileExtension = fileInfoSplit[1].toLowerCase();
 
@@ -257,7 +252,6 @@ const handlerFile = e => {
         fileExtension === 'png'
     ) {
         imgUrl.value = URL.createObjectURL(fileInfo[0]);
-        console.log(imgUrl.value);
     }
     fileData.value = fileInfo[0];
 };
@@ -327,7 +321,6 @@ const saveEmployee = async() => {
 
     //연봉 계산
     calculateSalary();
-    console.log(salary.value);
 
     //생년월일 yyyy-mm-dd 형시기 아닐경우 리턴
     const birthday = employeeForm.value.birthday;
@@ -438,7 +431,6 @@ const {mutate: updateEmployeeMutate} = useMutation({
 const openDaumPostcode = () => {
     new window.daum.Postcode({
         oncomplete: function (data) {
-            console.log(data);
             address.value = data.address; // 선택한 주소를 input에 적용
             employeeForm.value.zipCode = data.sigunguCode;
         },
@@ -556,7 +548,6 @@ watch(
             resignationReason.value = '';
         if (newVal && newVal.detail && newVal.detail.employeeId) {
             NowemployeeId.value = newVal.detail.employeeId;
-            console.log(NowemployeeId.value);
             NowregDate.value = newVal.detail.regDate;
 
         }
@@ -570,7 +561,6 @@ watch(
     () => modalType.value,
     Type => {
         if (Type === 'register') {
-            console.log(employeeForm.value);
             employeeForm.value = {}; // 선택 사항 (초기화)
             address.value = '';
             addressCode.value = '';
@@ -962,7 +952,7 @@ onMounted(() => {
                                     />
                                 </td>
                                 <th style="width: 80px;">
-                                    재직구분 <span class="required">*</span>
+                                    재직구분
                                 </th>
                                 <td colspan="3" style="width: 230px;">
                                     <label

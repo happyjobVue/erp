@@ -36,8 +36,6 @@ const fetchCalendarData = async () => {
   
 
   const res = await axios.post('/api/personnel/attendanceCalendar.do');
-  console.log(res);
-
 
   const reqList = res.data.attendanceList
   const reqStDate = {}
@@ -106,15 +104,11 @@ const handleEventClick = async (info) => {
   const statusCode = info.event.extendedProps.statusCode
   const reqSt = info.event.startStr
 
-  console.log(statusCode);
-  console.log(reqSt);
-
   const form = new URLSearchParams();
   form.append('searchStDate', reqSt);
   form.append('req_status', statusCode);
 
   const res = await axios.post('/api/personnel/approveDetail.do', form)
-  console.log(res.data);
   detailList.value = res.data.attendanceList
   showModal.value = true
 }

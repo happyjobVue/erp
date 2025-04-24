@@ -30,16 +30,11 @@ const ApprovalInfo = () => {
 
     param.append('id', props.AttId);
     //유저타입 A,C냐 따라 다르게 보이기 하기 
-    console.log(userInfo.user.userType);
-    console.log(userInfo.user.empId);
-    console.log(props.DetailRestatus);
     reqId.value = props.AttId;
 
     axios
         .post(`/api/personnel/attendanceDetail.do`, param)
         .then(res => {
-            console.log(res.data);
-
             //따로 저장
             attendanceApprovalDetail.value = res.data.detail;
         })
@@ -57,14 +52,12 @@ const OnSignFist = () => {
   params.append('userIdx', userInfo.user.empId);
   params.append('appReason', ApprovalReason.value);
 
-  console.log(reqId.value);
 
 
   axios
       .post(`/api/personnel/attendanceFirstApprove.do`, params)
       .then(res => {
           ListSearch();
-          console.log(res.data);
           alert('승인되었습니다.');
           closeModal();
       })
@@ -82,14 +75,12 @@ const params = new URLSearchParams();
 params.append('reqId', reqId.value);
 params.append('userIdx', userInfo.user.empId);
 
-console.log(reqId.value);
 
 
 axios
     .post(`/api/personnel/attendanceSecondApprove.do`, params)
     .then(res => {
         ListSearch();
-        console.log(res.data);
         alert('승인되었습니다.');
         closeModal();
     })
@@ -103,7 +94,7 @@ axios
 //반려 
 const reject = () => {
 
-  if(ApprovalReason.value == ''){
+  if(attendanceApprovalDetail.value.appReason == ''){
     alert('사유란은 공란일 수 없습니다.');
     return;
   }
@@ -114,14 +105,11 @@ const reject = () => {
   params.append('userIdx', userInfo.user.empId);
   params.append('appReason', ApprovalReason.value);
 
-  console.log(reqId.value);
-
 
   axios
       .post(`/api/personnel/attendanceReject.do`, params)
       .then(res => {
           ListSearch();
-          console.log(res.data);
           alert('반려되었습니다.');
           closeModal();
       })

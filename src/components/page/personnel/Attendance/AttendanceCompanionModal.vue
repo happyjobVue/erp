@@ -16,12 +16,10 @@ const CompanionInfo = () => {
     const param = new URLSearchParams();
 
     param.append('id', props.AttIdInfo);
-    console.log(props.AttIdInfo);
 
     axios
         .post(`/api/personnel/attendanceDetail.do`, param)
         .then(res => {
-            console.log(res.data);
 
             //따로 저장
             attendanceDetail.value = res.data.detail;

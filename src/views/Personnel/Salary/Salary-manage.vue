@@ -18,7 +18,6 @@ const showDetail = ref(false);
 const selectedEmployeeName = ref('');
 
 const SalarySearchList = () => {
-    console.log('쿼리 값:', route.query);
 
     const param = {
         ...route.query,
@@ -35,7 +34,6 @@ const SalarySearchList = () => {
         })
         .then(res => {
             SalaryList.value = res.data;
-            console.log(SalaryList.value);
         })
         .catch(err => {
             console.error('에러 발생:', err);
@@ -59,7 +57,6 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
         })
         .then(res => {
             valueName.value = res.data;
-            console.log(valueName.value);
         })
         .catch(err => {
             console.error('에러 발생:', err);
@@ -71,8 +68,6 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
 //급여 계산
  const saveSalaryDate = (SalaryDate) => {
 
-        console.log(SalaryDate);
-
         if(confirm("급여 계산을 하시겠습니까?") && SalaryDate.length > 0){
 
             const params = new URLSearchParams();
@@ -81,7 +76,6 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
             axios
                 .post(`/api/personnel/salarySave.do`, params)
                 .then(res => {
-                    console.log(res.data);
                     SalarySearchList();
                 })
                 .catch(err => {
@@ -107,10 +101,8 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
     axios
         .post(`/api/personnel/paymentStatusUpdate.do`, params)
         .then(res => {
-            console.log(res.data);
             if (confirm("지급 하시겟습니까?")) {
             // 확인 누른 경우
-            console.log("지급 완료");
             SalarySearchList();
             } else {
             // 취소 누른 경우
@@ -126,9 +118,8 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
 //일괄 지급 
   const allPaymentStatusUpdate = (searchMonth) => {
 
-    console.log(searchMonth)
-    console.log(route.query.searchPaymentMonth)
     if (confirm("일괄 지급 하시겟습니까?")) {
+
         if(SalaryList.value.salaryList.length > 0 && route.query.searchPaymentMonth === searchMonth){
             const params = new URLSearchParams();
 
@@ -137,8 +128,8 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
             axios
                 .post(`/api/personnel/allPaymentStatusUpdate.do`, params)
                 .then(res => {
-                    console.log(res.data);
-                    SalarySearchList();
+                  alert("지급 완료");
+                  SalarySearchList();
                 })
                 .catch(err => {
                     console.error('에러 발생:', err);
@@ -146,8 +137,9 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
         }else {
             alert("급여 연월을 검색후 진행주세요.");
         }
-    console.log("지급 완료");
-    SalarySearchList();
+
+        SalarySearchList();
+
     } else {
     // 취소 누른 경우
     console.log("error");
@@ -179,7 +171,6 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
         })
         .then(res => {
             DetailSalaryList.value = res.data;
-            console.log(SalaryList.value);
             showDetail.value = true;
         })
         .catch(err => {
@@ -206,7 +197,6 @@ const AxiosRequest =  (UrlInfo, param, valueName) => {
           })
           .then(res => {
               DetailSalaryList.value = res.data;
-              console.log(DetailSalaryList.value);
               showDetail.value = true;
           })
           .catch(err => {
