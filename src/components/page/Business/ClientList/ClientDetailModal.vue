@@ -42,7 +42,7 @@ const execDaumPostcode = () => {
             },
         }).open();
     } else {
-        console.error('Daum Postcode 스크립트가 로드되지 않았습니다.');
+        alert('다음 지도를 열 수 없습니다.');
     }
 };
 

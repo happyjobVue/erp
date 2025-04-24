@@ -80,7 +80,7 @@ const saveSalesPlan = () => {
         return;
     }
 
-    if (!selectedManufactureId.value || !selectedIndutryCode.value) {
+    if (!selectedIndutryCode.value) {
         alert('제조사를 선택해주세요.');
         return;
     }

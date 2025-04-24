@@ -35,7 +35,7 @@ async function estimateDetail() {
         estimateDetailData.value = response.data.estimateDetail;
         client.value = response.data.client;
     } catch (error) {
-        console.error('Error fetching estimate details:', error);
+        alert('데이터를 불러올 수 없습니다.');
     }
 }
 
